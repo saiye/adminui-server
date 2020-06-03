@@ -1,0 +1,21 @@
+<?php
+return [
+    'edit'=>'编辑',
+    'add'=>'添加',
+    'delete'=>'删除',
+    'affirm'=>'确认',
+    'cancel'=>'取消',
+    'yes'=>'是',
+    'no'=>'否',
+    'role_name'=>'角色名',
+    'role_id'=>'角色id',
+    'setting'=>'设置',
+    'lock'=>'锁定',
+    'unlock'=>'解锁',
+    'true'=>'正常',
+    'detail'=>'详情',
+    'recharge'=>'查看充值',
+    'info'=>'查看',
+    'abandon'=>'弃用',
+    'start_use'=>'启用',
+];

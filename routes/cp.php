@@ -1,0 +1,50 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::get('/user/login','Main\HomeController@getLogin')->name('cp-login');
+Route::post('/user/login','Main\HomeController@postLogin')->name('cp-dologin');
+Route::any('/user/logout','Main\HomeController@getLogout')->name('cp-logout');
+Route::get('/cant-access','Main\HomeController@getCantAccess')->name('cp-cantAccess');
+Route::get('/','Main\HomeController@getHome')->name('cp-home')->middleware('auth:cp');
+Route::get('/user/info', 'Main\HomeController@getUserInfo')->name('cp-getUserInfo')->middleware('auth:cp-api');
+Route::group([
+    'middleware' => ['auth:cp-api','rbac:cp-api','action.log:cp']
+   // 'middleware' => ['rbac:cp-api','action.log:cp']
+], function () {
+    //权限管理
+    Route::post('/main/sys/add-role', 'Main\SysController@postAddRole')->name('cp-doAddRole');
+    Route::get('/main/sys/edit-role', 'Main\SysController@getEditRole')->name('cp-editRole');
+    Route::post('/main/sys/edit-role', 'Main\SysController@postEditRole')->name('cp-doEditRole');
+    Route::post('/main/sys/del-role', 'Main\SysController@getDelRole')->name('cp-doDelRole');
+    Route::get('/main/sys/role-list', 'Main\SysController@getRoleList')->name('cp-roleList');
+    Route::get('/main/sys/del-role', 'Main\SysController@getDelRole')->name('cp-delRole');
+    Route::post('/main/sys/add-user', 'Main\SysController@postAddUser')->name('cp-doAddUser');
+    Route::get('/main/sys/add-user', 'Main\SysController@getAddUser')->name('cp-addUser');
+    Route::get('/main/sys/edit-user', 'Main\SysController@getEditUser')->name('cp-editUser');
+    Route::post('/main/sys/edit-user', 'Main\SysController@postEditUser')->name('cp-doEditUser');
+    Route::get('/main/sys/user-list', 'Main\SysController@getUserList')->name('cp-userList');
+    Route::any('/main/sys/lock-user', 'Main\SysController@getLockUser')->name('cp-lockUser');
+    Route::get('/main/sys/edit-act', 'Main\SysController@getEditAct')->name('cp-editAct');
+    Route::post('/main/sys/edit-act', 'Main\SysController@postEditAct')->name('cp-doEditAct');
+    //系统状态信息
+    Route::get('main/info/phpinfo', 'Main\InfoController@getPhpInfo')->name('cp-phpinfo');
+    Route::any('main/info/probe', 'Main\InfoController@getProbe')->name('cp-getProbe');
+    Route::get('main/info/clear-cache', 'Main\InfoController@getClearCache')->name('cp-clearCache');
+    //日志管理
+    Route::get('main/log/error', 'Main\LogController@getError')->name('cp-error');
+    Route::get('main/log/log-list', 'Main\LogController@getLog')->name('cp-log');
+    Route::get('main/log/action-log-list', 'Main\LogController@getActionLog')->name('cp-actionLog');
+    Route::get('main/log/api-action-log', 'Main\LogController@getApiActionLog')->name('cp-apiActionLog');
+    Route::get('main/log/login-log-list', 'Main\LogController@getLoginLog')->name('cp-loginLog');
+    //系统设置
+    Route::get('main/setting/list', 'Main\SettingController@getList')->name('cp-setList');
+    Route::get('main/setting/add', 'Main\SettingController@getAdd')->name('cp-setAdd');
+    Route::post('main/setting/add', 'Main\SettingController@postAdd')->name('cp-doSetAdd');
+    Route::get('main/setting/edit', 'Main\SettingController@getEdit')->name('cp-setEdit');
+    Route::post('main/setting/edit', 'Main\SettingController@postEdit')->name('cp-doSetEdit');
+    //测试功能
+    Route::get('test/image/list', 'Test\ImageController@getList')->name('cp-imageList');
+    Route::post('main/image/add', 'Test\ImageController@add')->name('cp-imageDoAdd');
+});
+Route::get('/test/home','Test\ImageController@index')->name('cp-test-home');
