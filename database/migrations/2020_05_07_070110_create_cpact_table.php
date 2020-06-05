@@ -16,7 +16,7 @@ class CreateCpactTable extends Migration
         Schema::create('cp_acts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('act')->comment('权限路由');
-            $table->integer('role_id')->comment('角色id');
+            $table->unsignedInteger('role_id')->comment('角色id');
             $table->timestamps();
         });
     }

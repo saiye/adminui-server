@@ -65,15 +65,4 @@ class ImageController extends BaseController
         return Redirect::to(route('cp-imageList'));
     }
 
-    public function index()
-    {
-       // $user = Auth::guard('cp')->login(1)->user();
-        //Auth::login($user);
-      //  $menus = $user->roleMenu();
-       // $act = explode('/', request()->path());
-       // $assign = compact('menus', 'act');
-        return $this->view('home');
-    }
-
-
 }

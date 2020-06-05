@@ -2,15 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user/login','Main\HomeController@getLogin')->name('cp-login');
-Route::post('/user/login','Main\HomeController@postLogin')->name('cp-dologin');
-Route::any('/user/logout','Main\HomeController@getLogout')->name('cp-logout');
-Route::get('/cant-access','Main\HomeController@getCantAccess')->name('cp-cantAccess');
-Route::get('/','Main\HomeController@getHome')->name('cp-home')->middleware('auth:cp');
+Route::get('/user/login', 'Main\HomeController@getLogin')->name('cp-login');
+Route::post('/user/login', 'Main\HomeController@postLogin')->name('cp-dologin');
+Route::any('/user/logout', 'Main\HomeController@getLogout')->name('cp-logout');
+Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('cp-cantAccess');
+Route::get('/', 'Main\HomeController@getHome')->name('cp-home')->middleware('auth:cp');
 Route::get('/user/info', 'Main\HomeController@getUserInfo')->name('cp-getUserInfo')->middleware('auth:cp-api');
 Route::group([
-    'middleware' => ['auth:cp-api','rbac:cp-api','action.log:cp']
-   // 'middleware' => ['rbac:cp-api','action.log:cp']
+    'middleware' => ['auth:cp-api', 'rbac:cp-api', 'action.log:cp']
+    // 'middleware' => ['rbac:cp-api','action.log:cp']
 ], function () {
     //权限管理
     Route::post('/main/sys/add-role', 'Main\SysController@postAddRole')->name('cp-doAddRole');
@@ -43,8 +43,14 @@ Route::group([
     Route::post('main/setting/add', 'Main\SettingController@postAdd')->name('cp-doSetAdd');
     Route::get('main/setting/edit', 'Main\SettingController@getEdit')->name('cp-setEdit');
     Route::post('main/setting/edit', 'Main\SettingController@postEdit')->name('cp-doSetEdit');
-    //测试功能
-    Route::get('test/image/list', 'Test\ImageController@getList')->name('cp-imageList');
-    Route::post('main/image/add', 'Test\ImageController@add')->name('cp-imageDoAdd');
+    //商户管理
+    Route::post('company/Index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');
+    Route::post('company/Index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');
+    Route::post('company/Index/checkCompany', 'Company\IndexController@checkCompany')->name('cp-checkCompany');
+    //门店管理
+    Route::post('store/Index/storeList', 'Store\IndexController@storeList')->name('cp-storeList');
+    Route::post('store/Index/addStore', 'Store\IndexController@addStore')->name('cp-addStore');
+    Route::post('store/Index/checkStore', 'Store\IndexController@checkStore')->name('cp-checkStore');
+
+
 });
-Route::get('/test/home','Test\ImageController@index')->name('cp-test-home');
