@@ -23,7 +23,7 @@ class Rbac
     {
         $user = Auth::guard($guard)->user();
         if (!$user) {
-            return $this->errorJson('你还没登录', 1001);
+            return $this->errorJson('你还没登录', 50008);
         }
         //登录后进行rbac权限判断
         if (!$this->rbac($request, $user, $guard)) {

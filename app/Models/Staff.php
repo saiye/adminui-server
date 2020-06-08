@@ -5,10 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 class Staff extends Model
 {
     public  $primaryKey='staff_id';
-    public   $timestamps=false;
     protected $table = 'staff';
 
     protected $guarded = [
-        'company_id'
+        'staff_id'
+    ];
+
+    protected $hidden = [
+        'password','api_token',
     ];
 }

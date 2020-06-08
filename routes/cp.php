@@ -9,8 +9,7 @@ Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('cp-cantAc
 Route::get('/', 'Main\HomeController@getHome')->name('cp-home')->middleware('auth:cp');
 Route::get('/user/info', 'Main\HomeController@getUserInfo')->name('cp-getUserInfo')->middleware('auth:cp-api');
 Route::group([
-    'middleware' => ['auth:cp-api', 'rbac:cp-api', 'action.log:cp']
-    // 'middleware' => ['rbac:cp-api','action.log:cp']
+    'middleware' => ['auth:cp-api', 'rbac:cp-api', 'action.log:cp-api']
 ], function () {
     //权限管理
     Route::post('/main/sys/add-role', 'Main\SysController@postAddRole')->name('cp-doAddRole');
@@ -32,11 +31,10 @@ Route::group([
     Route::any('main/info/probe', 'Main\InfoController@getProbe')->name('cp-getProbe');
     Route::get('main/info/clear-cache', 'Main\InfoController@getClearCache')->name('cp-clearCache');
     //日志管理
-    Route::get('main/log/error', 'Main\LogController@getError')->name('cp-error');
+    Route::post('main/log/error', 'Main\LogController@getError')->name('cp-error');
     Route::get('main/log/log-list', 'Main\LogController@getLog')->name('cp-log');
-    Route::get('main/log/action-log-list', 'Main\LogController@getActionLog')->name('cp-actionLog');
-    Route::get('main/log/api-action-log', 'Main\LogController@getApiActionLog')->name('cp-apiActionLog');
-    Route::get('main/log/login-log-list', 'Main\LogController@getLoginLog')->name('cp-loginLog');
+    Route::post('main/log/action-log-list', 'Main\LogController@getActionLog')->name('cp-actionLog');
+
     //系统设置
     Route::get('main/setting/list', 'Main\SettingController@getList')->name('cp-setList');
     Route::get('main/setting/add', 'Main\SettingController@getAdd')->name('cp-setAdd');
@@ -47,6 +45,7 @@ Route::group([
     Route::post('company/Index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');
     Route::post('company/Index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');
     Route::post('company/Index/checkCompany', 'Company\IndexController@checkCompany')->name('cp-checkCompany');
+    Route::post('company/Index/getState', 'Company\IndexController@getState')->name('cp-getState');
     //门店管理
     Route::post('store/Index/storeList', 'Store\IndexController@storeList')->name('cp-storeList');
     Route::post('store/Index/addStore', 'Store\IndexController@addStore')->name('cp-addStore');

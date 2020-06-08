@@ -6,9 +6,9 @@ use App;
 
 trait BaseTrait
 {
-    public function successJson($data, $message = '')
+    public function successJson($data, $message = '',$code=1)
     {
-        return response()->json(['message' => $message, 'code' => 1, 'data' => $data], 200);
+        return response()->json(['message' => $message, 'code' =>$code, 'data' => $data], 200);
     }
 
     public function isTest()
@@ -16,7 +16,7 @@ trait BaseTrait
         return App::environment() == 'testing';
     }
 
-    public function errorJson($message, $code = 2, $data = [], $status = 200)
+    public function errorJson($message, $code = 10001, $data = [], $status = 200)
     {
         if (!empty($data)) {
             $message = $this->validatorMessage($data);

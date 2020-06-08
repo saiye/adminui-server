@@ -27,12 +27,12 @@ class LogController extends Controller
         $file_path = $this->_get_path();
         $data = array();
         foreach (glob($file_path.DIRECTORY_SEPARATOR.'*.log') as $file){
-            $data[$file]=basename($file);
+            array_push($data,[
+               'file'=> basename($file)
+            ]);
         }
-        if(empty($data)){
-            return $this->errorJson('无日志文件！');
-        }
-        $assign = compact('data');
+        $total=count($data);
+        $assign = compact('data','total');
         return $this->successJson($assign);
     }
 
@@ -49,7 +49,7 @@ class LogController extends Controller
         else
             $content='';
         $assign = compact('content');
-        return $this->view('main.log.log',$assign);
+        return $this->successJson($assign);
     }
 
     public function getActionLog(){
@@ -59,42 +59,9 @@ class LogController extends Controller
         }
         $data=$data->orderBy('id','desc')->paginate(30)->appends($this->req->except('page'));
         $assign=compact('data');
-        return $this->view('main.log.action_log',$assign);
+        return $this->successJson($assign);
     }
 
-    public function getApiActionLog(){
-        $data= new ApiActionLog();
-        if($this->req->ip){
-            $data=$data->whereIp($this->req->ip);
-        }
-        if($this->req->uri){
-            $data=$data->whereUri($this->req->uri);
-        }
-        if($this->req->date_start){
-            $data=$data->where('date','>=',$this->req->date_start);
-        }
-        if($this->req->date_end){
-            $data=$data->where('date','<=',$this->req->date_end);
-        }
-        $data=$data->orderBy('id','desc')->paginate(30)->appends($this->req->except('page'));
-        $assign=compact('data');
-        return $this->view('main.log.api_action_log',$assign);
-    }
-    public function getLoginLog(){
-        $data= new LoginLog();
-        if($this->req->user){
-            $data=$data->where('user','like','%'.$this->req->user.'%');
-        }
-        if($this->req->user_id){
-            $data=$data->whereUserId($this->req->user_id);
-        }
-        if($this->req->action_type){
-            $data=$data->whereActionType($this->req->action_type);
-        }
-        $data=$data->orderBy('id','desc')->paginate(30)->appends($this->req->except('page'));
-        $assign=compact('data');
-        return $this->view('main.log.login_log',$assign);
-    }
 
 }
 

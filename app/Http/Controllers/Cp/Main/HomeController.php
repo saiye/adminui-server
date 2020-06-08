@@ -14,7 +14,6 @@ use Redirect;
 use App\Models\CpUser;
 use Auth;
 use Route;
-use App\Events\LoginEvent;
 use Illuminate\Support\Str;
 
 class HomeController extends BaseController
@@ -73,7 +72,6 @@ class HomeController extends BaseController
     {
         $user = Auth::guard('cp-api')->user();
         if ($user) {
-            event(new LoginEvent($user, $this->req, 'loginout'));
             Auth::guard('cp')->logout();
         }
         return $this->successJson([], '退出登录成功!');

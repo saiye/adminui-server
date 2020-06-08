@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Middleware;
-
 use Closure;
 use Auth;
 use App\Events\ActionLogEvent;
@@ -19,7 +18,7 @@ class ActionLog
         //记录操作日志
         $user=Auth::guard($guard)->user();
         if($user){
-            //event(new ActionLogEvent($user,$request,$guard));
+            event(new ActionLogEvent($user,$request,$guard));
         }
         return $next($request);
     }
