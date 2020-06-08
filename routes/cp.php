@@ -51,6 +51,4 @@ Route::group([
     Route::post('store/Index/storeList', 'Store\IndexController@storeList')->name('cp-storeList');
     Route::post('store/Index/addStore', 'Store\IndexController@addStore')->name('cp-addStore');
     Route::post('store/Index/checkStore', 'Store\IndexController@checkStore')->name('cp-checkStore');
-
-
 });
