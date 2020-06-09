@@ -16,9 +16,9 @@ class CreateStoreTable extends Migration
         Schema::create('store', function (Blueprint $table) {
             $table->increments('store_id')->comment('店面id');
             $table->string('store_name', 30)->comment('店面名称');
-            $table->unsignedInteger('state_id')->comment('所在国家');
-            $table->unsignedInteger('province_id')->comment('所在省份');
-            $table->unsignedInteger('city_id')->comment('所在城市');
+            $table->unsignedInteger('province_id')->comment('所在省份id');
+            $table->unsignedInteger('city_id')->comment('所在城市id');
+            $table->unsignedInteger('region_id')->comment('所在地区id');
             $table->string('address')->comment('店面详细地址');
             $table->unsignedInteger('company_id')->index()->comment('所属商户，对应公司表id');
             $table->string('describe', 200)->nullable()->comment('店面描述');

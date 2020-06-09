@@ -46,6 +46,7 @@ Route::group([
     Route::post('company/Index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');
     Route::post('company/Index/checkCompany', 'Company\IndexController@checkCompany')->name('cp-checkCompany');
     Route::post('company/Index/getState', 'Company\IndexController@getState')->name('cp-getState');
+    Route::post('company/Index/areaList', 'Company\IndexController@areaList')->name('cp-areaList');
     //门店管理
     Route::post('store/Index/storeList', 'Store\IndexController@storeList')->name('cp-storeList');
     Route::post('store/Index/addStore', 'Store\IndexController@addStore')->name('cp-addStore');
