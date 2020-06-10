@@ -35,7 +35,13 @@ class IndexController extends Controller
         if ($this->req->status) {
             $data = $data->whereStatus($this->req->status);
         }
-        $data = $data->orderBy('company_id', 'desc')->paginate($this->req->input('limit',15))->appends($this->req->except('page'));
+        if($this->req->listDate){
+            $data = $data->whereBetween('created_at',$this->req->listDate);
+        }
+        if($this->req->real_name){
+            $data = $data->where('staff.real_name','like','%'.$this->req->real_name.'%')->leftJoin('staff', 'company.staff_id', '=', 'staff.staff_id');
+        }
+        $data = $data->orderBy('company.company_id', 'desc')->paginate($this->req->input('limit',15))->appends($this->req->except('page'));
         foreach ($data as &$v) {
             $v->state = $v->state();
         }
@@ -98,6 +104,7 @@ class IndexController extends Controller
             'phone' => $this->req->phone,
             'lock' => 1,
             'type' => 1,
+            'status'=>2,
             'company_id' => $company->company_id,
             'password' => Hash::make($this->req->password),
         ];
@@ -125,11 +132,13 @@ class IndexController extends Controller
         $validator = Validator::make($this->req->all(), [
             'company_id' => 'required|numeric',
             'check' => 'required|numeric',
+            'reason' => 'max:100',
         ], [
             'company_id.required' => '商户id不能为空',
             'company_id.numeric' => '商户id是一个数字',
             'check.required' => '审核状态必须',
             'check.numeric' => '审核状态是一个数字',
+            'reason.max' => '拒绝原因不能超过100字',
         ]);
         if ($validator->fails()) {
             //返回默认支付
@@ -137,11 +146,42 @@ class IndexController extends Controller
         }
         $success = Company::whereCompanyId($this->req->company_id)->update([
             'check' => $this->req->check,
+            'status'=>$this->req->check,
+            'reason'=>$this->req->input('reason','.'),
         ]);
         if ($success) {
-            return $this->successJson([], '操作成功', 3);
+            return $this->successJson([], '操作成功',3);
         }
         return $this->errorJson('审核失败！');
+    }
+
+
+    /**
+     * 禁封商家
+     */
+    public function lockCompany()
+    {
+        $validator = Validator::make($this->req->all(), [
+            'company_id' => 'required|numeric',
+            'status' => 'required|numeric|in:1,2',
+        ], [
+            'company_id.required' => '商户id不能为空',
+            'company_id.numeric' => '商户id是一个数字',
+            'status.required' => '禁封状态必须',
+            'status.numeric' => '禁封状态是一个数字',
+            'status.in' => '禁封状态取值有误!',
+        ]);
+        if ($validator->fails()) {
+            //返回默认支付
+            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
+        }
+        $success = Company::whereCompanyId($this->req->company_id)->update([
+            'status'=>$this->req->status
+        ]);
+        if ($success) {
+            return $this->successJson([], '操作成功',3);
+        }
+        return $this->errorJson('操作失败！');
     }
 
     public function getState()

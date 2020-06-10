@@ -48,7 +48,16 @@ class IndexController extends Controller
         if ($this->req->check) {
             $data = $data->whereCheck($this->req->check);
         }
-        $data = $data->orderBy('store_id', 'desc')->paginate($this->req->input('limit',15))->appends($this->req->except('page'));
+        if($this->req->listDate){
+            $data = $data->whereBetween('store.created_at',$this->req->listDate);
+        }
+        if($this->req->company_name){
+            $data=$data->where('company.company_name','like','%'.$this->req->company_name.'%')->leftJoin('company','store.company_id','=','company.company_id');
+        }
+        if($this->req->real_name){
+            $data=$data->where('staff.real_name','like','%'.$this->req->real_name.'%')->leftJoin('staff','store.staff_id','=','staff.staff_id');
+        }
+        $data = $data->orderBy('store.store_id', 'desc')->paginate($this->req->input('limit',15))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

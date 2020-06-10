@@ -38,7 +38,7 @@ class SysController extends BaseController
         if ($this->req->email) {
             $data = $data->where('email', 'like', '%' . $this->req->email . '%');
         }
-        $data = $data->paginate(10);
+        $data = $data->paginate($this->req->input('limit',15))->appends($this->req->except('page'));
 
         foreach ($data as &$v) {
             $v->role_name = $v->cpRole->role_name;

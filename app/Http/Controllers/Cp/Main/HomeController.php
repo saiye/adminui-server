@@ -59,7 +59,7 @@ class HomeController extends BaseController
                 ], '登录成功');
             }
         }
-        return $this->errorJson('用户名或密码错误!', 2, []);
+        return $this->errorJson('用户名或密码错误!', 3, []);
     }
 
     public function getLogin()

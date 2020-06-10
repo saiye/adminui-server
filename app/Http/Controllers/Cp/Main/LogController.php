@@ -28,7 +28,8 @@ class LogController extends Controller
         $data = array();
         foreach (glob($file_path.DIRECTORY_SEPARATOR.'*.log') as $file){
             array_push($data,[
-               'file'=> basename($file)
+               'file'=> basename($file),
+               'info'=> file_get_contents($file),
             ]);
         }
         $total=count($data);
@@ -40,8 +41,8 @@ class LogController extends Controller
        return base_path('storage'.DIRECTORY_SEPARATOR.'logs');
     }
 
-    public function getLog(Request $req){
-        $filename=$req->input('filename');
+    public function showLog(Request $req){
+        $filename=$req->input('title');
         $file_path = $this->_get_path();
         $file=$file_path.DIRECTORY_SEPARATOR.$filename;
         if(is_file($file))
@@ -57,7 +58,10 @@ class LogController extends Controller
         if($this->req->uri){
             $data=$data->whereUri($this->req->uri);
         }
-        $data=$data->orderBy('id','desc')->paginate(30)->appends($this->req->except('page'));
+        if($this->req->user){
+            $data=$data->whereUser($this->req->user);
+        }
+        $data=$data->orderBy('id','desc')->paginate($this->req->input('limit',15))->appends($this->req->except('page'));
         $assign=compact('data');
         return $this->successJson($assign);
     }

@@ -19,7 +19,7 @@ class CreateActionLogTable extends Migration
             $table->char('guard',10)->comment('guard');
             $table->ipAddress('ip')->comment('ip');
             $table->string('uri')->comment('请求地址');
-            $table->text('params')->comment('参数');
+            $table->longText('params')->comment('参数');
             $table->integer('user_id')->comment('uid');
             $table->char('user',50)->comment('uid');
             $table->char('http_type',10)->comment('http_type');

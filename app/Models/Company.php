@@ -16,7 +16,7 @@ class Company extends Model
 {
     public $primaryKey = 'company_id';
     protected $table = 'company';
-    protected $dateFormat = 'Y-m-d H:i:s';
+    //protected $dateFormat = 'Y-m-d H:i:s';
     protected $guarded = [
         'company_id'
     ];

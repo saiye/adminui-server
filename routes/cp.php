@@ -22,7 +22,7 @@ Route::group([
     Route::get('/main/sys/add-user', 'Main\SysController@getAddUser')->name('cp-addUser');
     Route::get('/main/sys/edit-user', 'Main\SysController@getEditUser')->name('cp-editUser');
     Route::post('/main/sys/edit-user', 'Main\SysController@postEditUser')->name('cp-doEditUser');
-    Route::get('/main/sys/user-list', 'Main\SysController@getUserList')->name('cp-userList');
+    Route::post('/main/sys/user-list', 'Main\SysController@getUserList')->name('cp-userList');
     Route::any('/main/sys/lock-user', 'Main\SysController@getLockUser')->name('cp-lockUser');
     Route::get('/main/sys/edit-act', 'Main\SysController@getEditAct')->name('cp-editAct');
     Route::post('/main/sys/edit-act', 'Main\SysController@postEditAct')->name('cp-doEditAct');
@@ -32,7 +32,7 @@ Route::group([
     Route::get('main/info/clear-cache', 'Main\InfoController@getClearCache')->name('cp-clearCache');
     //日志管理
     Route::post('main/log/error', 'Main\LogController@getError')->name('cp-error');
-    Route::get('main/log/log-list', 'Main\LogController@getLog')->name('cp-log');
+    Route::post('main/log/show', 'Main\LogController@showLog')->name('cp-showLog');
     Route::post('main/log/action-log-list', 'Main\LogController@getActionLog')->name('cp-actionLog');
 
     //系统设置
@@ -45,6 +45,7 @@ Route::group([
     Route::post('company/Index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');
     Route::post('company/Index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');
     Route::post('company/Index/checkCompany', 'Company\IndexController@checkCompany')->name('cp-checkCompany');
+    Route::post('/company/Index/lockCompany', 'Company\IndexController@lockCompany')->name('cp-lockCompany');
     Route::post('company/Index/getState', 'Company\IndexController@getState')->name('cp-getState');
     Route::post('company/Index/areaList', 'Company\IndexController@areaList')->name('cp-areaList');
     //门店管理
