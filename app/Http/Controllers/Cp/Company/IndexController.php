@@ -95,7 +95,7 @@ class IndexController extends Controller
         $data['state_id'] = $this->req->state_id;
         $data['proportion'] = $this->req->proportion;
         $company = Company::create($data);
-        $company->save();
+
         //联系人入库
         $staff = [
             'account' => $this->req->account,
@@ -104,17 +104,15 @@ class IndexController extends Controller
             'phone' => $this->req->phone,
             'lock' => 1,
             'type' => 1,
-            'status'=>2,
             'company_id' => $company->company_id,
             'password' => Hash::make($this->req->password),
         ];
         $staffObj = Staff::create($staff);
-        $isStaff = $staffObj->save();
         //更新商户表
         $company->staff_id = $staffObj->staff_id;
         $isCompany = $company->save();
 
-        if ($isCompany and $isStaff) {
+        if ($company and $staffObj and  $isCompany ) {
             DB::commit();
             return $this->successJson([], '操作成功');
         } else {
@@ -150,7 +148,7 @@ class IndexController extends Controller
             'reason'=>$this->req->input('reason','.'),
         ]);
         if ($success) {
-            return $this->successJson([], '操作成功',3);
+            return $this->successJson([], '操作成功');
         }
         return $this->errorJson('审核失败！');
     }
@@ -179,7 +177,7 @@ class IndexController extends Controller
             'status'=>$this->req->status
         ]);
         if ($success) {
-            return $this->successJson([], '操作成功',3);
+            return $this->successJson([], '操作成功');
         }
         return $this->errorJson('操作失败！');
     }
@@ -188,7 +186,7 @@ class IndexController extends Controller
     {
         $data = Config::get('deploy.state');
         $assign = compact('data');
-        return $this->successJson($assign, '操作成功');
+        return $this->successJson($assign);
     }
 
     public function areaList()
@@ -215,7 +213,7 @@ class IndexController extends Controller
             ]);
         }
         $assign = compact('data');
-        return $this->successJson($assign, '操作成功');
+        return $this->successJson($assign);
     }
 }
 

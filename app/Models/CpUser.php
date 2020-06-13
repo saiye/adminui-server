@@ -1,14 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: chenyuansai
- * Email:714433615@qq.com
- * Date: 2018/4/25
- * Time: 17:04
- */
 
 namespace App\Models;
 
+use App\TraitInterface\ModelDataFormat;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Config;

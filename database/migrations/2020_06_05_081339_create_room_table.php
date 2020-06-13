@@ -16,16 +16,13 @@ class CreateRoomTable extends Migration
         Schema::create('room', function (Blueprint $table) {
             $table->increments('room_id')->comment('房间id');
             $table->string('room_name',30)->comment('房间名称');
-            $table->unsignedInteger('seats_num')->comment('座位数');
+            $table->tinyInteger('seats_num')->default(0)->comment('座位数');
+            $table->string('describe',150)->nullable()->comment('房间描述');
+            $table->unsignedInteger('billing_id')->comment('计费模式');
+            $table->tinyInteger('is_use')->default(2)->comment('是否使用1是，2否');
+            $table->unsignedInteger('use_time')->default(0)->comment('开始使用的时间点');
             $table->unsignedInteger('store_id')->comment('所属店面');
-            $table->unsignedInteger('game_plank_id')->comment('游戏板子id');
-            $table->tinyInteger('voice_type')->comment('声音类型');
-            $table->tinyInteger('desk_sort')->comment('桌子排序');
-            $table->string('description',150)->nullable()->comment('房间描述');
-            $table->tinyInteger('mode')->comment('胜负模式');
-            $table->tinyInteger('card')->comment('明牌暗牌');
-            $table->tinyInteger('sergeant')->comment('竞选警长');
-            $table->json('time_set')->comment('时间设置json');
+            $table->unsignedInteger('company_id')->default(0)->comment('所属公司id');
             $table->timestamps();
         });
     }

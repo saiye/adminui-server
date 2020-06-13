@@ -9,10 +9,12 @@
 
 namespace App\Models;
 
+use App\TraitInterface\ModelDataFormat;
 use Illuminate\Database\Eloquent\Model;
 
 class LoginLog extends Model
 {
+    use ModelDataFormat;
     public   $timestamps=false;
     protected $guarded = [
         'id'

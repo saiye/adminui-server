@@ -52,7 +52,7 @@ class IndexController extends Controller
     /**
      * 添加门店
      */
-    public function addStrff()
+    public function addStaff()
     {
         $validator = Validator::make($this->req->all(), [
             'account' => 'required|max:30',

@@ -42,14 +42,34 @@ Route::group([
     Route::get('main/setting/edit', 'Main\SettingController@getEdit')->name('cp-setEdit');
     Route::post('main/setting/edit', 'Main\SettingController@postEdit')->name('cp-doSetEdit');
     //商户管理
-    Route::post('company/Index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');
-    Route::post('company/Index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');
-    Route::post('company/Index/checkCompany', 'Company\IndexController@checkCompany')->name('cp-checkCompany');
-    Route::post('/company/Index/lockCompany', 'Company\IndexController@lockCompany')->name('cp-lockCompany');
-    Route::post('company/Index/getState', 'Company\IndexController@getState')->name('cp-getState');
-    Route::post('company/Index/areaList', 'Company\IndexController@areaList')->name('cp-areaList');
+    Route::post('company/index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');
+    Route::post('company/index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');
+    Route::post('company/index/checkCompany', 'Company\IndexController@checkCompany')->name('cp-checkCompany');
+    Route::post('/company/index/lockCompany', 'Company\IndexController@lockCompany')->name('cp-lockCompany');
+    Route::post('company/index/getState', 'Company\IndexController@getState')->name('cp-getState');
+    Route::post('company/index/areaList', 'Company\IndexController@areaList')->name('cp-areaList');
     //门店管理
-    Route::post('store/Index/storeList', 'Store\IndexController@storeList')->name('cp-storeList');
-    Route::post('store/Index/addStore', 'Store\IndexController@addStore')->name('cp-addStore');
-    Route::post('store/Index/checkStore', 'Store\IndexController@checkStore')->name('cp-checkStore');
+    Route::post('store/index/storeList', 'Store\IndexController@storeList')->name('cp-storeList');
+    Route::post('store/index/addStore', 'Store\IndexController@addStore')->name('cp-addStore');
+    Route::post('store/index/checkStore', 'Store\IndexController@checkStore')->name('cp-checkStore');
+
+    //新增会员
+    Route::post('game/index/userList', 'Game\IndexController@userList')->name('cp-GameUserList');
+    Route::post('game/index/addUser', 'Game\IndexController@addUser')->name('cp-GameAddUser');
+    Route::post('game/index/lockUser', 'Game\IndexController@lockUser')->name('cp-GameLockUser');
+    //订单管理
+    Route::post('order/index/orderList', 'Order\IndexController@orderList')->name('cp-GameOrderList');
+    Route::post('order/index/addOrder', 'Order\IndexController@addOrder')->name('cp-GameAddOrder');
+    //房间管理
+    Route::post('room/index/roomList', 'Room\IndexController@roomList')->name('cp-RoomList');
+    Route::post('room/index/addRoom', 'Room\IndexController@addRoom')->name('cp-addRoom');
+    Route::post('room/index/companyAndRoomList', 'Room\IndexController@companyAndRoomList')->name('cp-companyAndRoomList');
+    //设备管理
+    Route::post('room/device/deviceList', 'Room\DeviceController@deviceList')->name('cp-deviceList');
+    Route::post('room/device/addDevice', 'Room\DeviceController@addDevice')->name('cp-addDevice');
+    //计费管理
+    Route::post('room/billing/billingList', 'Room\BillingController@billingList')->name('cp-billingList');
+    Route::post('room/billing/addBilling', 'Room\BillingController@addBilling')->name('cp-addBilling');
+    Route::post('room/billing/billingConfig', 'Room\BillingController@billingConfig')->name('cp-billingConfig');
+
 });

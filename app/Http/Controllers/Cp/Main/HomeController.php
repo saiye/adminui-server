@@ -92,7 +92,7 @@ class HomeController extends BaseController
                 'avatar' => $user->avatar,
                 'email' => $user->email,
                 'role_id' => $user->role_id,
-            ], '成功获取用户信息!');
+            ]);
         }
         return $this->errorJson('抱歉!你没有登录，或登录过期！', 2, []);
     }

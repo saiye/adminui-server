@@ -3,11 +3,13 @@
 
 namespace App\Models;
 
+use App\TraitInterface\ModelDataFormat;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Image extends Model
 {
+    use ModelDataFormat;
 
     /**
      * The attributes that are mass assignable.
