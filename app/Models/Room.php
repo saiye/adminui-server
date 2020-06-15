@@ -33,7 +33,7 @@ class Room extends Model
 
     public function devices()
     {
-        return $this->hasMany('App\Models\Device', 'store_id', 'store_id');
+        return $this->hasMany('App\Models\Device', 'room_id', 'room_id');
     }
 
     public function getIsUseAttribute($value)

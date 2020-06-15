@@ -198,7 +198,6 @@ class IndexController extends Controller
             'parent_id.numeric' => 'parent_id一个数字',
         ]);
         if ($validator->fails()) {
-            //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
         $res = Area::whereParentId($this->req->parent_id)->get();

@@ -64,6 +64,8 @@ Route::group([
     Route::post('room/index/roomList', 'Room\IndexController@roomList')->name('cp-RoomList');
     Route::post('room/index/addRoom', 'Room\IndexController@addRoom')->name('cp-addRoom');
     Route::post('room/index/companyAndRoomList', 'Room\IndexController@companyAndRoomList')->name('cp-companyAndRoomList');
+    Route::post('room/index/editRoom', 'Room\IndexController@editRoom')->name('cp-editRoom');
+
     //设备管理
     Route::post('room/device/deviceList', 'Room\DeviceController@deviceList')->name('cp-deviceList');
     Route::post('room/device/addDevice', 'Room\DeviceController@addDevice')->name('cp-addDevice');
