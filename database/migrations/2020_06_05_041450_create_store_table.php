@@ -19,9 +19,10 @@ class CreateStoreTable extends Migration
             $table->unsignedInteger('province_id')->comment('所在省份id');
             $table->unsignedInteger('city_id')->comment('所在城市id');
             $table->unsignedInteger('region_id')->comment('所在地区id');
-            $table->string('address')->comment('店面详细地址');
+            $table->string('address',100)->comment('店面详细地址');
             $table->unsignedInteger('company_id')->index()->comment('所属商户，对应公司表id');
-            $table->string('describe', 200)->nullable()->comment('店面描述');
+            $table->string('describe', 100)->nullable()->comment('店面描述');
+            $table->string('reason', 100)->nullable()->comment('拒绝原因');
             $table->unsignedInteger('staff_id')->comment('店面联系人id，对应staff表id');
             $table->tinyInteger('check')->default(0)->comment('审核状态0未审核，1审核通过，2审核不通过');
             $table->timestamps();

@@ -16,6 +16,10 @@ class Company extends Model
         'company_id'
     ];
 
+    protected $casts = [
+      //  'company_id' => 'string',
+    ];
+
     public function staffs()
     {
         return $this->hasMany('App\Models\Staff', 'company_id', 'company_id');

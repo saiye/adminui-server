@@ -16,6 +16,12 @@ class Room extends Model
         'room_id'
     ];
 
+    protected $casts = [
+       // 'store_id' => 'string',
+       // 'company_id' => 'string',
+       // 'room_id' => 'string',
+    ];
+
     public function store()
     {
         return $this->hasOne('App\Models\Store', 'store_id', 'store_id');
@@ -33,7 +39,7 @@ class Room extends Model
 
     public function devices()
     {
-        return $this->hasMany('App\Models\Device', 'room_id', 'room_id');
+        return $this->hasMany('App\Models\Device', 'room_id', 'room_id')->orderBy('seat_num','asc');
     }
 
     public function getIsUseAttribute($value)

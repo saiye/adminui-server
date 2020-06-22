@@ -32,12 +32,13 @@ trait BaseTrait
                 if (is_array($su)) {
                     $msg .= $this->validatorMessage($su);
                 } else {
-                    $msg .= $su;
+                    $msg .= $su.',';
                 }
             }
             return $msg;
         }
         return $array;
     }
+
 
 }

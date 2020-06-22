@@ -35,17 +35,11 @@ Route::group([
     Route::post('main/log/show', 'Main\LogController@showLog')->name('cp-showLog');
     Route::post('main/log/action-log-list', 'Main\LogController@getActionLog')->name('cp-actionLog');
 
-    //系统设置
-    Route::get('main/setting/list', 'Main\SettingController@getList')->name('cp-setList');
-    Route::get('main/setting/add', 'Main\SettingController@getAdd')->name('cp-setAdd');
-    Route::post('main/setting/add', 'Main\SettingController@postAdd')->name('cp-doSetAdd');
-    Route::get('main/setting/edit', 'Main\SettingController@getEdit')->name('cp-setEdit');
-    Route::post('main/setting/edit', 'Main\SettingController@postEdit')->name('cp-doSetEdit');
     //商户管理
     Route::post('company/index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');
     Route::post('company/index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');
     Route::post('company/index/checkCompany', 'Company\IndexController@checkCompany')->name('cp-checkCompany');
-    Route::post('/company/index/lockCompany', 'Company\IndexController@lockCompany')->name('cp-lockCompany');
+    Route::post('company/index/lockCompany', 'Company\IndexController@lockCompany')->name('cp-lockCompany');
     Route::post('company/index/getState', 'Company\IndexController@getState')->name('cp-getState');
     Route::post('company/index/areaList', 'Company\IndexController@areaList')->name('cp-areaList');
     //门店管理
@@ -56,7 +50,23 @@ Route::group([
     //新增会员
     Route::post('game/index/userList', 'Game\IndexController@userList')->name('cp-GameUserList');
     Route::post('game/index/addUser', 'Game\IndexController@addUser')->name('cp-GameAddUser');
+    Route::post('game/index/editUser', 'Game\IndexController@editUser')->name('cp-GameEditUser');
     Route::post('game/index/lockUser', 'Game\IndexController@lockUser')->name('cp-GameLockUser');
+
+    //新增渠道
+    Route::post('game/channel/channelList', 'Game\ChannelController@channelList')->name('cp-GameChannelList');
+    Route::post('game/channel/addChannel', 'Game\ChannelController@addChannel')->name('cp-GameAddChannel');
+    Route::post('game/channel/editChannel', 'Game\ChannelController@editChannel')->name('cp-GameEditChannel');
+
+    //板子管理
+    Route::post('game/board/boardList', 'Game\BoardController@boardList')->name('cp-GameBoardList');
+    Route::post('game/board/addBoard', 'Game\BoardController@addBoard')->name('cp-GameAddBoard');
+    Route::post('game/board/editBoard', 'Game\BoardController@editBoard')->name('cp-GameEditBoard');
+
+    //工具类接口
+    Route::post('tool/image/upload', 'Tool\ImageController@upload')->name('cp-toolImageUpload');
+    Route::post('tool/image/delete', 'Tool\ImageController@delete')->name('cp-toolImageDelete');
+
     //订单管理
     Route::post('order/index/orderList', 'Order\IndexController@orderList')->name('cp-GameOrderList');
     Route::post('order/index/addOrder', 'Order\IndexController@addOrder')->name('cp-GameAddOrder');
@@ -73,5 +83,11 @@ Route::group([
     Route::post('room/billing/billingList', 'Room\BillingController@billingList')->name('cp-billingList');
     Route::post('room/billing/addBilling', 'Room\BillingController@addBilling')->name('cp-addBilling');
     Route::post('room/billing/billingConfig', 'Room\BillingController@billingConfig')->name('cp-billingConfig');
-
 });
+
+
+Route::any('client/checkDeviceBindStatus', 'Game\ClientController@checkDevice')->name('cp-checkDeviceBindStatus');
+
+Route::any('client/reqLogin', 'Game\ClientController@login')->name('cp-clientLogin');
+
+Route::any('client/queryDeviceRoomData', 'Game\ClientController@queryDeviceRoomData')->name('cp-clientQueryDeviceRoomData');

@@ -29,6 +29,7 @@ class ImageCut
 
     public function __construct($config)
     {
+        if($config)
         $this->config = $config;
     }
 

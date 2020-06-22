@@ -40,6 +40,9 @@ class Rbac
         if ($guard . '-cantAccess' == Route::currentRouteName()) {
             return true;
         }
+        if(in_array($user->role_id, [1])){
+            return true;
+        }
         //超级管理员，一般是开发者账号，直接跳过数据库权限判断
         $super_admin = Config::get('role.super_admin', []);
         if (in_array($user->user_name, $super_admin)) {

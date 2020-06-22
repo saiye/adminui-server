@@ -46,7 +46,7 @@ class IndexController extends Controller
             $data = $data->whereStaffId($this->req->staff_id);
         }
         if ($this->req->check) {
-            $data = $data->whereCheck($this->req->check);
+            $data = $data->whereIn('check',$this->req->check);
         }
         if($this->req->listDate){
             $data = $data->whereBetween('store.created_at',$this->req->listDate);
@@ -72,7 +72,7 @@ class IndexController extends Controller
             'area' => 'required|array',
             'address' => 'required|max:100',
             'company_id' => 'required',
-            'describe' => 'max:200',
+            'describe' => 'max:100',
             'account' => ['regex:/^[0-9A-Za-z]+$/', 'required', 'max:20', 'unique:staff,account'],
             'password' => 'required|max:100',
             'real_name' => 'required|max:100',
@@ -84,7 +84,7 @@ class IndexController extends Controller
             'store_name.max' => '门店名称最大长度30！',
             'area.required' => '所在地区，不能为空！',
             'area.array' => '所在地区，必须是个数组！',
-            'describe.max' => '店面描述不能超过200字！',
+            'describe.max' => '店面描述不能超过100字！',
             'address.required' => '地址，不能为空！',
             'address.max' => '地址最大长度100！',
             'account.required' => '账号，不能为空！',
@@ -159,7 +159,7 @@ class IndexController extends Controller
         $validator = Validator::make($this->req->all(), [
             'store_id' => 'required|numeric',
             'check' => 'required|numeric',
-
+            'reason' => 'max:100',
         ], [
             'store_id.required' => '商户id不能为空',
             'store_id.numeric' => '商户id是一个数字',
@@ -171,7 +171,8 @@ class IndexController extends Controller
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
         $success = Store::whereStoreId($this->req->store_id)->update([
-            'check' => $this->req->req->check,
+            'check' => $this->req->check,
+            'reason' => $this->req->reason??'',
         ]);
         if ($success) {
             return $this->successJson([], '操作成功');

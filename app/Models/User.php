@@ -19,6 +19,10 @@ class User extends Authenticatable
     ];
 
 
+    protected $casts = [
+       // 'id' => 'string',
+    ];
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -27,15 +31,4 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
     ];
-
-    public function getLockAttribute($value)
-    {
-        return Config::get('deploy.lock.'.$value);
-    }
-
-    public function getJudgeAttribute($value)
-    {
-        return Config::get('deploy.judge.'.$value);
-    }
-
 }

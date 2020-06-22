@@ -24,6 +24,7 @@ class CreateRoomTable extends Migration
             $table->unsignedInteger('use_time')->default(0)->comment('开始使用的时间点');
             $table->unsignedInteger('store_id')->comment('所属店面');
             $table->unsignedInteger('company_id')->default(0)->comment('所属公司id');
+            $table->unsignedInteger('dup_id')->default(1)->comment('游戏dup_id');
             $table->timestamps();
         });
     }

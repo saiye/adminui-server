@@ -14,6 +14,11 @@ class Store extends Model
         'store_id'
     ];
 
+    protected $casts = [
+       // 'store_id' => 'string',
+       // 'company_id' => 'string',
+    ];
+
     public function staff()
     {
         return $this->hasOne('App\Models\Staff', 'staff_id', 'staff_id');

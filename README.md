@@ -72,19 +72,6 @@ server
 
 }
 ```
-##前端页面编译
-
-```text
-前端基于node+webpack+vue+vue-router+element-ui技术
-cd project
-安装依赖
-npm install
-
-开发环境，无刷新，热重载启动
-npm run start
-
-生产环境
-npm run build
 
 ```
 
