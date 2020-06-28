@@ -32,7 +32,7 @@ class ChannelController extends Controller
 
         $validator = Validator::make($this->req->all(), [
             'channel_name' => 'required',
-            'gameSerAddr' => 'required|url',
+            'gameSrvAddr' => 'required|url',
             'loginCallBackAddr' => 'required|url',
         ], [
             'channel_name.required' => '渠道名称不能为空',
@@ -44,7 +44,7 @@ class ChannelController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误!',10001, $validator->errors()->toArray());
         }
-        $data = $this->req->only('channel_name', 'gameSerAddr', 'loginCallBackAddr');
+        $data = $this->req->only('channel_name', 'gameSrvAddr', 'loginCallBackAddr');
         $res = Channel::create($data);
         if ($res) {
             return $this->successJson('添加成功');

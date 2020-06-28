@@ -32,7 +32,7 @@ class CpUserTableSeeder extends Seeder
         if(!$hasuser){
             CpUser::create($data);
         }else{
-            CpUser::where('usern_ame','=',$data['user_name'])->update($data);
+            CpUser::where('user_name','=',$data['user_name'])->update($data);
         }
     }
 
