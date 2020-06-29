@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cp\Room;
 
+use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Company;
 use App\Models\Device;
@@ -35,7 +36,7 @@ class IndexController extends Controller
         if ($this->req->store_name) {
             $data = $data->where('store.store_name', 'like', '%' . $this->req->store_name . '%')->leftJoin('store', 'room.store_id', '=', 'store.company_id');
         }
-        $data = $data->orderBy('room.room_id', 'desc')->paginate($this->req->input('limit', 15))->appends($this->req->except('page'));
+        $data = $data->orderBy('room.room_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

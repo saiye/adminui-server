@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cp\Game;
 
+use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\GameBoard;
 use Illuminate\Validation\Rule;
@@ -26,7 +27,7 @@ class BoardController extends Controller
         if ($this->req->dup_id) {
             $data = $data->whereDupId($this->req->dup_id);
         }
-        $data = $data->orderBy('board_id', 'desc')->paginate($this->req->input('limit', 15))->appends($this->req->except('page'));
+        $data = $data->orderBy('board_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

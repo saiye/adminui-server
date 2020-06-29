@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
+use App\Constants\PaginateSet;
 
 /**
  *
@@ -41,7 +42,7 @@ class IndexController extends Controller
         if($this->req->real_name){
             $data = $data->where('staff.real_name','like','%'.$this->req->real_name.'%')->leftJoin('staff', 'company.staff_id', '=', 'staff.staff_id');
         }
-        $data = $data->orderBy('company.company_id', 'desc')->paginate($this->req->input('limit',15))->appends($this->req->except('page'));
+        $data = $data->orderBy('company.company_id', 'desc')->paginate($this->req->input('limit',PaginateSet::LIMIT))->appends($this->req->except('page'));
         foreach ($data as &$v) {
             $v->state = $v->state();
         }

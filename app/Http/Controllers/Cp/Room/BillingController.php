@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cp\Room;
 
+use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Billing;
 use Illuminate\Support\Facades\Config;
@@ -39,7 +40,7 @@ class BillingController extends Controller
         if ($this->req->price_type) {
             $data = $data->where('billing.price_type', $this->req->price_type);
         }
-        $data = $data->orderBy('billing.billing_id', 'desc')->paginate($this->req->input('limit', 15))->appends($this->req->except('page'));
+        $data = $data->orderBy('billing.billing_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

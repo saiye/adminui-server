@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cp\Staff;
 
+use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Staff;
 use Validator;
@@ -44,7 +45,8 @@ class IndexController extends Controller
         if ($this->req->store_id) {
             $data = $data->where('store_id', $this->req->store_id);
         }
-        $data = $data->orderBy('id', 'desc')->paginate(30)->appends($this->req->except('page'));
+        $limit=$this->req->input('limit',PaginateSet::LIMIT);
+        $data = $data->orderBy('id', 'desc')->paginate($limit)->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

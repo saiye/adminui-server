@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cp\Game;
 
+use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Device;
 use App\Models\PhysicsAddress;
@@ -28,7 +29,7 @@ class IndexController extends Controller
                 ->orWhere('nickname', 'like', '%' . $this->req->search_name . '%')
                 ->orWhere('email', 'like', '%' . $this->req->search_name . '%');
         }
-        $data = $data->orderBy('users.id', 'desc')->paginate($this->req->input('limit', 15))->appends($this->req->except('page'));
+        $data = $data->orderBy('users.id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

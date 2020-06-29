@@ -8,6 +8,7 @@
  */
 
 namespace App\Http\Controllers\Cp\Main;
+use App\Constants\PaginateSet;
 use App\Http\Controllers\Cp\BaseController;
 use App\Models\Setting;
 use Redirect;
@@ -29,7 +30,7 @@ class SettingController extends BaseController
         if($this->req->tid){
             $data=$data->whereTid($this->req->tid);
         }
-        $data=$data->orderBy('id','desc')->paginate(30)->appends($this->req->except('page'));
+        $data=$data->orderBy('id','desc')->paginate(PaginateSet::LIMIT)->appends($this->req->except('page'));
         $assign=compact('data');
         return $this->successJson($assign);
     }

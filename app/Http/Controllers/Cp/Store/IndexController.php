@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cp\Store;
 
+use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Staff;
 use App\Models\Store;
@@ -57,7 +58,7 @@ class IndexController extends Controller
         if($this->req->real_name){
             $data=$data->where('staff.real_name','like','%'.$this->req->real_name.'%')->leftJoin('staff','store.staff_id','=','staff.staff_id');
         }
-        $data = $data->orderBy('store.store_id', 'desc')->paginate($this->req->input('limit',15))->appends($this->req->except('page'));
+        $data = $data->orderBy('store.store_id', 'desc')->paginate($this->req->input('limit',  $limit=$this->req->input('limit',PaginateSet::LIMIT)))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

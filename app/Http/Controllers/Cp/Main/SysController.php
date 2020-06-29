@@ -9,6 +9,7 @@
 
 namespace App\Http\Controllers\Cp\Main;
 
+use App\Constants\PaginateSet;
 use App\Http\Controllers\Cp\BaseController;
 use App\Models\CpAct;
 use App\Models\CpRole;
@@ -38,7 +39,7 @@ class SysController extends BaseController
         if ($this->req->email) {
             $data = $data->where('email', 'like', '%' . $this->req->email . '%');
         }
-        $data = $data->paginate($this->req->input('limit',15))->appends($this->req->except('page'));
+        $data = $data->paginate($this->req->input('limit',PaginateSet::LIMIT))->appends($this->req->except('page'));
 
         foreach ($data as &$v) {
             $v->role_name = $v->cpRole->role_name;

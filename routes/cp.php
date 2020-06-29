@@ -91,3 +91,6 @@ Route::any('client/checkDeviceBindStatus', 'Game\ClientController@checkDevice')-
 Route::any('client/reqLogin', 'Game\ClientController@login')->name('cp-clientLogin');
 
 Route::any('client/queryDeviceRoomData', 'Game\ClientController@queryDeviceRoomData')->name('cp-clientQueryDeviceRoomData');
+
+Route::any('client/call', 'Game\ClientController@callLogin')->name('cp-callLogin');
+

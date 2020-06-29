@@ -20,7 +20,6 @@ class Device extends Model
     ];
 
 
-
     public function room(){
         return $this->hasOne('App\Models\Room', 'room_id','room_id');
     }

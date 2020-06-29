@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cp\Game;
 
+use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Channel;
 use Validator;
@@ -22,7 +23,7 @@ class ChannelController extends Controller
         if ($this->req->channel_id) {
             $data = $data->whereChannelId($this->req->channel_id);
         }
-        $data = $data->orderBy('channel_id', 'desc')->paginate($this->req->input('limit', 15))->appends($this->req->except('page'));
+        $data = $data->orderBy('channel_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }
@@ -32,12 +33,11 @@ class ChannelController extends Controller
 
         $validator = Validator::make($this->req->all(), [
             'channel_name' => 'required',
-            'gameSrvAddr' => 'required|url',
+            'gameSrvAddr' => 'required',
             'loginCallBackAddr' => 'required|url',
         ], [
             'channel_name.required' => '渠道名称不能为空',
-            'gameSerAddr.required' => '游戏服地址不能为空',
-            'gameSerAddr.url' => '游戏服地址，不是url',
+            'gameSrvAddr.required' => '游戏服地址不能为空',
             'loginCallBackAddr.required' => '登录回调地址不能为空',
             'loginCallBackAddr.url' => '登录回调地址，不是url',
         ]);
@@ -57,20 +57,19 @@ class ChannelController extends Controller
         $validator = Validator::make($this->req->all(), [
             'channel_id' => 'required',
             'channel_name' => 'required',
-            'gameSerAddr' => 'required|url',
+            'gameSrvAddr' => 'required',
             'loginCallBackAddr' => 'required|url',
         ], [
             'channel_id.required' => '渠道id不能为空',
             'channel_name.required' => '渠道名称不能为空',
-            'gameSerAddr.required' => '游戏服地址不能为空',
-            'gameSerAddr.url' => '游戏服地址，不是url',
+            'gameSrvAddr.required' => '游戏服地址不能为空',
             'loginCallBackAddr.required' => '登录回调地址不能为空',
             'loginCallBackAddr.url' => '登录回调地址，不是url',
         ]);
         if ($validator->fails()) {
             return $this->errorJson('参数错误!',10001, $validator->errors()->toArray());
         }
-        $data = $this->req->only('channel_name', 'gameSerAddr', 'loginCallBackAddr');
+        $data = $this->req->only('channel_name', 'gameSrvAddr', 'loginCallBackAddr');
         $res = Channel::whereChannelId($this->req->channel_id)->update($data);
         if ($res) {
             return $this->successJson('修改成功');

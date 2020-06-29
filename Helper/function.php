@@ -241,7 +241,7 @@ if (!function_exists("get_https_curl")) {
     }
 }
 if (!function_exists("post_curl")) {
-    function post_curl($url, $data, array $header)
+    function post_curl($url, $data, array $header=[])
     {
        $postData=is_array($data)?http_build_query($data):$data;
 

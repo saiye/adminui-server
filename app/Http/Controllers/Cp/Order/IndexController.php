@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cp\Order;
 
+use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Room;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +35,7 @@ class IndexController extends Controller
         if ($this->req->staff_id) {
             $data = $data->where('staff_id', $this->req->staff_id);
         }
-        $data = $data->orderBy('roder_id', 'desc')->paginate($this->req->input('limit', 15))->appends($this->req->except('page'));
+        $data = $data->orderBy('roder_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

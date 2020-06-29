@@ -9,6 +9,7 @@
 
 namespace App\Http\Controllers\Cp\Test;
 
+use App\Constants\PaginateSet;
 use App\Http\Controllers\Cp\BaseController;
 use App\Models\Image;
 use Redirect;
@@ -26,7 +27,7 @@ class ImageController extends BaseController
         if ($this->req->type) {
             $data = $data->whereType($this->req->type);
         }
-        $data = $data->orderBy('id', 'desc')->paginate(30)->appends($this->req->except('page'));
+        $data = $data->orderBy('id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->view('test.image.list', $assign);
     }
