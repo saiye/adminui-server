@@ -10,8 +10,6 @@ class Channel extends Model
     protected $table = 'channel';
     public   $timestamps=false;
 
-    protected $guarded = [
-        'channel_id'
-    ];
+
 
 }

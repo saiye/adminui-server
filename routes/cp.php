@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/user/login', 'Main\HomeController@getLogin')->name('cp-login');
 Route::post('/user/login', 'Main\HomeController@postLogin')->name('cp-dologin');
 Route::any('/user/logout', 'Main\HomeController@getLogout')->name('cp-logout');
@@ -85,12 +86,4 @@ Route::group([
     Route::post('room/billing/billingConfig', 'Room\BillingController@billingConfig')->name('cp-billingConfig');
 });
 
-
-Route::any('client/checkDeviceBindStatus', 'Game\ClientController@checkDevice')->name('cp-checkDeviceBindStatus');
-
-Route::any('client/reqLogin', 'Game\ClientController@login')->name('cp-clientLogin');
-
-Route::any('client/queryDeviceRoomData', 'Game\ClientController@queryDeviceRoomData')->name('cp-clientQueryDeviceRoomData');
-
-Route::any('client/call', 'Game\ClientController@callLogin')->name('cp-callLogin');
 

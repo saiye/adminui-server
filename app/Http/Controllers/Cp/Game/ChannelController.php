@@ -30,12 +30,15 @@ class ChannelController extends Controller
 
     public function addChannel()
     {
-
         $validator = Validator::make($this->req->all(), [
+            'channel_id' => 'required|numeric|min:1|max:300000',
             'channel_name' => 'required',
             'gameSrvAddr' => 'required',
             'loginCallBackAddr' => 'required|url',
         ], [
+            'channel_id.required' => '渠道id不能为空',
+            'channel_id.min' => '渠道id不能小于1',
+            'channel_id.max' => '渠道id不能大于30W',
             'channel_name.required' => '渠道名称不能为空',
             'gameSrvAddr.required' => '游戏服地址不能为空',
             'loginCallBackAddr.required' => '登录回调地址不能为空',
@@ -44,22 +47,39 @@ class ChannelController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误!',10001, $validator->errors()->toArray());
         }
-        $data = $this->req->only('channel_name', 'gameSrvAddr', 'loginCallBackAddr');
-        $res = Channel::create($data);
-        if ($res) {
-            return $this->successJson('添加成功');
+        return $this->doEditOrAddChannel();
+    }
+
+    private function doEditOrAddChannel(){
+        $data = $this->req->only('channel_id','channel_name', 'gameSrvAddr', 'loginCallBackAddr');
+        $hasChannel= Channel::whereChannelId($this->req->channel_id)->first();
+        if($hasChannel){
+            $res = Channel::whereChannelId($this->req->channel_id)->update($data);
+            if ($res) {
+                return $this->successJson('修改成功');
+            }
+            return $this->errorJson('修改失败!');
+        }else{
+            $res = Channel::insert($data);
+            if ($res) {
+                return $this->successJson('添加成功');
+            }
+            return $this->errorJson('添加失败!');
         }
-        return $this->errorJson('添加失败!');
     }
 
     public function editChannel()
     {
         $validator = Validator::make($this->req->all(), [
+            'channel_id' => 'required|numeric|min:1|max:300000',
             'channel_id' => 'required',
             'channel_name' => 'required',
             'gameSrvAddr' => 'required',
             'loginCallBackAddr' => 'required|url',
         ], [
+            'channel_id.required' => '渠道id不能为空',
+            'channel_id.min' => '渠道id不能小于1',
+            'channel_id.max' => '渠道id不能大于30W',
             'channel_id.required' => '渠道id不能为空',
             'channel_name.required' => '渠道名称不能为空',
             'gameSrvAddr.required' => '游戏服地址不能为空',
@@ -69,12 +89,7 @@ class ChannelController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误!',10001, $validator->errors()->toArray());
         }
-        $data = $this->req->only('channel_name', 'gameSrvAddr', 'loginCallBackAddr');
-        $res = Channel::whereChannelId($this->req->channel_id)->update($data);
-        if ($res) {
-            return $this->successJson('修改成功');
-        }
-        return $this->errorJson('修改失败!');
+        return $this->doEditOrAddChannel();
     }
 }
 

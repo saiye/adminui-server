@@ -43,20 +43,32 @@ class RouteServiceProvider extends ServiceProvider
     public function map()
     {
         $this->mapApiRoutes();
+
+        $this->mapClientRoutes();
+
+        $this->mapWxRoutes();
     }
 
-    /**
-     * Define the "api" routes for the application.
-     *
-     * These routes are typically stateless.
-     *
-     * @return void
-     */
+
     protected function mapApiRoutes()
     {
         //prefix('api')
         Route::middleware('cp')
-            ->namespace($this->namespace.'\\Cp')
+            ->namespace($this->namespace . '\\Cp')
             ->group(base_path('routes/cp.php'));
+    }
+
+    protected function mapClientRoutes()
+    {
+        Route::prefix('client')->middleware('client')
+            ->namespace($this->namespace . '\\Client')
+            ->group(base_path('routes/client.php'));
+    }
+
+    protected function mapWxRoutes()
+    {
+        Route::prefix('wx')->middleware('wx')
+            ->namespace($this->namespace . '\\Wx')
+            ->group(base_path('routes/wx.php'));
     }
 }
