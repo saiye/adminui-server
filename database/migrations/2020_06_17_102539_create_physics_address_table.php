@@ -16,6 +16,7 @@ class CreatePhysicsAddressTable extends Migration
         Schema::create('physics_address', function (Blueprint $table) {
             $table->id()->comment('设备短id');
             $table->string('physics_id',128)->index()->comment('设备物理地址');
+            $table->string('qrCodePath',100)->nullable()->comment('二维码地址');
         });
         DB::statement("ALTER TABLE physics_address AUTO_INCREMENT = 1000;");
     }

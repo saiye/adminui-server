@@ -3,8 +3,8 @@
 
 return [
     'wx'=>[
-        'AppId'=>'',
-        'AppSecret'=>'',
+        'AppId'=>env('AUTH2_WX_APPID',''),
+        'AppSecret'=>env('AUTH2_EX_APPSECRET',''),
     ],
 
 

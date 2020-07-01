@@ -6,5 +6,4 @@ namespace App\Constants;
 class CacheKey
 {
     const WX_ACCESS_TOKEN_KEY ='WX_ACCESS_TOKEN_KEY';
-    const WX_USER_KEY ='WX_ACCESS_TOKEN_KEY';
 }

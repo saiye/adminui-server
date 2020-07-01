@@ -20,6 +20,6 @@ class ErrorCode
     const  ACCOUNT_NOT_LOGIN = -11; //用户未登录
     const  THREE_ACCOUNT_NOT_LOGIN = -12; //第三方用户未登录，auth2 code验证失败
     const  CREATE_ACCOUNT_ERROR = -13; //创建用户失败
-    const  CREATE_ERCODE_ERROR = -14; //创建用户失败
+    const  CREATE_ERCODE_ERROR = -14; //二维码生成失败
     const  SUCCESS = 0; // 成功
 }
