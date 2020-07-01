@@ -77,10 +77,10 @@ if (!function_exists("get_between_date")) {
     {
         $start_time = is_numeric($start_date) ? $start_date : strtotime($start_date);
         $end_time = is_numeric($end_date) ? $end_date : strtotime($end_date);
-        if($start_time>$end_time){
-            $tem=$end_time;
-            $end_time=$start_time;
-            $start_time=$tem;
+        if ($start_time > $end_time) {
+            $tem = $end_time;
+            $end_time = $start_time;
+            $start_time = $tem;
         }
         if ($format == 'Y-m-d' or $format == 'Ymd') {
             $new_date = date('Y-m-d H:i:s', $start_time);
@@ -121,7 +121,7 @@ if (!function_exists("get_address")) {
     function get_address($ip)
     {
         static $qqwry = null;
-        if(class_exists('qqwry')){
+        if (class_exists('qqwry')) {
             if (is_null($qqwry))
                 $qqwry = new qqwry(storage_path() . '/qqwry.dat');
             return array_map(function ($address) {
@@ -132,17 +132,18 @@ if (!function_exists("get_address")) {
     }
 }
 if (!function_exists("isChinaIp")) {
-    function isChinaIp($ip){
-        $in=substr($ip,0,3);
-        if(in_array($in,['192','127'])){
+    function isChinaIp($ip)
+    {
+        $in = substr($ip, 0, 3);
+        if (in_array($in, ['192', '127'])) {
             return 0;
         }
-        $url='http://ip.taobao.com/service/getIpInfo.php?ip='.$ip;
-        $str=file_get_contents($url);
-        if($str){
-            $res=json_decode($str,true);
-            if(isset($res['code']) and $res['code']==0){
-                if($res['data']['country']=='中国'){
+        $url = 'http://ip.taobao.com/service/getIpInfo.php?ip=' . $ip;
+        $str = file_get_contents($url);
+        if ($str) {
+            $res = json_decode($str, true);
+            if (isset($res['code']) and $res['code'] == 0) {
+                if ($res['data']['country'] == '中国') {
                     return 1;
                 }
             }
@@ -180,7 +181,7 @@ if (!function_exists("makeSign")) {
 if (!function_exists("checkSign")) {
     function checkSign($data, $sign, $key)
     {
-        $tmpSign=makeSign($data,$key);
+        $tmpSign = makeSign($data, $key);
         return $tmpSign === $sign;
     }
 }
@@ -209,10 +210,10 @@ if (!function_exists("filterNull")) {
 }
 
 if (!function_exists("get_https_curl")) {
-    function get_https_curl($url, $data = '',array  $header)
+    function get_https_curl($url, $data = '', array $header)
     {
-        if(is_array($data)){
-            $data=http_build_query($data);
+        if (is_array($data)) {
+            $data = http_build_query($data);
         }
         $result = array();
         $curl = curl_init(); // 启动一个CURL会话
@@ -222,11 +223,11 @@ if (!function_exists("get_https_curl")) {
         curl_setopt($curl, CURLOPT_TIMEOUT, 10); // 设置超时限制防止死循环
         curl_setopt($curl, CURLOPT_HEADER, 0); // 显示返回的Header区域内容
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // 获取的信息以文件流的形式返回
-       curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-        if($header){
-            $headData=[];
-            foreach ($header as $k=>$d){
-                array_push($headData,$k.': '.$d);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+        if ($header) {
+            $headData = [];
+            foreach ($header as $k => $d) {
+                array_push($headData, $k . ': ' . $d);
             }
             curl_setopt($curl, CURLOPT_HTTPHEADER, $headData);
         }
@@ -241,21 +242,21 @@ if (!function_exists("get_https_curl")) {
     }
 }
 if (!function_exists("post_curl")) {
-    function post_curl($url, $data, array $header=[])
+    function post_curl($url, $data, array $header = [])
     {
-       $postData=is_array($data)?http_build_query($data):$data;
+        $postData = is_array($data) ? http_build_query($data) : $data;
 
         $ch = curl_init();
-        if(substr($url,0,5)=='https'){
+        if (substr($url, 0, 5) == 'https') {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // 跳过证书检查
-            curl_setopt ( $ch, CURLOPT_SSL_VERIFYHOST, 2 );
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $url);
-        if($header){
-            $headData=[];
-            foreach ($header as $k=>$d){
-                array_push($headData,$k.': '.$d);
+        if ($header) {
+            $headData = [];
+            foreach ($header as $k => $d) {
+                array_push($headData, $k . ': ' . $d);
             }
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headData);
         }
@@ -264,12 +265,25 @@ if (!function_exists("post_curl")) {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         $response = curl_exec($ch);
-        if($error=curl_error($ch)){
+        if ($error = curl_error($ch)) {
             return '{}';
         }
         curl_close($ch);
         return $response;
 
+    }
+}
+
+if (!function_exists("scene_decode")) {
+    function scene_decode($code)
+    {
+        return json_decode(base64_decode($code));
+    }
+}
+if (!function_exists("scene_encode")) {
+    function scene_encode($data)
+    {
+        return base64_encode(json_encode($data));
     }
 }
 

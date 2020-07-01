@@ -39,6 +39,4 @@ trait BaseTrait
         }
         return $array;
     }
-
-
 }

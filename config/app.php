@@ -2,6 +2,28 @@
 
 return [
 
+    'debug_blacklist' => [
+        '_ENV' => [
+            'APP_KEY',
+            'DB_PASSWORD',
+            'UserName',
+            'AdminPassword',
+            'DB_USERNAME',
+            'REDIS_PASSWORD',
+            'MAIL_PASSWORD',
+            'AWS_SECRET_ACCESS_KEY',
+        ],
+
+        '_SERVER' => [
+            'APP_KEY',
+            'DB_PASSWORD',
+        ],
+
+        '_POST' => [
+            'password',
+        ],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

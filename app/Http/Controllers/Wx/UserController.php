@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Wx;
 use App\Constants\CacheKey;
 use App\Models\Device;
 use App\Models\User;
+use App\Service\LoginApi\WeiXinLoginLoginApi;
 use GuzzleHttp\Client;
 use App\Constants\ErrorCode;
 use Illuminate\Support\Facades\Cache;
@@ -16,7 +17,7 @@ class UserController extends Base
     /**
      * 微信小程序登录接口
      */
-    public function login()
+    public function login(WeiXinLoginLoginApi $loginApi)
     {
         $validator = $this->validationFactory->make($this->request->all(), [
             //'scene' => 'required',
@@ -29,30 +30,28 @@ class UserController extends Base
             ]);
         }
         //效验用户，获取用户信息
-        $open_id = '';
-        $user = User::whereAccount($open_id)->first();
+        list($status,$message,$user)=$loginApi->getUser();
+        if (!$status) {
+            return $this->json([
+                'errorMessage' => $message,
+                'code' => ErrorCode::ACCOUNT_NOT_EXIST,
+            ]);
+        }
         $token = Str::random(16);
+        Cache::put($token, $user, 10);
         if (!$this->request->input('scene')) {
-            Cache::put($token, $user, 10);
             return $this->json([
                 'errorMessage' => 'success',
                 'token' => $token,
                 'code' => ErrorCode::SUCCESS,
             ]);
         }
-        //存在则login call game
+        //存在scene,解析数据
         $data = json_decode(base64_decode($this->scene));
         $deviceShortId = $data['deviceShortId'] ?? 0;
         if (!is_numeric($deviceShortId) or $deviceShortId > 0) {
             return $this->json([
                 'errorMessage' => 'scene值错误!',
-                'code' => ErrorCode::ACCOUNT_NOT_EXIST,
-            ]);
-        }
-
-        if (!$user) {
-            return $this->json([
-                'errorMessage' => '账号不存在',
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
             ]);
         }
@@ -62,7 +61,7 @@ class UserController extends Base
                 'code' => ErrorCode::ACCOUNT_LOCK,
             ]);
         }
-        $device = Device::whereDeviceId()->first();
+        $device = Device::whereDeviceId($deviceShortId)->first();
         if (!$device) {
             return $this->json([
                 'errorMessage' => '设备未绑定房间',
@@ -71,7 +70,7 @@ class UserController extends Base
         }
         if ($device->seat_num == 0 and $user->judge !== 1) {
             return $this->json([
-                'errorMessage' => '该账号没有权限登录当前设备,因为普通账号,无法登陆法官设备',
+                'errorMessage' => '普通账号,无法登陆法官设备',
                 'code' => ErrorCode::ACCOUNT_NO_PREVILEGE,
             ]);
         }
@@ -102,9 +101,7 @@ class UserController extends Base
                     "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
                 ]
             ]);
-
             if ($response->getStatusCode() == 200) {
-                Cache::put($token, $user, 10);
                 return $this->json([
                     'errorMessage' => 'success',
                     'token' => $token,
@@ -122,6 +119,7 @@ class UserController extends Base
                 'code' => ErrorCode::SERVER_ERROR,
             ]);
         }
+
     }
 
     public function info()
@@ -142,6 +140,5 @@ class UserController extends Base
                 'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
             ]);
         }
-
     }
 }

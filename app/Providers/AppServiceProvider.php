@@ -14,7 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+
     }
 
     /**
@@ -24,12 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
-
         Schema::defaultStringLength(191);
-        //cp
-        view()->composer(
-            'cp.layout.left', 'App\ViewComposers\Cp\SysComposer'
-        );
     }
 }
