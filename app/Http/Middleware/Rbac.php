@@ -12,6 +12,8 @@ class Rbac
 {
     use BaseTrait;
 
+    private $prefix='admin';
+
     /**
      * Handle an incoming request.
      *
@@ -37,9 +39,6 @@ class Rbac
         if ($user->lock) {
             return false;
         }
-        if ($guard . '-cantAccess' == Route::currentRouteName()) {
-            return true;
-        }
         if(in_array($user->role_id, [1])){
             return true;
         }
@@ -48,7 +47,8 @@ class Rbac
         if (in_array($user->user_name, $super_admin)) {
             return true;
         }
-        $path = $request->path();
+        //去掉$prefix
+        $path =substr($request->path(),6);
         //不需要rbac权限的路由,pass
         if ($this->checkAct($path,'cp')) {
             return true;
