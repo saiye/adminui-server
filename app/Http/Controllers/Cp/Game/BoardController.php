@@ -63,7 +63,7 @@ class BoardController extends Controller
     {
         $validator = Validator::make($this->req->all(), [
             'board_id' => ['numeric', 'required'],
-            'dup_id' => ['required','numeric'],
+            'dup_id' => ['required', 'numeric'],
             'board_name' => 'required|max:30',
         ], [
             'board_name.required' => '板子名称，不能为空！',
@@ -77,9 +77,9 @@ class BoardController extends Controller
             //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $hasBoard=GameBoard::where('board_id','!=',$this->req->board_id)->whereDupId($this->req->dup_id)->first();
-        if($hasBoard){
-            return $this->errorJson($hasBoard->board_name.'板子,已经使用，该dup id,不能重复入库!');
+        $hasBoard = GameBoard::where('board_id', '!=', $this->req->board_id)->whereDupId($this->req->dup_id)->first();
+        if ($hasBoard) {
+            return $this->errorJson($hasBoard->board_name . '板子,已经使用，该dup id,不能重复入库!');
         }
         $data = $this->req->only('dup_id', 'board_name');
         $board = GameBoard::whereBoardId($this->req->board_id)->update($data);
@@ -89,6 +89,21 @@ class BoardController extends Controller
             return $this->errorJson('入库失败');
         }
     }
+
+    /**
+     * 从excel导入,板子
+     */
+    public function excel()
+    {
+
+    }
+
+
+
+
+
+
+
 
 
 }

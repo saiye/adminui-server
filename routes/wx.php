@@ -12,7 +12,7 @@ Route::any('user/login', 'UserController@login')->name('wx-UserLogin');
 
 Route::any('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
 
-Route::any('qrCode/testQrCode', 'QrCodeController@testQrCode')->name('wx-QrCodeTestQrCode');
+Route::any('qrCode/test', 'QrCodeController@testQrCode')->name('wx-QrCodeTestQrCode');
 
 
 

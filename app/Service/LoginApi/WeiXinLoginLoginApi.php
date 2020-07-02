@@ -118,6 +118,7 @@ class WeiXinLoginLoginApi extends BaseLoginApi
             Log::info('获取access_token失败,无法创建二维码!');
             return false;
         }
+        $sceneData = scene_decode($data['scene']);
         $post = [
             'scene' => $data['scene'],
             'width' => $data['width'],
@@ -127,7 +128,7 @@ class WeiXinLoginLoginApi extends BaseLoginApi
                 'g' => 120,
                 'b' => 192,
             ],
-            'is_hyaline' => true,
+          //  'is_hyaline' => true,
         ];
         $url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' . $access_token;
         try {
@@ -142,18 +143,14 @@ class WeiXinLoginLoginApi extends BaseLoginApi
             ]);
             if ($response->getStatusCode() == 200) {
                 $str = $response->getBody()->getContents();
-                if(is_resource($str)){
-                    $sceneData=scene_decode($data['scene']);
-                    Storage::disk('public')->put('1.png', $str);
-                }else{
-                    $res = json_decode($str, true);
-                    if (isset($res['errcode']) and $res['errcode'] == 0) {
-                        $sceneData = scene_encode($data['scene']);
-                        return $this->saveErCode($res['buffer'], $res['contentType'], $sceneData['deviceShortId']);
-                    }
-                    Log::info('获取小程序二维码失败：');
-                    Log::info($res);
-                }
+                $image_path='qrCode/'.$sceneData['deviceShortId'].'.png';
+                Storage::disk('public')->put($image_path, $str);
+                $full_path=Storage::disk('public')->url($image_path);
+                //二维码入库
+                PhysicsAddress::whereId($sceneData['deviceShortId'])->update([
+                    'qrCodePath'=>$image_path,
+                ]);
+                return ['image_path'=>$image_path,'full_path'=>$full_path];
             } else {
                 Log::info('获取小程序二维码失败:status code not 200!');
             }

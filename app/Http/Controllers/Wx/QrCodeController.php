@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Wx;
 
 
 use App\Models\Device;
+use App\Models\PhysicsAddress;
 use App\Service\LoginApi\WeiXinLoginLoginApi;
 use GuzzleHttp\Client;
 use App\Constants\ErrorCode;
@@ -21,7 +22,7 @@ class QrCodeController extends Base
     public function image(WeiXinLoginLoginApi $api)
     {
 
-       /* $validator = $this->validationFactory->make($this->request->all(), [
+        $validator = $this->validationFactory->make($this->request->all(), [
             'scene' => 'required|max:32',
             'width' => 'required|numeric|max:1280|min:280',
         ]);
@@ -30,17 +31,9 @@ class QrCodeController extends Base
                 'errorMessage' => $validator->errors()->first(),
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
-        }*/
+        }
+        $data = $this->request->input();
 
-      //  $data=$this->request->input();
-
-
-        $data = [
-            'scene' => scene_encode([
-                'deviceShortId' => 1025,
-            ]),
-            'width' => 300,
-        ];
         $sceneData = scene_decode($data['scene']);
 
         if (!array_key_exists('deviceShortId', $sceneData)) {
@@ -49,20 +42,38 @@ class QrCodeController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $url = $api->getUnlimited($data);
-        if($url){
-            $fullUrl = Storage::url($url);
+        $deviceShortId = $sceneData['deviceShortId'];
+        if (!is_numeric($deviceShortId)) {
             return $this->json([
-                'errorMessage' => 'success',
-                'code' => ErrorCode::SUCCESS,
-                'url' => $fullUrl,
+                'errorMessage' => 'deviceShortId必须是一个数字！',
+                'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
+        $hasDevice = PhysicsAddress::whereId($deviceShortId)->first();
+        if (!$hasDevice) {
+            return $this->json([
+                'errorMessage' => 'device cant find!',
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        if ($hasDevice->qrCodePath) {
+            $full_path = Storage::disk('public')->url($hasDevice->qrCodePath);
+        } else {
+            $imageRes = $api->getUnlimited($data);
+            if ($imageRes) {
+                $full_path = $imageRes['full_path'];
+            } else {
+                return $this->json([
+                    'errorMessage' => '二维码生成失败',
+                    'code' => ErrorCode::CREATE_ERCODE_ERROR,
+                ]);
+            }
+        }
         return $this->json([
-            'errorMessage' => '二维码生成失败',
-            'code' => ErrorCode::CREATE_ERCODE_ERROR,
+            'errorMessage' => 'success',
+            'code' => ErrorCode::SUCCESS,
+            'full_path' => $full_path,
         ]);
-
     }
 
 
@@ -72,7 +83,7 @@ class QrCodeController extends Base
         $url = route('wx-QrCodeImage');
         $data = [
             'scene' => scene_encode([
-                'deviceShortId' => 1025,
+                'deviceShortId' => 1024,
             ]),
             'width' => 300,
         ];
@@ -86,20 +97,15 @@ class QrCodeController extends Base
             ],
         ]);
         $response = $client->post($url, [
-            'json' => $data,
+            'form_params' =>$data,
         ]);
         if ($response->getStatusCode() == 200) {
-            return $this->json([
-                'errorMessage' => 'success',
-                'code' => 0,
-                'body' => $response->getBody()->getContents(),
-            ]);
+            $res= json_decode($response->getBody()->getContents(),true);
+            if(isset($res['code']) and $res['code']==0){
+                return $res['full_path'];
+            }
         } else {
-            return $this->json([
-                'errorMessage' => 'error',
-                'code' => -1,
-                'body' => $response->getBody()->getContents(),
-            ]);
+            return 'cant create erCode';
         }
     }
 

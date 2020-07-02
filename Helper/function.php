@@ -277,7 +277,7 @@ if (!function_exists("post_curl")) {
 if (!function_exists("scene_decode")) {
     function scene_decode($code)
     {
-        return json_decode(base64_decode($code));
+        return json_decode(base64_decode($code),true);
     }
 }
 if (!function_exists("scene_encode")) {
