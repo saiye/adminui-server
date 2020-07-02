@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Wx;
 
 use App\Constants\CacheKey;
+use App\Models\Channel;
 use App\Models\Device;
 use App\Models\User;
 use App\Service\LoginApi\WeiXinLoginLoginApi;
@@ -30,28 +31,10 @@ class UserController extends Base
             ]);
         }
         //效验用户，获取用户信息
-        list($status,$message,$user)=$loginApi->getUser();
+        list($status, $message, $user) = $loginApi->getUser();
         if (!$status) {
             return $this->json([
                 'errorMessage' => $message,
-                'code' => ErrorCode::ACCOUNT_NOT_EXIST,
-            ]);
-        }
-        $token = Str::random(16);
-        Cache::put($token, $user, 10);
-        if (!$this->request->input('scene')) {
-            return $this->json([
-                'errorMessage' => 'success',
-                'token' => $token,
-                'code' => ErrorCode::SUCCESS,
-            ]);
-        }
-        //存在scene,解析数据
-        $data = json_decode(base64_decode($this->scene));
-        $deviceShortId = $data['deviceShortId'] ?? 0;
-        if (!is_numeric($deviceShortId) or $deviceShortId > 0) {
-            return $this->json([
-                'errorMessage' => 'scene值错误!',
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
             ]);
         }
@@ -59,6 +42,26 @@ class UserController extends Base
             return $this->json([
                 'errorMessage' => '账号已锁定!',
                 'code' => ErrorCode::ACCOUNT_LOCK,
+            ]);
+        }
+        $scene = $this->request->input('scene');
+        $token = Str::random(16);
+        Cache::put($token, $user, 10);
+        if (!$scene) {
+            return $this->json([
+                'errorMessage' => 'success',
+                'token' => $token,
+                'code' => ErrorCode::SUCCESS,
+            ]);
+        }
+        //存在scene,解析数据
+        $data = scene_decode($scene);
+        $deviceShortId = $data['deviceShortId'] ?? 0;
+        $channelId = $data['channelId '] ?? 0;
+        if (!is_numeric($deviceShortId) or $deviceShortId > 0) {
+            return $this->json([
+                'errorMessage' => 'scene值错误!',
+                'code' => ErrorCode::ACCOUNT_NOT_EXIST,
             ]);
         }
         $device = Device::whereDeviceId($deviceShortId)->first();
@@ -75,7 +78,20 @@ class UserController extends Base
             ]);
         }
         try {
-            $url = Config::get('game.game_login_call_url');
+            $url = '';
+            if ($channelId) {
+                $channel = Channel::whereChannelId($channelId)->first();
+                if ($channel) {
+                    $url = $channel->loginCallBackAddr;
+                } else {
+                    return $this->json([
+                        'errorMessage' => '渠道'.$channelId.'不存在！',
+                        'code' => ErrorCode::CHANNEL_NONENTITY,
+                    ]);
+                }
+            } else {
+                $url = Config::get('game.game_login_call_url');
+            }
             $client = new Client([
                 // 'handler' => HandlerStack::create(new CoroutineHandler()),
                 'timeout' => 3,

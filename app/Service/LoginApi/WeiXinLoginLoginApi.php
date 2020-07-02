@@ -113,10 +113,8 @@ class WeiXinLoginLoginApi extends BaseLoginApi
      */
     public function getUnlimited($data)
     {
-
-        // $access_token = $this->refreshAccessToken();
-        $access_token = '34_ysTDn6DxUUl6KR3-JG-yLsL5PEjGCG3NoSfkzRKJoy4mvAyaRfI346Gg06MQq1_rDrEolJ39mVq4XmI0_OKwfWEzE52Q0C6UzxFc7GXbggzNNxio2_V3OUu8cwc5QXAz3sguuNY6VkIgoN7bMZIiAEAYLU';
-        if (!$access_token) {
+        $access_token = $this->refreshAccessToken();
+       if (!$access_token) {
             Log::info('获取access_token失败,无法创建二维码!');
             return false;
         }
@@ -144,16 +142,18 @@ class WeiXinLoginLoginApi extends BaseLoginApi
             ]);
             if ($response->getStatusCode() == 200) {
                 $str = $response->getBody()->getContents();
-
-                Storage::disk('public')->put('1.png', $str);
-                dd('ok');
-                $res = json_decode($response->getBody()->getContents(), true);
-                if (isset($res['errcode']) and $res['errcode'] == 0) {
-                    $sceneData = scene_encode($data['scene']);
-                    return $this->saveErCode($res['buffer'], $res['contentType'], $sceneData['deviceShortId']);
+                if(is_resource($str)){
+                    $sceneData=scene_decode($data['scene']);
+                    Storage::disk('public')->put('1.png', $str);
+                }else{
+                    $res = json_decode($str, true);
+                    if (isset($res['errcode']) and $res['errcode'] == 0) {
+                        $sceneData = scene_encode($data['scene']);
+                        return $this->saveErCode($res['buffer'], $res['contentType'], $sceneData['deviceShortId']);
+                    }
+                    Log::info('获取小程序二维码失败：');
+                    Log::info($res);
                 }
-                Log::info('获取小程序二维码失败：');
-                Log::info($res);
             } else {
                 Log::info('获取小程序二维码失败:status code not 200!');
             }
@@ -162,31 +162,6 @@ class WeiXinLoginLoginApi extends BaseLoginApi
             Log::info($e->getMessage());
         }
         return false;
-    }
-
-    public function httpRequest($url, $data = '', $method = 'GET')
-    {
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($curl, CURLOPT_AUTOREFERER, 1);
-        if ($method == 'POST') {
-            curl_setopt($curl, CURLOPT_POST, 1);
-            if ($data != '') {
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-            }
-        }
-
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($curl, CURLOPT_HEADER, 0);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $result = curl_exec($curl);
-        curl_close($curl);
-        return $result;
-
     }
 
     /**

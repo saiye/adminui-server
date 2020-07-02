@@ -78,5 +78,8 @@ abstract class BaseLoginApi
 
     abstract protected function refreshAccessToken();
 
+    abstract protected function code2Session();
+
     abstract protected function type();
+
 }
