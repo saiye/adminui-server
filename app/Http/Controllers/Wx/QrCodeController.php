@@ -23,7 +23,8 @@ class QrCodeController extends Base
     {
 
         $validator = $this->validationFactory->make($this->request->all(), [
-            'scene' => 'required|max:32',
+            'deviceShortId' => 'required|numeric|min:1',
+            'channelId' => 'required|numeric|min:1',
             'width' => 'required|numeric|max:1280|min:280',
         ]);
         if ($validator->fails()) {
@@ -33,22 +34,7 @@ class QrCodeController extends Base
             ]);
         }
         $data = $this->request->input();
-
-        $sceneData = scene_decode($data['scene']);
-
-        if (!array_key_exists('deviceShortId', $sceneData)) {
-            return $this->json([
-                'errorMessage' => 'scene 参数有误！',
-                'code' => ErrorCode::VALID_FAILURE,
-            ]);
-        }
-        $deviceShortId = $sceneData['deviceShortId'];
-        if (!is_numeric($deviceShortId)) {
-            return $this->json([
-                'errorMessage' => 'deviceShortId必须是一个数字！',
-                'code' => ErrorCode::VALID_FAILURE,
-            ]);
-        }
+        $deviceShortId=$this->request->input('deviceShortId');
         $hasDevice = PhysicsAddress::whereId($deviceShortId)->first();
         if (!$hasDevice) {
             return $this->json([
@@ -82,15 +68,14 @@ class QrCodeController extends Base
 
         $url = route('wx-QrCodeImage');
         $data = [
-            'scene' => scene_encode([
-                'deviceShortId' => 1024,
-            ]),
+            'deviceShortId'=>1026,
+            'channelId'=>1,
             'width' => 300,
         ];
-
         $client = new Client([
             // 'handler' => HandlerStack::create(new CoroutineHandler()),
             'timeout' => 5,
+            'verify'=>false,
             'swoole' => [
                 'timeout' => 10,
                 'socket_buffer_size' => 1024 * 1024 * 2,
@@ -104,6 +89,7 @@ class QrCodeController extends Base
             if(isset($res['code']) and $res['code']==0){
                 return $res['full_path'];
             }
+            return $res['errorMessage'];
         } else {
             return 'cant create erCode';
         }

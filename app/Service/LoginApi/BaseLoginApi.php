@@ -38,7 +38,7 @@ abstract class BaseLoginApi
     public function getUser()
     {
         list($code, $info) = $this->code2Session();
-        if ($code == 0) {
+        if ($code==0) {
             $hasThreeUser = ThreeUser::whereOpenId($info['openid'])->first();
             if (!$hasThreeUser) {
                 DB::beginTransaction();
@@ -52,8 +52,7 @@ abstract class BaseLoginApi
                     'icon' => $info['icon'],
                 ]);
                 if ($user) {
-                    $threeUser = ThreeUser::created([
-                        'union_id' => $info['union_id'],
+                    $threeUser = ThreeUser::create([
                         'open_id' => $info['openid'],
                         'icon' => $info['icon'],
                         'user_id' => $user->id,

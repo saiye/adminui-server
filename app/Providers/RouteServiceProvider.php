@@ -47,6 +47,10 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapClientRoutes();
 
         $this->mapWxRoutes();
+
+        $this->mapWebRoutes();
+
+        $this->mapBusinessRoutes();
     }
 
 
@@ -69,5 +73,17 @@ class RouteServiceProvider extends ServiceProvider
         Route::prefix('wx')
             ->namespace($this->namespace . '\\Wx')
             ->group(base_path('routes/wx.php'));
+    }
+
+    protected function mapWebRoutes()
+    {
+        Route::namespace($this->namespace . '\\Www')
+            ->group(base_path('routes/web.php'));
+    }
+
+    protected function mapBusinessRoutes()
+    {
+        Route::prefix('business')->namespace($this->namespace . '\\Business')
+            ->group(base_path('routes/business.php'));
     }
 }

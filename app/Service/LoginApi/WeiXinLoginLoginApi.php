@@ -25,9 +25,33 @@ class WeiXinLoginLoginApi extends BaseLoginApi
         return 'wx';
     }
 
+    /**
+     * 服务端要用户头像等信息，小程序似乎调用无效
+     * https://developers.weixin.qq.com/doc/oplatform/Mobile_App/WeChat_Login/Authorized_API_call_UnionID.html
+     * @param $openid
+     * @return array
+     */
+    public function userInfo($openid)
+    {
+        $url = 'https://api.weixin.qq.com/sns/userinfo?';
+        $param = [
+            'access_token' => $this->refreshAccessToken(),
+            'openid' => $openid,
+            'lang' => 'zh_CN',
+        ];
+        $json = file_get_contents($url . http_build_query($param));
+        $userInfo = json_decode($json, true);
+        if (isset($userInfo['openid'])) {
+            return [ErrorCode::SUCCESS, $userInfo];
+        }
+        Log::info('wx-userInfo:error');
+        Log::info($userInfo);
+        return [ErrorCode::THREE_ACCOUNT_NOT_LOGIN, null];
+    }
+
     public function code2Session()
     {
-        $url = 'https://api.weixin.qq.com/sns/jscode2session';
+        $url = 'https://api.weixin.qq.com/sns/jscode2session?';
         $config = $this->config();
         $data = [
             'appid' => $config['AppId'],
@@ -39,14 +63,13 @@ class WeiXinLoginLoginApi extends BaseLoginApi
             $client = new Client([
                 'timeout' => 3,
             ]);
-            $response = $client->get($url, $data);
+            $response = $client->get($url . http_build_query($data), []);
             if ($response->getStatusCode() == 200) {
                 $res = json_decode($response->getBody()->getContents(), true);
-                if (isset($res['errcode']) and $res['errcode'] == 0) {
+                if (isset($res['openid'])) {
                     return [ErrorCode::SUCCESS, [
                         'openid' => $res['openid'],
                         'session_key' => $res['session_key'],
-                        'unionid' => $res['unionid'],
                         'sex' => 0,
                         'icon' => '',
                     ]];
@@ -57,6 +80,7 @@ class WeiXinLoginLoginApi extends BaseLoginApi
         } catch (\Exception $e) {
             Log::info('刷新小程序refreshAccessToken:error');
             Log::info($e->getMessage());
+            return [ErrorCode::THREE_ACCOUNT_NOT_LOGIN, ['message' => $e->getMessage()]];
         }
         return [ErrorCode::THREE_ACCOUNT_NOT_LOGIN, ['message' => '小程序用户效验失败!']];
     }
@@ -114,13 +138,16 @@ class WeiXinLoginLoginApi extends BaseLoginApi
     public function getUnlimited($data)
     {
         $access_token = $this->refreshAccessToken();
-       if (!$access_token) {
+        if (!$access_token) {
             Log::info('获取access_token失败,无法创建二维码!');
             return false;
         }
-        $sceneData = scene_decode($data['scene']);
+        $sceneData = scene_encode([
+            'd' => $data['deviceShortId'],
+            'c' => $data['channelId'],
+        ]);
         $post = [
-            'scene' => $data['scene'],
+            'scene' => $sceneData,
             'width' => $data['width'],
             'auto_color' => true,
             'line_color' => [
@@ -128,7 +155,7 @@ class WeiXinLoginLoginApi extends BaseLoginApi
                 'g' => 120,
                 'b' => 192,
             ],
-          //  'is_hyaline' => true,
+            //  'is_hyaline' => true,
         ];
         $url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' . $access_token;
         try {
@@ -136,6 +163,7 @@ class WeiXinLoginLoginApi extends BaseLoginApi
                 'timeout' => 3,
             ]);
             $response = $client->post($url, [
+                'verify' => false,
                 'headers' => [
                     'Accept' => 'application/json',
                 ],
@@ -143,14 +171,14 @@ class WeiXinLoginLoginApi extends BaseLoginApi
             ]);
             if ($response->getStatusCode() == 200) {
                 $str = $response->getBody()->getContents();
-                $image_path='qrCode/'.$sceneData['deviceShortId'].'.png';
+                $image_path = 'qrCode/' . $data['deviceShortId'] . '.png';
                 Storage::disk('public')->put($image_path, $str);
-                $full_path=Storage::disk('public')->url($image_path);
+                $full_path = Storage::disk('public')->url($image_path);
                 //二维码入库
-                PhysicsAddress::whereId($sceneData['deviceShortId'])->update([
-                    'qrCodePath'=>$image_path,
+                PhysicsAddress::whereId($data['deviceShortId'])->update([
+                    'qrCodePath' => $image_path,
                 ]);
-                return ['image_path'=>$image_path,'full_path'=>$full_path];
+                return ['image_path' => $image_path, 'full_path' => $full_path];
             } else {
                 Log::info('获取小程序二维码失败:status code not 200!');
             }
@@ -182,9 +210,7 @@ class WeiXinLoginLoginApi extends BaseLoginApi
                 'qrCodePath' => $fileName,
             ]);
         }
-
         return $fileName;
-
     }
 
 }

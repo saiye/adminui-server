@@ -8,6 +8,4 @@ Route::any('/queryDeviceRoomData', 'ClientController@queryDeviceRoomData');
 
 Route::any('/reqLogin', 'ClientController@reqLogin');
 
-Route::any('/user/login', 'UserController@login');
-
 Route::any('/user/callLoginTest', 'UserController@callLoginTest');

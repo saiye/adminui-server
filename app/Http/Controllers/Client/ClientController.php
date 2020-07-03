@@ -193,8 +193,8 @@ class ClientController extends Base
                     "StoreName" => $device->store->store_name,
                     "RoomName" => $device->room->room_name,
                     "RoomId" => $device->room_id,
-                    "LoginUrl" => 'http://192.168.1.78:9501/user/login',
-                    "GameServerAddress" => 'http://192.168.1.78:9501/user/login',
+                    "LoginUrl" => 'https://192.168.1.71/user/login',
+                    "GameServerAddress" => '47.115.45.34:10002',
                 ]);
             }
         }

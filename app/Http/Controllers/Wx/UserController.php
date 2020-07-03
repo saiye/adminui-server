@@ -10,6 +10,7 @@ use App\Service\LoginApi\WeiXinLoginLoginApi;
 use GuzzleHttp\Client;
 use App\Constants\ErrorCode;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 
@@ -32,7 +33,7 @@ class UserController extends Base
         }
         //效验用户，获取用户信息
         list($status, $message, $user) = $loginApi->getUser();
-        if (!$status) {
+        if ($status!==0) {
             return $this->json([
                 'errorMessage' => $message,
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
@@ -56,9 +57,9 @@ class UserController extends Base
         }
         //存在scene,解析数据
         $data = scene_decode($scene);
-        $deviceShortId = $data['deviceShortId'] ?? 0;
-        $channelId = $data['channelId '] ?? 0;
-        if (!is_numeric($deviceShortId) or $deviceShortId > 0) {
+        $deviceShortId = $data['d'] ?? 0;
+        $channelId = $data['c'] ?? 0;
+        if (!is_numeric($deviceShortId) or $deviceShortId <1) {
             return $this->json([
                 'errorMessage' => 'scene值错误!',
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
@@ -78,7 +79,6 @@ class UserController extends Base
             ]);
         }
         try {
-            $url = '';
             if ($channelId) {
                 $channel = Channel::whereChannelId($channelId)->first();
                 if ($channel) {
@@ -140,6 +140,8 @@ class UserController extends Base
 
     public function info()
     {
+
+
         $token = $this->request->header('token');
         $user = Cache::get($token);
         if ($user) {

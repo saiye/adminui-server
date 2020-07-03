@@ -277,13 +277,20 @@ if (!function_exists("post_curl")) {
 if (!function_exists("scene_decode")) {
     function scene_decode($code)
     {
-        return json_decode(base64_decode($code),true);
+        $res = explode('&', $code);
+        $post = [];
+        foreach ($res as $val) {
+            $v = explode('=', $val);
+            if (count($v) == 2)
+                $post[$v[0]]=$v[1];
+        }
+        return $post;
     }
 }
 if (!function_exists("scene_encode")) {
     function scene_encode($data)
     {
-        return base64_encode(json_encode($data));
+        return http_build_query($data);
     }
 }
 
