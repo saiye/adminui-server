@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Jobs\CallBackGameLogin;
 use App\Models\Channel;
 use App\Models\Device;
 use App\Models\PhysicsAddress;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Constants\ErrorCode;
-use GuzzleHttp\Client;
-
 /**
  *
  * @author chenyuansai
@@ -19,7 +18,7 @@ class ClientController extends Base
 {
 
     /**
-     * 【测试⽤接⼝，正式环境不可⽤】
+     * 内部测试用
      */
     public function reqLogin()
     {
@@ -63,63 +62,35 @@ class ClientController extends Base
                     'errorMessage' => '普通账号,无法登陆法官设备',
                     'code' => ErrorCode::FAIL_LOGIN_CURRENT_DEVICE,
                 ]);
-
             }
             $chanel = Channel::whereChannelId($this->request->input('channelId'))->first();
             if ($chanel) {
                 $url = $chanel->loginCallBackAddr;
-                // $url='http://192.168.1.78:9502/user/callLoginTest';
                 try {
-                    $client = new Client([
-                        'timeout' => 3,
-                    ]);
-                    $response = $client->post($url, [
-                        'headers' => [
-                            'Accept' => 'application/json',
-                        ],
-                        'json' => [
-                            "deviceShortId" => $device->device_id,
-                            "account" => $user->account,
-                            "userId" => $user->id,
-                            "name" => $user->nickname,
-                            "sex" => $user->sex,
-                            "icon" => '',
-                            "roomId" => $device->room_id, // [可选] 房间唯一id
-                            "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
-                            "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
-                            "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
-                        ]
-                    ]);
-
-                    if ($response->getStatusCode() == 200) {
-                        $res = json_decode($response->getBody()->getContents(), true);
-                        if (isset($res['code']) and $res['code'] == 0) {
-                            return $this->json([
-                                'errorMessage' => 'success',
-                                'gameSrvAddr' => $chanel->gameSrvAddr,
-                                'code' => ErrorCode::SUCCESS,
-                            ]);
-                        } else {
-                            return $this->json([
-                                'errorMessage' => 'call back return code is not 0',
-                                'code' => ErrorCode::THREE_FAIL,
-                            ]);
-                        }
-
-                    } else {
-                        return $this->json([
-                            'errorMessage' => 'The http status code is not 200',
-                            'code' => ErrorCode::SERVER_ERROR,
-                            'url' => $url,
-                        ]);
-                    }
+                    //立即调用接口队列
+                    dispatch_now(new CallBackGameLogin($url, [
+                        "deviceShortId" => $device->device_id,
+                        "account" => $user->account,
+                        "userId" => $user->id,
+                        "name" => $user->nickname,
+                        "sex" => $user->sex,
+                        "icon" => $user->icon,
+                        "roomId" => $device->room_id, // [可选] 房间唯一id
+                        "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
+                        "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
+                        "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
+                    ]));
                 } catch (\Exception $e) {
                     return $this->json([
                         'errorMessage' => $e->getMessage(),
                         'code' => ErrorCode::CONNECTION_TIMEOUT,
-                        'url' => $url,
                     ]);
                 }
+                return $this->json([
+                    'errorMessage' => 'success',
+                    'gameSrvAddr' => $chanel->gameSrvAddr,
+                    'code' => ErrorCode::SUCCESS,
+                ]);
             } else {
                 return $this->json([
                     'errorMessage' => '渠道不存在!',
@@ -127,7 +98,6 @@ class ClientController extends Base
                 ]);
             }
         }
-
         return $this->json([
             'errorMessage' => '登录失败',
             'code' => ErrorCode::ACCOUNT_VALID_FAILURE,

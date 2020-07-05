@@ -7,17 +7,18 @@
  */
 
 namespace App\TraitInterface;
-
+use DateTimeInterface;
 
 trait ModelDataFormat
 {
-    public function getUpdatedAtAttribute($value)
+    /**
+     * Prepare a date for array / JSON serialization.
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDate(DateTimeInterface $date)
     {
-        return $value ? date("Y-m-d H:i:s", strtotime($value)) : '';
-    }
-
-    public function getCreatedAtAttribute($value)
-    {
-        return $value ? date("Y-m-d H:i:s", strtotime($value)) : '';
+        return $date->format('Y-m-d H:i:s');
     }
 }

@@ -14,7 +14,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
+        $this->app->bind(
+            'App\Service\LoginApi\LoginApi',
+            'App\Service\LoginApi\WeiXinLoginApi'
+        );
     }
 
     /**

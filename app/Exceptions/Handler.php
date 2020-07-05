@@ -57,7 +57,7 @@ class Handler extends ExceptionHandler
 
     protected function invalidJson($request,$exception)
     {
-        return response()->json(['message' =>'Exception ERROR:'.$exception->getMessage(), 'code' => 1002, 'data' =>$request->input()], $exception->status);
+        return response()->json(['message' =>'system error', 'code' => 1002], $exception->status);
     }
 
 }

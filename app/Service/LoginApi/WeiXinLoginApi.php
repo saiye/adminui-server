@@ -16,37 +16,13 @@ use function GuzzleHttp\default_user_agent;
  *  小程序登录接口api
  * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
  */
-class WeiXinLoginLoginApi extends BaseLoginApi
+class WeiXinLoginApi extends BaseLoginApi
 {
 
 
     public function type()
     {
         return 'wx';
-    }
-
-    /**
-     * 服务端要用户头像等信息，小程序似乎调用无效
-     * https://developers.weixin.qq.com/doc/oplatform/Mobile_App/WeChat_Login/Authorized_API_call_UnionID.html
-     * @param $openid
-     * @return array
-     */
-    public function userInfo($openid)
-    {
-        $url = 'https://api.weixin.qq.com/sns/userinfo?';
-        $param = [
-            'access_token' => $this->refreshAccessToken(),
-            'openid' => $openid,
-            'lang' => 'zh_CN',
-        ];
-        $json = file_get_contents($url . http_build_query($param));
-        $userInfo = json_decode($json, true);
-        if (isset($userInfo['openid'])) {
-            return [ErrorCode::SUCCESS, $userInfo];
-        }
-        Log::info('wx-userInfo:error');
-        Log::info($userInfo);
-        return [ErrorCode::THREE_ACCOUNT_NOT_LOGIN, null];
     }
 
     public function code2Session()
@@ -62,6 +38,7 @@ class WeiXinLoginLoginApi extends BaseLoginApi
         try {
             $client = new Client([
                 'timeout' => 3,
+                'verify' => false,
             ]);
             $response = $client->get($url . http_build_query($data), []);
             if ($response->getStatusCode() == 200) {
@@ -108,6 +85,7 @@ class WeiXinLoginLoginApi extends BaseLoginApi
         try {
             $client = new Client([
                 'timeout' => 3,
+                'verify' => false,
             ]);
             $response = $client->get($url, []);
             if ($response->getStatusCode() == 200) {
@@ -133,9 +111,9 @@ class WeiXinLoginLoginApi extends BaseLoginApi
 
     /**
      * 获取小程序二维码
-     * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html
+     * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getQrCode.html
      */
-    public function getUnlimited($data)
+    public function getQrCode($data)
     {
         $access_token = $this->refreshAccessToken();
         if (!$access_token) {

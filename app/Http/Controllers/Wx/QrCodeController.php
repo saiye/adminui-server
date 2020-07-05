@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers\Wx;
 
-
-use App\Models\Device;
 use App\Models\PhysicsAddress;
-use App\Service\LoginApi\WeiXinLoginLoginApi;
+use App\Service\LoginApi\LoginApi;
 use GuzzleHttp\Client;
 use App\Constants\ErrorCode;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 
 class QrCodeController extends Base
@@ -19,7 +15,7 @@ class QrCodeController extends Base
     /**
      * 生成设备小程序的二维码
      */
-    public function image(WeiXinLoginLoginApi $api)
+    public function image(LoginApi  $api)
     {
 
         $validator = $this->validationFactory->make($this->request->all(), [
@@ -34,7 +30,7 @@ class QrCodeController extends Base
             ]);
         }
         $data = $this->request->input();
-        $deviceShortId=$this->request->input('deviceShortId');
+        $deviceShortId = $this->request->input('deviceShortId');
         $hasDevice = PhysicsAddress::whereId($deviceShortId)->first();
         if (!$hasDevice) {
             return $this->json([
@@ -42,10 +38,14 @@ class QrCodeController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
+        $full_path='';
         if ($hasDevice->qrCodePath) {
-            $full_path = Storage::disk('public')->url($hasDevice->qrCodePath);
-        } else {
-            $imageRes = $api->getUnlimited($data);
+            if(Storage::disk('public')->exists($hasDevice->qrCodePath)){
+                $full_path = Storage::disk('public')->url($hasDevice->qrCodePath);
+            }
+        }
+        if(!$full_path) {
+            $imageRes = $api->getQrCode($data);
             if ($imageRes) {
                 $full_path = $imageRes['full_path'];
             } else {
@@ -68,25 +68,25 @@ class QrCodeController extends Base
 
         $url = route('wx-QrCodeImage');
         $data = [
-            'deviceShortId'=>1026,
-            'channelId'=>1,
+            'deviceShortId' => 1026,
+            'channelId' => 1,
             'width' => 300,
         ];
         $client = new Client([
             // 'handler' => HandlerStack::create(new CoroutineHandler()),
             'timeout' => 5,
-            'verify'=>false,
+            'verify' => false,
             'swoole' => [
                 'timeout' => 10,
                 'socket_buffer_size' => 1024 * 1024 * 2,
             ],
         ]);
         $response = $client->post($url, [
-            'form_params' =>$data,
+            'form_params' => $data,
         ]);
         if ($response->getStatusCode() == 200) {
-            $res= json_decode($response->getBody()->getContents(),true);
-            if(isset($res['code']) and $res['code']==0){
+            $res = json_decode($response->getBody()->getContents(), true);
+            if (isset($res['code']) and $res['code'] == 0) {
                 return $res['full_path'];
             }
             return $res['errorMessage'];

@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Wx;
 
-use App\Constants\CacheKey;
+use App\Jobs\CallBackGameLogin;
 use App\Models\Channel;
 use App\Models\Device;
-use App\Models\User;
-use App\Service\LoginApi\WeiXinLoginLoginApi;
+use App\Service\LoginApi\LoginApi;
 use GuzzleHttp\Client;
 use App\Constants\ErrorCode;
 use Illuminate\Support\Facades\Cache;
@@ -19,7 +18,7 @@ class UserController extends Base
     /**
      * 微信小程序登录接口
      */
-    public function login(WeiXinLoginLoginApi $loginApi)
+    public function login(LoginApi $loginApi)
     {
         $validator = $this->validationFactory->make($this->request->all(), [
             //'scene' => 'required',
@@ -33,7 +32,8 @@ class UserController extends Base
         }
         //效验用户，获取用户信息
         list($status, $message, $user) = $loginApi->getUser();
-        if ($status!==0) {
+
+        if ($status !== 0) {
             return $this->json([
                 'errorMessage' => $message,
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
@@ -45,108 +45,76 @@ class UserController extends Base
                 'code' => ErrorCode::ACCOUNT_LOCK,
             ]);
         }
-        $scene = $this->request->input('scene');
-        $token = Str::random(16);
-        Cache::put($token, $user, 10);
-        if (!$scene) {
-            return $this->json([
-                'errorMessage' => 'success',
-                'token' => $token,
-                'code' => ErrorCode::SUCCESS,
-            ]);
-        }
-        //存在scene,解析数据
-        $data = scene_decode($scene);
-        $deviceShortId = $data['d'] ?? 0;
-        $channelId = $data['c'] ?? 0;
-        if (!is_numeric($deviceShortId) or $deviceShortId <1) {
-            return $this->json([
-                'errorMessage' => 'scene值错误!',
-                'code' => ErrorCode::ACCOUNT_NOT_EXIST,
-            ]);
-        }
-        $device = Device::whereDeviceId($deviceShortId)->first();
-        if (!$device) {
-            return $this->json([
-                'errorMessage' => '设备未绑定房间',
-                'code' => ErrorCode::DEVICE_NOT_BINDING,
-            ]);
-        }
-        if ($device->seat_num == 0 and $user->judge !== 1) {
-            return $this->json([
-                'errorMessage' => '普通账号,无法登陆法官设备',
-                'code' => ErrorCode::ACCOUNT_NO_PREVILEGE,
-            ]);
-        }
-        try {
-            if ($channelId) {
-                $channel = Channel::whereChannelId($channelId)->first();
-                if ($channel) {
-                    $url = $channel->loginCallBackAddr;
-                } else {
-                    return $this->json([
-                        'errorMessage' => '渠道'.$channelId.'不存在！',
-                        'code' => ErrorCode::CHANNEL_NONENTITY,
-                    ]);
-                }
-            } else {
-                $url = Config::get('game.game_login_call_url');
+     //   $scene = $this->request->input('scene');
+        $scene = scene_encode([
+            'd'=>1026,
+            'c'=>1,
+        ]);
+        if ($scene) {
+            //存在则需要回调游戏登录地址
+            $data = scene_decode($scene);
+            $deviceShortId = $data['d'] ?? 0;
+            $channelId = $data['c'] ?? 0;
+            if (!is_numeric($deviceShortId) or $deviceShortId < 1) {
+                return $this->json([
+                    'errorMessage' => 'scene值错误!',
+                    'code' => ErrorCode::ACCOUNT_NOT_EXIST,
+                ]);
             }
-            $client = new Client([
-                // 'handler' => HandlerStack::create(new CoroutineHandler()),
-                'timeout' => 3,
-                'swoole' => [
-                    'timeout' => 3,
-                    'socket_buffer_size' => 1024 * 1024 * 2,
-                ],
-            ]);
-            $response = $client->post($url, [
-                'headers' => [
-                    'Accept' => 'application/json',
-                ],
-                'json' => [
+            $device = Device::whereDeviceId($deviceShortId)->first();
+            if (!$device) {
+                return $this->json([
+                    'errorMessage' => '设备未绑定房间',
+                    'code' => ErrorCode::DEVICE_NOT_BINDING,
+                ]);
+            }
+            if ($device->seat_num == 0 and $user->judge !== 1) {
+                return $this->json([
+                    'errorMessage' => '普通账号,无法登陆法官设备',
+                    'code' => ErrorCode::ACCOUNT_NO_PREVILEGE,
+                ]);
+            }
+
+            $channel = Channel::whereChannelId($channelId)->first();
+            if ($channel) {
+                $url = $channel->loginCallBackAddr;
+                dispatch(new CallBackGameLogin($url, [
                     "deviceShortId" => $device->device_id,
                     "account" => $user->account,
                     "userId" => $user->id,
                     "name" => $user->nickname,
                     "sex" => $user->sex,
-                    "icon" => '',
+                    "icon" => $user->icon,
                     "roomId" => $device->room_id, // [可选] 房间唯一id
                     "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
                     "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
                     "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
-                ]
-            ]);
-            if ($response->getStatusCode() == 200) {
-                return $this->json([
-                    'errorMessage' => 'success',
-                    'token' => $token,
-                    'code' => ErrorCode::SUCCESS,
-                ]);
+                ]));
             } else {
                 return $this->json([
-                    'errorMessage' => 'error',
-                    'code' => ErrorCode::CONNECTION_TIMEOUT,
+                    'errorMessage' => '渠道' . $channelId . '不存在！',
+                    'code' => ErrorCode::CHANNEL_NONENTITY,
                 ]);
             }
-        } catch (\Exception $e) {
-            return $this->json([
-                'errorMessage' => $e->getMessage(),
-                'code' => ErrorCode::SERVER_ERROR,
-            ]);
+
         }
+        $token = Str::random(16);
+        Cache::put($token, $user, 10);
+        return $this->json([
+            'errorMessage' => 'success',
+            'token' => $token,
+            'code' => ErrorCode::SUCCESS,
+        ]);
 
     }
 
     public function info()
     {
-
-
         $token = $this->request->header('token');
         $user = Cache::get($token);
         if ($user) {
             return $this->json([
-                'errorMessage' => '',
+                'errorMessage' => 'success',
                 'nickname' => $user->nickname,
                 'sex' => $user->sex,
                 'icon' => $user->icon,

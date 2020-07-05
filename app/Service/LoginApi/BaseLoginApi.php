@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-abstract class BaseLoginApi
+abstract class BaseLoginApi implements LoginApi
 {
     public $request = null;
 
@@ -73,12 +73,4 @@ abstract class BaseLoginApi
         }
         return [$code, $info['message'], null];
     }
-
-
-    abstract protected function refreshAccessToken();
-
-    abstract protected function code2Session();
-
-    abstract protected function type();
-
 }
