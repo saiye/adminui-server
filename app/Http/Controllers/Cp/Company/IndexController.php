@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Cp\Company;
 
+use App\Constants\CacheKey;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Area;
 use App\Models\Company;
 use App\Models\Image;
 use App\Models\Staff;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Validator;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +32,7 @@ class IndexController extends Controller
             $data = $data->whereCompanyId($this->req->company_id);
         }
         if ($this->req->company_name) {
-            $data = $data->where('company_name', 'like','%'.trim($this->req->company_name).'%');
+            $data = $data->where('company_name', 'like', '%' . trim($this->req->company_name) . '%');
         }
         if ($this->req->state_id) {
             $data = $data->whereStateId($this->req->state_id);
@@ -37,13 +40,13 @@ class IndexController extends Controller
         if ($this->req->status) {
             $data = $data->whereStatus($this->req->status);
         }
-        if($this->req->listDate){
-            $data = $data->whereBetween('created_at',$this->req->listDate);
+        if ($this->req->listDate) {
+            $data = $data->whereBetween('created_at', $this->req->listDate);
         }
-        if($this->req->real_name){
-            $data = $data->where('staff.real_name','like','%'.$this->req->real_name.'%')->leftJoin('staff', 'company.staff_id', '=', 'staff.staff_id');
+        if ($this->req->real_name) {
+            $data = $data->where('staff.real_name', 'like', '%' . $this->req->real_name . '%')->leftJoin('staff', 'company.staff_id', '=', 'staff.staff_id');
         }
-        $data = $data->orderBy('company.company_id', 'desc')->paginate($this->req->input('limit',PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->orderBy('company.company_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         foreach ($data as &$v) {
             $v->state = $v->state();
         }
@@ -114,13 +117,25 @@ class IndexController extends Controller
         //更新商户表
         $company->staff_id = $staffObj->staff_id;
         $isCompany = $company->save();
-        $imagedata=$this->req->input('imageData',[]);
-        if($imagedata){
-            Image::whereIn('id',$imagedata)->update([
-                'foreign_id'=>$company->company_id
-            ]);
+        $imagedata = $this->req->input('imageData', []);
+        if ($imagedata) {
+            //图片是你上传的,才关联。其他没关联的，通过
+            $user = Auth::guard('cp-api')->user();
+            $key = CacheKey::CP_UPLOAD_KEY . $user->id;
+            $imageJson = Cache::get($key, '');
+            if ($imageJson) {
+                $tmp = json_decode($imageJson, true);
+                $tmp = array_uintersect($tmp, $imagedata, "strcasecmp");
+                if($tmp){
+                    Image::whereIn('id', $tmp)->update([
+                        'foreign_id' => $company->company_id
+                    ]);
+                }else{
+                    return $this->errorJson('营业执照入库失败！');
+                }
+            }
         }
-        if ($company and $staffObj and  $isCompany ) {
+        if ($company and $staffObj and $isCompany) {
             DB::commit();
             return $this->successJson([], '操作成功');
         } else {
@@ -152,8 +167,8 @@ class IndexController extends Controller
         }
         $success = Company::whereCompanyId($this->req->company_id)->update([
             'check' => $this->req->check,
-            'status'=>$this->req->check,
-            'reason'=>$this->req->input('reason','.'),
+            'status' => $this->req->check,
+            'reason' => $this->req->input('reason', '.'),
         ]);
         if ($success) {
             return $this->successJson([], '操作成功');
@@ -182,7 +197,7 @@ class IndexController extends Controller
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
         $success = Company::whereCompanyId($this->req->company_id)->update([
-            'status'=>$this->req->status
+            'status' => $this->req->status
         ]);
         if ($success) {
             return $this->successJson([], '操作成功');
