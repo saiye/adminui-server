@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Cp\Tool;
 
+use App\Constants\CacheKey;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Image;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Validator;
 use Illuminate\Support\Facades\Storage;
 
@@ -22,14 +25,13 @@ class ImageController extends Controller
         $validator = Validator::make($this->req->all(), [
             'file' => 'required|image',
             'type' => 'required|numeric|in:1,2',
-            'foreign_id' => 'required|numeric',
+            'foreign_id' => 'numeric',
         ], [
             'file.required' => 'file字段不存在',
             'file.image' => '不是图片类型文件！',
             'type.required' => 'type required',
             'type.numeric' => 'type 是一个数字',
             'type.in' => 'type 1商户营业执照,2店面照片',
-            'foreign_id.required' => '外键不能为空',
             'foreign_id.numeric' => '外键是一个数字',
 
         ]);
@@ -44,21 +46,34 @@ class ImageController extends Controller
         /**
          * 入库处理
          */
-        $image = Image::created([
+        $image = Image::create([
             'path' => $path,
             'type' => $this->req->type,
-            'foreign_id' => $this->req->foreign_id,
+            'foreign_id' => $this->req->input('foreign_id',0),
         ]);
         if (!$image) {
             //物理文件删除操作
             Storage::delete($path);
             $this->errorJson('上传成功，入库失败!');
         }
+        $user=Auth::guard('cp-api')->user();
+        //标记图片是你上传的
+        $key=CacheKey::CP_UPLOAD_KEY.$user->id;
+        $imageJson=Cache::get($key,'');
+        if($imageJson){
+            $tmp=json_decode($imageJson,true);
+            $imageData=array_merge($tmp,[$image->id]);
+        }else{
+            $imageData=[$image->id];
+        }
+        Cache::put($key,json_encode($imageData),3600);
         return $this->successJson([
+            'id' => $image->id,
             'path' => $path,
             'url' => $url,
             'image_id' => $image->id,
-        ]);
+            'imageData' => $imageData,
+        ],'上传成功！');
     }
 
     /**

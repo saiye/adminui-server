@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cp\Company;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Area;
 use App\Models\Company;
+use App\Models\Image;
 use App\Models\Staff;
 use Illuminate\Support\Facades\Hash;
 use Validator;
@@ -58,7 +59,7 @@ class IndexController extends Controller
         $validator = Validator::make($this->req->all(), [
             'company_name' => ['required', 'max:30', 'unique:company,company_name'],
             'state_id' => 'required|integer',
-            // 'has_license' => 'required',
+            'imageData' => 'required|array',
             'account' => ['regex:/^[0-9A-Za-z]+$/', 'required', 'max:20', 'unique:staff,account'],
             'password' => 'required|max:100',
             'real_name' => 'required|max:100',
@@ -66,11 +67,12 @@ class IndexController extends Controller
             'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/', 'unique:staff,phone'],
             'proportion' => 'required|integer|min:1|max:100',
         ], [
+            'imageData.required' => '商户营业执照不能为空！',
+            'imageData.array' => '商户营业执照参数格式错误！',
             'company_name.required' => '商户名称不能为空！',
             'company_name.unique' => '商户名称已存在！',
             'state_id.required' => '商户所在国家不能为空！',
             'state_id.integer' => '商户所在国家参数必须是一个整数！',
-            'has_license.required' => '营业执照，不能为空！',
             'account.required' => '账号，不能为空！',
             'account.max' => '商户账号最大长度20！',
             'account.regex' => '商户账号必须是字母数字的组合！',
@@ -112,7 +114,12 @@ class IndexController extends Controller
         //更新商户表
         $company->staff_id = $staffObj->staff_id;
         $isCompany = $company->save();
-
+        $imagedata=$this->req->input('imageData',[]);
+        if($imagedata){
+            Image::whereIn('id',$imagedata)->update([
+                'foreign_id'=>$company->company_id
+            ]);
+        }
         if ($company and $staffObj and  $isCompany ) {
             DB::commit();
             return $this->successJson([], '操作成功');
