@@ -20,6 +20,7 @@ class UserController extends Base
      */
     public function login(LoginApi $loginApi)
     {
+        Log::info($this->request->all());
         $validator = $this->validationFactory->make($this->request->all(), [
             //'scene' => 'required',
             'js_code' => 'required',
