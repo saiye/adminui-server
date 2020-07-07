@@ -56,6 +56,7 @@ class CallBackGameLogin implements ShouldQueue
         $client = new Client([
             'timeout' => 3,
         ]);
+       // Log::info($this->post);
         $response = $client->post($this->url, [
             'headers' => [
                 'Accept' => 'application/json',

@@ -6,11 +6,10 @@ use App\Jobs\CallBackGameLogin;
 use App\Models\Channel;
 use App\Models\Device;
 use App\Service\LoginApi\LoginApi;
-use GuzzleHttp\Client;
 use App\Constants\ErrorCode;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 
 class UserController extends Base
@@ -20,10 +19,17 @@ class UserController extends Base
      */
     public function login(LoginApi $loginApi)
     {
+        Log::info('wx-login');
         Log::info($this->request->all());
         $validator = $this->validationFactory->make($this->request->all(), [
             //'scene' => 'required',
             'js_code' => 'required',
+            'nickName' => 'required',
+            'avatarUrl' => 'required',
+            'gender' => 'required',
+            'province' => 'required',
+            'city' => 'required',
+            'country' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -33,7 +39,6 @@ class UserController extends Base
         }
         //效验用户，获取用户信息
         list($status, $message, $user) = $loginApi->getUser();
-
         if ($status !== 0) {
             return $this->json([
                 'errorMessage' => $message,
@@ -46,16 +51,12 @@ class UserController extends Base
                 'code' => ErrorCode::ACCOUNT_LOCK,
             ]);
         }
-     //   $scene = $this->request->input('scene');
-        $scene = scene_encode([
-            'd'=>1026,
-            'c'=>1,
-        ]);
+        $scene = $this->request->input('scene');
         if ($scene) {
             //存在则需要回调游戏登录地址
             $data = scene_decode($scene);
-            $deviceShortId = $data['d'] ?? 0;
-            $channelId = $data['c'] ?? 0;
+            $deviceShortId = (int) $data['d'] ?? 0;
+            $channelId = (int) $data['c'] ?? 0;
             if (!is_numeric($deviceShortId) or $deviceShortId < 1) {
                 return $this->json([
                     'errorMessage' => 'scene值错误!',
@@ -75,7 +76,6 @@ class UserController extends Base
                     'code' => ErrorCode::ACCOUNT_NO_PREVILEGE,
                 ]);
             }
-
             $channel = Channel::whereChannelId($channelId)->first();
             if ($channel) {
                 $url = $channel->loginCallBackAddr;
@@ -85,7 +85,7 @@ class UserController extends Base
                     "userId" => $user->id,
                     "name" => $user->nickname,
                     "sex" => $user->sex,
-                    "icon" => $user->icon,
+                    "icon" => $user->icon??'',
                     "roomId" => $device->room_id, // [可选] 房间唯一id
                     "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
                     "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
@@ -97,7 +97,6 @@ class UserController extends Base
                     'code' => ErrorCode::CHANNEL_NONENTITY,
                 ]);
             }
-
         }
         $token = Str::random(16);
         Cache::put($token, $user, 10);

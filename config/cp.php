@@ -104,6 +104,16 @@ return array(
             ),
         ),
     ),
+    'tool' => array('name' => '全局功能管理', 'checked' => false, 'display' => true, 'act' => 'default', 'class' => 'fa fa-share',
+        'child' => array(
+            'image' => array('name' => '图片上传', 'checked' => false, 'display' => false, 'act' => 'default', 'class' => 'fa fa-circle-o',
+                'child' => array(
+                    'upload' => array('name' => '上传图片', 'checked' => false, 'display' => true, 'url' => 'tool/image/upload', 'act' => 'default'),
+                    'delete' => array('name' => '删除图片', 'checked' => false, 'display' => true, 'url' => 'tool/image/delete', 'act' => 'default'),
+                ),
+            ),
+        ),
+    ),
 
 
 );

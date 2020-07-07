@@ -9,6 +9,7 @@ use App\Models\PhysicsAddress;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Constants\ErrorCode;
+
 /**
  *
  * @author chenyuansai
@@ -74,7 +75,7 @@ class ClientController extends Base
                         "userId" => $user->id,
                         "name" => $user->nickname,
                         "sex" => $user->sex,
-                        "icon" => $user->icon,
+                        "icon" => $user->icon ?? '',
                         "roomId" => $device->room_id, // [可选] 房间唯一id
                         "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
                         "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
@@ -175,6 +176,91 @@ class ClientController extends Base
         ]);
     }
 
+    /**
+     * 游戏结束
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function beginGame()
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'roomId' => 'required|numeric',
+            'beginTime' => 'required|numeric',
+            'unitInfos' => 'required|array',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+    }
+
+    /**
+     * 游戏结束
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function endGame()
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'roomId' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        return $this->json([
+            'errorMessage' => '',
+            'code' => ErrorCode::SUCCESS,
+        ]);
+    }
+
+    /**
+     * 更换板子
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function changeDup()
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'roomId' => 'required|numeric',
+            'dupId' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        return $this->json([
+            'errorMessage' => '',
+            'code' => ErrorCode::SUCCESS,
+        ]);
+    }
+
+    /**
+     * 战绩结果推送
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function gameResLog()
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'id' => 'required|numeric',
+            'gameRes' => 'required',
+            'beginTick' => 'required',
+            'unitInfos' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        return $this->json([
+            'errorMessage' => '',
+            'code' => ErrorCode::SUCCESS,
+        ]);
+    }
 
 }
 

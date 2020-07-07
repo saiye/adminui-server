@@ -46,6 +46,11 @@ return [
             'provider' => 'cp_users',
             'hash' => false,
         ],
+        'staff' => [
+            'driver' => 'token',
+            'provider' => 'staff',
+            'hash' => false,
+        ],
     ],
 
     /*
@@ -69,6 +74,10 @@ return [
         'cp_users' => [
             'driver' => 'eloquent',
             'model' => App\Models\CpUser::class,
+        ],
+        'staff' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Staff::class,
         ],
 
         // 'users' => [
