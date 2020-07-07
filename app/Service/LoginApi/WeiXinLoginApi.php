@@ -44,11 +44,23 @@ class WeiXinLoginApi extends BaseLoginApi
             if ($response->getStatusCode() == 200) {
                 $res = json_decode($response->getBody()->getContents(), true);
                 if (isset($res['openid'])) {
+                    $gender = $this->request->input('gender', 0);
+                    $sex=1;
+                    switch ($gender) {
+                        case 1:
+                            $sex=0;
+                            break;
+                        case 0:
+                        case 2:
+                            $sex=1;
+                            break;
+                    }
                     return [ErrorCode::SUCCESS, [
                         'openid' => $res['openid'],
                         'session_key' => $res['session_key'],
-                        'sex' => 0,
-                        'icon' => '',
+                        'sex' => $sex,
+                        'icon' => $this->request->input('avatarUrl', ''),
+                        'nickname' => $this->request->input('nickName', ''),
                     ]];
                 }
                 Log::info('刷新小程序refreshAccessToken:res');
@@ -166,29 +178,4 @@ class WeiXinLoginApi extends BaseLoginApi
         }
         return false;
     }
-
-    /**
-     * 保存二维码到目录
-     */
-    private function saveErCode($buffer, $contentType, $deviceShortId)
-    {
-        //保存图片到本地
-        $ext = '.png';
-        if (strpos($contentType, 'jpeg')) {
-            $ext = '.jpg';
-        }
-        $fileName = 'qrCode' . DIRECTORY_SEPARATOR . $deviceShortId . $ext;
-
-        Storage::disk('public')->put($fileName, $buffer);
-        //入库
-        //qrCodePath
-        $device = PhysicsAddress::whereId($deviceShortId)->first();
-        if (!$device->qrCodePath) {
-            $device->update([
-                'qrCodePath' => $fileName,
-            ]);
-        }
-        return $fileName;
-    }
-
 }

@@ -38,12 +38,13 @@ abstract class BaseLoginApi implements LoginApi
     public function getUser()
     {
         list($code, $info) = $this->code2Session();
-        if ($code==0) {
+        if ($code == 0) {
             $hasThreeUser = ThreeUser::whereOpenId($info['openid'])->first();
             if (!$hasThreeUser) {
                 DB::beginTransaction();
                 $threeUser = null;
                 $user = User::create([
+                    'nickname' => $info['nickname'],
                     'account' => $info['openid'],
                     'password' => Hash::make($info['openid']),
                     'sex' => $info['sex'],
@@ -69,6 +70,13 @@ abstract class BaseLoginApi implements LoginApi
             }
             //已注册用户
             $user = User::whereId($hasThreeUser->user_id)->first();
+            if ($user) {
+                //更新用户信息
+                $user->sex = $info['sex'];
+                $user->nickname = $info['nickname'];
+                $user->icon = $info['icon'];
+                $user->save();
+            }
             return [ErrorCode::SUCCESS, '老用户', $user];
         }
         return [$code, $info['message'], null];

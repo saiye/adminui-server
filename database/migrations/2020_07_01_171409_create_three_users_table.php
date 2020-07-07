@@ -17,7 +17,7 @@ class CreateThreeUsersTable extends Migration
             $table->id();
             $table->string('open_id', 100)->unique()->comment('openId');
             $table->tinyInteger('type')->default(1)->comment('type1小程序');
-            $table->string('icon')->nullable()->comment('unionid平台唯一');
+            $table->string('icon')->nullable()->comment('icon');
             $table->tinyInteger('sex')->comment('sex0未知，1男,2女');
             $table->bigInteger('user_id')->default(0)->comment('绑定的用户id!');
             $table->string('session_key', 100)->default('')->comment('session_key');

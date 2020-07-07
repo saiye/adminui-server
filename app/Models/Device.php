@@ -13,10 +13,6 @@ class Device extends Model
     ];
 
     protected $casts = [
-      //  'id' => 'string',
-     //   'company_id' => 'string',
-       // 'room_id' => 'string',
-      //  'store_id' => 'string',
     ];
 
 

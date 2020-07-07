@@ -34,7 +34,7 @@ class QrCodeController extends Base
         $hasDevice = PhysicsAddress::whereId($deviceShortId)->first();
         if (!$hasDevice) {
             return $this->json([
-                'errorMessage' => 'device cant find!',
+                'errorMessage' => '设置不存在!',
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
@@ -68,7 +68,7 @@ class QrCodeController extends Base
 
         $url = route('wx-QrCodeImage');
         $data = [
-            'deviceShortId' => 1026,
+            'deviceShortId' => 1113,
             'channelId' => 1,
             'width' => 300,
         ];
