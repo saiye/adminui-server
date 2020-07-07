@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Business\Main;
 
 use App\Http\Controllers\Business\BaseController;
 use App\Models\Staff;
+use Illuminate\Support\Facades\Hash;
 use Redirect;
 use Auth;
 use Route;
+
 use Illuminate\Support\Str;
 
 class HomeController extends BaseController
@@ -17,7 +19,7 @@ class HomeController extends BaseController
      */
     public function getHome()
     {
-        return $this->successJson([], 'home', []);
+        return $this->successJson([], 'business home', []);
     }
 
     /**
@@ -31,24 +33,24 @@ class HomeController extends BaseController
             'account' => 'required|max:255',
             'password' => 'required|max:255',
         ]);
-        $u1 = Staff::whereAccount($this->req->account)->first();
-        if ($u1) {
-            if ($u1->lock) {
+        $user = Staff::whereAccount($this->req->account)->first();
+        if ($user) {
+            if ($user->lock) {
                 return $this->errorJson('用户名已被锁定，请联系管理员!', 2, []);
             }
-            if (Auth::guard('staff')->attempt(['user_name' => $this->req->account, 'password' => $this->req->password])) {
+
+            if (Hash::check($this->req->password,$user->password)) {
                 $token = hash('sha256', Str::random(60));
-                $user = Auth::guard('account')->user();
                 $data['last_ip'] = $user->current_ip;
                 $data['current_ip'] = $this->req->ip();
                 $data['current_login_at'] = date('Y-m-d H:i:s');
                 $data['last_login_at'] = $user->current_login_at;
                 $data['api_token'] = $token;
-                Staff::where('id', $user->id)->update($data);
+                Staff::whereStaffId( $user->staff_id)->update($data);
                 return $this->successJson([
                     'token' =>$token,
-                    'user_name' => $u1->user_name,
-                    'avatar' => $u1->avatar,
+                    'account' => $user->account,
+                    'avatar' => '',
                 ], '登录成功');
             }
         }

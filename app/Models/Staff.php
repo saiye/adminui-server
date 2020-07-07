@@ -1,13 +1,11 @@
 <?php
 namespace App\Models;
-use App\TraitInterface\ModelDataFormat;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class Staff  extends Authenticatable
+class Staff extends Authenticatable
 {
-    use Notifiable,ModelDataFormat;
-    use ModelDataFormat;
+    use Notifiable;
     public  $primaryKey='staff_id';
     protected $table = 'staff';
 
@@ -16,6 +14,6 @@ class Staff  extends Authenticatable
     ];
 
     protected $hidden = [
-        'password','api_token',
+        'password',
     ];
 }

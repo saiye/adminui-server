@@ -40,7 +40,6 @@ class Handler extends ExceptionHandler
     {
         parent::report($exception);
     }
-
     /**
      * Render an exception into an HTTP response.
      *
@@ -55,9 +54,5 @@ class Handler extends ExceptionHandler
         return parent::render($request, $exception);
     }
 
-    protected function invalidJson($request,$exception)
-    {
-        return response()->json(['message' =>'system error', 'code' => 1002], $exception->status);
-    }
 
 }

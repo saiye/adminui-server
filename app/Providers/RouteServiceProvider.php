@@ -42,15 +42,17 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
+
+
         $this->mapApiRoutes();
 
         $this->mapClientRoutes();
 
         $this->mapWxRoutes();
 
-       // $this->mapWebRoutes();
-
         $this->mapBusinessRoutes();
+
+        $this->mapWebRoutes();
     }
 
 
@@ -83,7 +85,6 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapBusinessRoutes()
     {
-        Route::prefix('business')->namespace($this->namespace . '\\Business')
-            ->group(base_path('routes/business.php'));
+        Route::namespace($this->namespace . '\\Business')->prefix('bs')->group(base_path('routes/bs.php'));
     }
 }
