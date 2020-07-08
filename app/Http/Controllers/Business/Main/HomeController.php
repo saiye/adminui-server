@@ -35,10 +35,9 @@ class HomeController extends BaseController
         ]);
         $user = Staff::whereAccount($this->req->account)->first();
         if ($user) {
-            if ($user->lock) {
+            if ($user->lock==2) {
                 return $this->errorJson('用户名已被锁定，请联系管理员!', 2, []);
             }
-
             if (Hash::check($this->req->password,$user->password)) {
                 $token = hash('sha256', Str::random(60));
                 $data['last_ip'] = $user->current_ip;
@@ -46,7 +45,7 @@ class HomeController extends BaseController
                 $data['current_login_at'] = date('Y-m-d H:i:s');
                 $data['last_login_at'] = $user->current_login_at;
                 $data['api_token'] = $token;
-                Staff::whereStaffId( $user->staff_id)->update($data);
+                Staff::whereStaffId($user->staff_id)->update($data);
                 return $this->successJson([
                     'token' =>$token,
                     'account' => $user->account,
@@ -61,7 +60,10 @@ class HomeController extends BaseController
     {
         $user = Auth::guard('staff')->user();
         if ($user) {
-            Auth::guard('staff')->logout();
+            $token = hash('sha256', Str::random(60));
+            Staff::whereStaffId($user->staff_id)->update([
+                'api_token'=>$token
+            ]);
         }
         return $this->successJson([], '退出登录成功!');
     }

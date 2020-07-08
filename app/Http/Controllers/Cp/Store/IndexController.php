@@ -47,18 +47,18 @@ class IndexController extends Controller
             $data = $data->whereStaffId($this->req->staff_id);
         }
         if ($this->req->check) {
-            $data = $data->whereIn('check',$this->req->check);
+            $data = $data->whereIn('check', $this->req->check);
         }
-        if($this->req->listDate){
-            $data = $data->whereBetween('store.created_at',$this->req->listDate);
+        if ($this->req->listDate) {
+            $data = $data->whereBetween('store.created_at', $this->req->listDate);
         }
-        if($this->req->company_name){
-            $data=$data->where('company.company_name','like','%'.$this->req->company_name.'%')->leftJoin('company','store.company_id','=','company.company_id');
+        if ($this->req->company_name) {
+            $data = $data->where('company.company_name', 'like', '%' . $this->req->company_name . '%')->leftJoin('company', 'store.company_id', '=', 'company.company_id');
         }
-        if($this->req->real_name){
-            $data=$data->where('staff.real_name','like','%'.$this->req->real_name.'%')->leftJoin('staff','store.staff_id','=','staff.staff_id');
+        if ($this->req->real_name) {
+            $data = $data->where('staff.real_name', 'like', '%' . $this->req->real_name . '%')->leftJoin('staff', 'store.staff_id', '=', 'staff.staff_id');
         }
-        $data = $data->orderBy('store.store_id', 'desc')->paginate($this->req->input('limit',  $limit=$this->req->input('limit',PaginateSet::LIMIT)))->appends($this->req->except('page'));
+        $data = $data->orderBy('store.store_id', 'desc')->paginate($this->req->input('limit', $limit = $this->req->input('limit', PaginateSet::LIMIT)))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }
@@ -119,7 +119,7 @@ class IndexController extends Controller
             'real_name' => $this->req->real_name,
             'sex' => $this->req->sex,
             'phone' => $this->req->phone,
-            'lock' => 1,
+            'lock' => 2,
             'type' => 1,
             'company_id' => $this->req->company_id,
             'password' => Hash::make($this->req->password),
@@ -171,12 +171,17 @@ class IndexController extends Controller
             //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $success = Store::whereStoreId($this->req->store_id)->update([
-            'check' => $this->req->check,
-            'reason' => $this->req->reason??'',
-        ]);
-        if ($success) {
-            return $this->successJson([], '操作成功');
+        $item = Store::whereStoreId($this->req->store_id)->first();
+        if ($item) {
+            $item->check = $this->req->check;
+            $item->reason = $this->req->reason ?? '';
+            $success = $item->save();
+            $checkStaff = Staff::whereStaffId($item->staff_id)->update([
+                'lock' => 1,
+            ]);
+            if ($success and $checkStaff) {
+                return $this->successJson([], '操作成功');
+            }
         }
         return $this->errorJson('审核失败！');
     }

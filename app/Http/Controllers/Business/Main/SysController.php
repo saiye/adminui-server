@@ -27,17 +27,18 @@ class SysController extends BaseController
 
     public function getUserList(Staff $user)
     {
-        $data = $user->orderBy('staff_id', 'desc');
-        if ($this->req->id) {
-            $data = $data->whereId($this->req->id);
+        $data = $user->where('staff.company_id','=',$this->loginUser->company_id);
+        if(in_array($this->loginUser->role_id,[3,4])){
+            $data=$data->whereStoreId($this->loginUser->store_id);
         }
-        if ($this->req->name) {
-            $data = $data->where('name', 'like', '%' . $this->req->name . '%');
+        if($this->req->search_name){
+            $data = $data->where('staff.account', 'like', '%' . $this->req->search_name. '%')->orWhere('staff.real_name', 'like', '%' . $this->req->search_name. '%')->orWhere('store.store_name','like','%'.$this->req->search_name.'%');
         }
         if ($this->req->role_id) {
             $data = $data->whereRoleId($this->req->role_id);
         }
-        $data = $data->paginate($this->req->input('limit',PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->select(['staff.staff_id','staff.real_name','staff.account','staff.role_id','staff.lock','staff.phone','staff.store_id','store.store_name'])->leftJoin('store','staff.store_id','=','store.store_id')->orderBy('staff.staff_id', 'desc')->paginate($this->req->input('limit',PaginateSet::LIMIT))->appends($this->req->except('page'));
+
 
         $roleList=Config::get('business.role_list');
 
@@ -50,7 +51,7 @@ class SysController extends BaseController
 
     public function getLockUser(Staff $user)
     {
-        $user->whereId($this->req->user_id)->update(['lock' => $this->req->lock]);
+        $user->whereStaffId($this->req->staff_id)->update(['lock' => $this->req->lock]);
         return $this->successJson([], '操作成功');
     }
 
@@ -58,16 +59,17 @@ class SysController extends BaseController
     {
         $validator = Validator::make($this->req->all(), [
             'password' => 'required|max:191',
-            'account' =>['regex:/^[0-9A-Za-z]+$/', 'required', 'max:20'],
+            'account' =>['regex:/^[0-9A-Za-z]+$/', 'required', 'max:20','unique:staff,account'],
             'role_id' => 'required|numeric',
+            'store_id' => 'required|numeric',
             'real_name' => 'required',
             'phone' => 'required',
-            'store_id' => 'required',
         ], [
             'password.required' => '密码是必须！',
-            'account.regex' => '账号名取值只能是字母数字组合！',
-            'account.required' => '账号名是必须的！',
-            'account.unique' => '账号名已经存在，账号名必须是唯一的！',
+            'account.required' => '账号，不能为空！',
+            'account.max' => '账号最大长度20！',
+            'account.regex' => '账号必须是字母数字的组合！',
+            'account.unique' => '账号已存在，请用其他账号注册！',
             'role_id.required' => '请选择角色！',
         ]);
         if ($validator->fails()) {
@@ -75,13 +77,18 @@ class SysController extends BaseController
             return $this->errorJson('params error', 2, $validator->errors()->toArray());
         }
         $data['account'] = $this->req->account;
+        $data['company_id'] = $this->loginUser->company_id;
         $data['role_id'] = $this->req->role_id;
+        $data['store_id'] = $this->req->store_id;
+        $data['real_name'] = $this->req->real_name;
+        $data['lock'] = 1;
+        $data['phone'] = $this->req->phone;
         $data['password'] = Hash::make($this->req->password);
         $data['last_ip'] = $this->req->ip();
         $data['current_ip'] = $this->req->ip();
         $data['current_login_at'] = date('Y-m-d H:i:s');
         $data['last_login_at'] = date('Y-m-d H:i:s');
-        Staff::insert($data);
+        Staff::create($data);
         return $this->successJson([], '操作成功');
     }
 
@@ -89,32 +96,34 @@ class SysController extends BaseController
     {
         $validator = Validator::make($this->req->all(), [
             'password' => 'max:255',
-            'account' => ['required', 'max:20','regex:/^[0-9A-Za-z]+$/', Rule::unique('staff')->ignore($this->req->staff_id)],
+            'account' => ['required', 'max:20','regex:/^[0-9A-Za-z]+$/', Rule::unique('staff')->ignore($this->req->staff_id,'staff_id')],
             'role_id' => 'required|numeric',
             'real_name' => 'required',
             'phone' => 'required',
             'store_id' => 'required',
+            'staff_id' => 'required',
         ], [
             'account.regex' => '账号名取值只能是字母数字组合！',
             'account.required' => '账号名是必须的！',
             'account.unique' => '账号名已经存在，账号名必须是唯一的！',
             'role_id.required' => '角色是必须选择！',
             'store_id.required' => '门店必须选择！',
+            'staff_id.required' => '店员id不能为空！',
             'real_name.required' => '员工名称必须填写！',
         ]);
         if ($validator->fails()) {
             return $this->errorJson('参数错误！', 2, $validator->errors()->toArray());
         }
-        $data = $this->req->except('_token','user_id', 'password');
+        $data = $this->req->except('_token','staff_id', 'password','role_name');
         if ($this->req->password)
             $data['password'] = Hash::make($this->req->password);
-        $Staff->where('id', $this->req->user_id)->update($data);
+        $Staff->where('staff_id', $this->req->staff_id)->update($data);
         return $this->successJson([], '修改成功');
     }
 
     public function getRoleList()
     {
-        $data =Config::get('business.role_list');
+        $data =array_values(Config::get('business.role_list'));
         $assgin = compact('data');
         return $this->successJson($assgin);
     }

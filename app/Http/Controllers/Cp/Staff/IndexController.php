@@ -36,8 +36,8 @@ class IndexController extends Controller
         if ($this->req->lock) {
             $data = $data->where('lock', $this->req->lock);
         }
-        if ($this->req->type) {
-            $data = $data->where('type', $this->req->type);
+        if ($this->req->role_id) {
+            $data = $data->where('role_id', $this->req->role_id);
         }
         if ($this->req->company_id) {
             $data = $data->where('company_id', $this->req->company_id);
@@ -98,7 +98,7 @@ class IndexController extends Controller
         $data['store_id'] = $this->req->store_id;
         $staffObj = Staff::create($data);
         $staffObj->save();
-
+        
         //联系人入库
         $staff = [
             'account' => $this->req->account,

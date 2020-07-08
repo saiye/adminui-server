@@ -28,18 +28,14 @@ class UserController extends Base
         $user = Cache::get($key);
         if (!$user) {
             $user = User::whereId($uerId)->first();
-            if ($user) {
-                Cache::put($key, $user, 60);
-            }
         }
         if ($user) {
             return $this->json([
                 'errorMessage' => 'success',
-                "account" => $user->account,
-                "userId" => $user->id,
-                "name" => $user->nickname,
+                "nickname" => $user->nickname,
                 "sex" => $user->sex,
                 "icon" => $user->icon ?? '',
+                "userId" => $user->id,
                 "playCount" => 120,//总局数
                 "successCount" => 110,//胜利局数
                 "failureCount" => 10,//失败局数

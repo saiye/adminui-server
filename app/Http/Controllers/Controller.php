@@ -8,6 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use App\TraitInterface\BaseTrait;
+use Illuminate\Support\Facades\Auth;
 
 abstract class Controller extends BaseController
 {
@@ -16,9 +17,11 @@ abstract class Controller extends BaseController
     public  $req;
     public $st=' 00:00:00';
     public $et=' 23:59:59';
+    public $loginUser=null;
     public function __construct(Request $req)
     {
         $this->req=$req;
+        $this->loginUser=AUth::guard('staff')->user();
     }
 
     public function view($file,$data=[],$time=5){

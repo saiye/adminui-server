@@ -6,7 +6,7 @@ Route::any('/user/login', 'Main\HomeController@postLogin')->name('bs-dologin');
 Route::any('/user/logout', 'Main\HomeController@getLogout')->name('bs-logout');
 Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('bs-cantAccess');
 Route::get('/', 'Main\HomeController@getHome')->name('bs-home')->middleware('auth:staff');
-Route::get('/user/info', 'Main\HomeController@getUserInfo')->name('bs-getUserInfo')->middleware('auth:bs-api');
+Route::get('/user/info', 'Main\HomeController@getUserInfo')->name('bs-getUserInfo')->middleware('auth:staff');
 Route::group([
     'middleware' => ['auth:staff']
 ], function () {

@@ -108,8 +108,8 @@ class IndexController extends Controller
             'real_name' => $this->req->real_name,
             'sex' => $this->req->sex,
             'phone' => $this->req->phone,
-            'lock' => 1,
-            'type' => 1,
+            'lock' => 2,
+            'role_id' => 1,
             'company_id' => $company->company_id,
             'password' => Hash::make($this->req->password),
         ];
@@ -170,7 +170,10 @@ class IndexController extends Controller
             'status' => $this->req->check,
             'reason' => $this->req->input('reason', '.'),
         ]);
-        if ($success) {
+       $checkStaff= Staff::whereCompanyId($this->req->company_id)->update([
+            'lock'=>1,
+        ]);
+        if ($success and $checkStaff) {
             return $this->successJson([], '操作成功');
         }
         return $this->errorJson('审核失败！');

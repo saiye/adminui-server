@@ -22,6 +22,9 @@ class IndexController extends Controller
     {
         $data = new Store();
         $data = $data->with('staff')->with('company')->with('region')->with('province')->with('city');
+
+        $data = $data->whereCompanyId($this->loginUser->company_id);
+
         if ($this->req->store_id) {
             $data = $data->whereStoreId($this->req->store_id);
         }
@@ -39,9 +42,6 @@ class IndexController extends Controller
         }
         if ($this->req->city_id) {
             $data = $data->whereCityId($this->req->city_id);
-        }
-        if ($this->req->company_id) {
-            $data = $data->whereCompanyId($this->req->company_id);
         }
         if ($this->req->staff_id) {
             $data = $data->whereStaffId($this->req->staff_id);
