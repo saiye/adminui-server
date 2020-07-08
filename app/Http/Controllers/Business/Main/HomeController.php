@@ -76,7 +76,7 @@ class HomeController extends BaseController
         $user = Auth::guard('staff')->user();
         if ($user) {
             return $this->successJson([
-                'user_id' => $user->staff_id,
+                'staff_id' => $user->staff_id,
                 'account' => $user->account,
                 'phone' => $user->phone,
                 'company_id' => $user->company_id,
@@ -88,7 +88,7 @@ class HomeController extends BaseController
     public function getRoleMenu()
     {
         $act = request()->path();
-        $user = Auth::guard('staff')->user();
+        $user =Auth::guard('staff')->user();
         $menus = $user->roleMenu();
         return $this->successJson($menus);
     }

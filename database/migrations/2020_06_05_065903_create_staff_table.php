@@ -21,7 +21,7 @@ class CreateStaffTable extends Migration
             $table->tinyInteger('sex')->default(3)->comment('性别1男,2女,3未知');
             $table->string('phone',11)->comment('手机号码');
             $table->tinyInteger('lock')->default(0)->comment('是否锁定1正常2锁定');
-            $table->tinyInteger('type')->default(4)->comment('账号类型:1超级管理员,2管理员,3店长,4店员');
+            $table->tinyInteger('role_id')->default(4)->comment('账号类型:1超级管理员,2管理员,3店长,4店员');
             $table->unsignedInteger('company_id')->default(0)->comment('所属公司id');
             $table->unsignedInteger('store_id')->default(0)->comment('所属店面id,0非店面人员');
             $table->ipAddress('last_ip')->comment('last ip address');

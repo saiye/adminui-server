@@ -5,10 +5,10 @@ Route::any('/', 'IndexController@home')->name('bs-home');
 Route::any('/user/login', 'Main\HomeController@postLogin')->name('bs-dologin');
 Route::any('/user/logout', 'Main\HomeController@getLogout')->name('bs-logout');
 Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('bs-cantAccess');
-Route::get('/', 'Main\HomeController@getHome')->name('bs-home')->middleware('auth:statf');
+Route::get('/', 'Main\HomeController@getHome')->name('bs-home')->middleware('auth:staff');
 Route::get('/user/info', 'Main\HomeController@getUserInfo')->name('bs-getUserInfo')->middleware('auth:bs-api');
 Route::group([
-    'middleware' => ['auth:statf', 'rbac:statf', 'action.log:statf']
+    'middleware' => ['auth:staff']
 ], function () {
     //权限管理
     Route::post('/main/sys/add-role', 'Main\SysController@postAddRole')->name('bs-doAddRole');
@@ -16,22 +16,11 @@ Route::group([
     Route::post('/main/sys/edit-role', 'Main\SysController@postEditRole')->name('bs-doEditRole');
     Route::post('/main/sys/del-role', 'Main\SysController@getDelRole')->name('bs-doDelRole');
     Route::get('/main/sys/role-list', 'Main\SysController@getRoleList')->name('bs-roleList');
-    Route::get('/main/sys/del-role', 'Main\SysController@getDelRole')->name('bs-delRole');
     Route::post('/main/sys/add-user', 'Main\SysController@postAddUser')->name('bs-doAddUser');
-    Route::get('/main/sys/add-user', 'Main\SysController@getAddUser')->name('bs-addUser');
-    Route::get('/main/sys/edit-user', 'Main\SysController@getEditUser')->name('bs-editUser');
     Route::post('/main/sys/edit-user', 'Main\SysController@postEditUser')->name('bs-doEditUser');
     Route::post('/main/sys/user-list', 'Main\SysController@getUserList')->name('bs-userList');
     Route::any('/main/sys/lock-user', 'Main\SysController@getLockUser')->name('bs-lockUser');
-    Route::get('/main/sys/edit-act', 'Main\SysController@getEditAct')->name('bs-editAct');
     Route::post('/main/sys/edit-act', 'Main\SysController@postEditAct')->name('bs-doEditAct');
-    //商户管理
-    Route::post('company/index/companyList', 'Company\IndexController@companyList')->name('bs-companyList');
-    Route::post('company/index/addCompany', 'Company\IndexController@addCompany')->name('bs-addCompany');
-    Route::post('company/index/checkCompany', 'Company\IndexController@checkCompany')->name('bs-checkCompany');
-    Route::post('company/index/lockCompany', 'Company\IndexController@lockCompany')->name('bs-lockCompany');
-    Route::post('company/index/getState', 'Company\IndexController@getState')->name('bs-getState');
-    Route::post('company/index/areaList', 'Company\IndexController@areaList')->name('bs-areaList');
     //门店管理
     Route::post('store/index/storeList', 'Store\IndexController@storeList')->name('bs-storeList');
     Route::post('store/index/addStore', 'Store\IndexController@addStore')->name('bs-addStore');

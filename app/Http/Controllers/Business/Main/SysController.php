@@ -14,6 +14,7 @@ use App\Http\Controllers\Business\BaseController;
 use App\Models\CpAct;
 use App\Models\CpRole;
 use App\Models\Staff;
+use App\Models\StaffAct;
 use Config;
 use Hash;
 use Auth;
@@ -26,24 +27,22 @@ class SysController extends BaseController
 
     public function getUserList(Staff $user)
     {
-        $data = $user->orderBy('id', 'desc');
+        $data = $user->orderBy('staff_id', 'desc');
         if ($this->req->id) {
             $data = $data->whereId($this->req->id);
         }
         if ($this->req->name) {
             $data = $data->where('name', 'like', '%' . $this->req->name . '%');
         }
-        if ($this->req->role) {
-            $data = $data->whereRole($this->req->role);
-        }
-        if ($this->req->email) {
-            $data = $data->where('email', 'like', '%' . $this->req->email . '%');
+        if ($this->req->role_id) {
+            $data = $data->whereRoleId($this->req->role_id);
         }
         $data = $data->paginate($this->req->input('limit',PaginateSet::LIMIT))->appends($this->req->except('page'));
 
+        $roleList=Config::get('business.role_list');
+
         foreach ($data as &$v) {
-            $v->role_name = $v->cpRole->role_name;
-            $v->lock_status = $v->lock();
+            $v->role_name =$roleList[$v->role_id]?$roleList[$v->role_id]['role_name']:$v->role_id;
         }
         $assign = compact('data');
         return $this->successJson($assign);
@@ -55,33 +54,28 @@ class SysController extends BaseController
         return $this->successJson([], '操作成功');
     }
 
-    public function getAddUser(CpRole $cprole)
-    {
-        $roles = $cprole->get();
-        $assign = compact('roles');
-        return $this->successJson($assign, '操作成功');
-    }
-
     public function postAddUser(Staff $user)
     {
         $validator = Validator::make($this->req->all(), [
             'password' => 'required|max:191',
-            'user_name' => 'required|max:20|unique:cp_users',
-            'role_id' => 'required|integer',
-            'email' => 'required|email|max:50',
+            'account' =>['regex:/^[0-9A-Za-z]+$/', 'required', 'max:20'],
+            'role_id' => 'required|numeric',
+            'real_name' => 'required',
+            'phone' => 'required',
+            'store_id' => 'required',
         ], [
             'password.required' => '密码是必须！',
-            'user_name.unique' => '用户已经存在！',
-            'user_name.required' => '用户名不能为空！',
-            'email.required' => '邮箱不能为空！',
+            'account.regex' => '账号名取值只能是字母数字组合！',
+            'account.required' => '账号名是必须的！',
+            'account.unique' => '账号名已经存在，账号名必须是唯一的！',
+            'role_id.required' => '请选择角色！',
         ]);
         if ($validator->fails()) {
             //返回默认支付
             return $this->errorJson('params error', 2, $validator->errors()->toArray());
         }
-        $data['user_name'] = $this->req->user_name;
+        $data['account'] = $this->req->account;
         $data['role_id'] = $this->req->role_id;
-        $data['email'] = $this->req->email;
         $data['password'] = Hash::make($this->req->password);
         $data['last_ip'] = $this->req->ip();
         $data['current_ip'] = $this->req->ip();
@@ -91,31 +85,22 @@ class SysController extends BaseController
         return $this->successJson([], '操作成功');
     }
 
-    public function getEditUser(Staff $user, CpRole $cprole)
-    {
-        $item = $user->find($this->req->id);
-        if (!$item) {
-            abort(404);
-        }
-        $roles = $cprole->all();
-        $assign = compact('item', 'roles');
-        return $this->successJson($assign, '获取成功');
-    }
-
     public function postEditUser(Staff $Staff)
     {
-
         $validator = Validator::make($this->req->all(), [
             'password' => 'max:255',
-            'user_name' => ['required', 'max:50', Rule::unique('cp_users')->ignore($this->req->user_id)],
-            'role_id' => 'required|max:50',
-            'email' => ['required', 'email', 'max:50'],
-            'user_id' => 'required',
+            'account' => ['required', 'max:20','regex:/^[0-9A-Za-z]+$/', Rule::unique('staff')->ignore($this->req->staff_id)],
+            'role_id' => 'required|numeric',
+            'real_name' => 'required',
+            'phone' => 'required',
+            'store_id' => 'required',
         ], [
-            'user_name.required' => '用户名是必须的！',
-            'role_id.required' => '角色id是必须的！',
-            'user_name.required' => '用户名已经存在，用户名必须是唯一的！',
-            'email.required' => '邮箱必填!',
+            'account.regex' => '账号名取值只能是字母数字组合！',
+            'account.required' => '账号名是必须的！',
+            'account.unique' => '账号名已经存在，账号名必须是唯一的！',
+            'role_id.required' => '角色是必须选择！',
+            'store_id.required' => '门店必须选择！',
+            'real_name.required' => '员工名称必须填写！',
         ]);
         if ($validator->fails()) {
             return $this->errorJson('参数错误！', 2, $validator->errors()->toArray());
@@ -127,51 +112,26 @@ class SysController extends BaseController
         return $this->successJson([], '修改成功');
     }
 
-    public function getRoleList(CpRole $role)
+    public function getRoleList()
     {
-        $limit = $this->req->input('limit', 10);
-        $data = $role->orderBy('role_id', 'desc')->paginate($limit)->appends($this->req->except('page'));
+        $data =Config::get('business.role_list');
         $assgin = compact('data');
         return $this->successJson($assgin);
     }
 
-    public function getDelRole(CpRole $role)
+    public function getEditRole(StaffAct $acts)
     {
-        if ($this->req->role_id) {
-            $role->find($this->req->role_id)->acts()->delete();
-            $role->find($this->req->role_id)->delete();
-            return $this->successJson([], '删除成功');
-        }
-        return $this->errorJson('角色id不能为空！');
-    }
-
-
-    public function postAddRole()
-    {
-        $validator = Validator::make($this->req->all(), [
-            'role_name' => 'required|max:50|unique:cp_roles',
-        ], [
-            'role_name.required' => '角色名必须的！',
-            'role_name.max' => '角色名最大长度是50！',
-            'role_name.unique' => '角色名已经存在，角色名必须是唯一的！',
-        ]);
-        if ($validator->fails()) {
-            return $this->errorJson('参数错误！', 2, $validator->errors()->toArray());
-        }
-        CpRole::create($this->req->except('_token'));
-        return $this->successJson([], '添加成功');
-    }
-
-    public function getEditRole(CpRole $role)
-    {
-        if ($this->req->role_id) {
-            $item = $role->find($this->req->role_id);
-            if (!$item) {
-                abort(404);
+        if ($this->req->type) {
+            $roleList =Config::get('company.role_list');
+            $roleIds=array_map(function ($role){
+                return $role['role_id'];
+            },$roleList);
+            if (!in_array($roleIds,$this->req->type)) {
+                return $this->errorJson('角色不存在！');
             }
-            $menu = Config::get('cp');
+            $menu = Config::get('business');
             //采集
-            $data = $item->acts->pluck('act')->toArray();
+            $data = $acts->pluck('act')->toArray();
             foreach ($menu as $k => &$v) {
                 $v['checked'] = in_array($k, $data) ? true : false;
                 foreach ($v['child'] as $i => &$sub) {
@@ -187,17 +147,20 @@ class SysController extends BaseController
         return $this->errorJson('角色id不能为空！');
     }
 
-    public function postEditRole(CpAct $cpAct)
+    public function postEditRole(StaffAct $staffAct)
     {
         $this->validate($this->req, [
             'act' => 'required|max:255',
             'role_id' => 'required|integer',
         ]);
-        $cpAct->whereRoleId($this->req->role_id)->delete();
+        $user=Auth::guard('staff')->user();
+        $companyId=$user->company_id;
+        $staffAct->whereRoleId($this->req->role_id)->whereCompanyId($companyId)->delete();
         foreach ($this->req->act as $k => $v) {
-            $cpAct->create(array(
+            $staffAct->create(array(
                 'role_id' => $this->req->role_id,
                 'act' => $v,
+                'company_id' => $companyId,
             ));
         }
         return $this->successJson([], '修改成功！');
