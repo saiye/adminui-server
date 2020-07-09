@@ -130,17 +130,15 @@ class SysController extends BaseController
 
     public function getEditRole(StaffAct $acts)
     {
-        if ($this->req->type) {
-            $roleList =Config::get('company.role_list');
-            $roleIds=array_map(function ($role){
-                return $role['role_id'];
-            },$roleList);
-            if (!in_array($roleIds,$this->req->type)) {
+        if ($this->req->role_id) {
+            $roleList =Config::get('business.role_list');
+            $roleIds=array_keys($roleList);
+            if (!in_array($this->req->role_id,$roleIds)) {
                 return $this->errorJson('角色不存在！');
             }
-            $menu = Config::get('business');
+            $menu = Config::get('bs');
             //采集
-            $data = $acts->pluck('act')->toArray();
+            $data = $acts->whereCompanyId($this->loginUser->company_id)->whereRoleId($this->req->role_id)->pluck('act')->toArray();
             foreach ($menu as $k => &$v) {
                 $v['checked'] = in_array($k, $data) ? true : false;
                 foreach ($v['child'] as $i => &$sub) {
@@ -150,6 +148,7 @@ class SysController extends BaseController
                     }
                 }
             }
+            $item=$roleList[$this->req->role_id];
             $assign = compact('item', 'menu');
             return $this->successJson($assign);
         }
@@ -162,8 +161,7 @@ class SysController extends BaseController
             'act' => 'required|max:255',
             'role_id' => 'required|integer',
         ]);
-        $user=Auth::guard('staff')->user();
-        $companyId=$user->company_id;
+        $companyId=$this->loginUser->company_id;
         $staffAct->whereRoleId($this->req->role_id)->whereCompanyId($companyId)->delete();
         foreach ($this->req->act as $k => $v) {
             $staffAct->create(array(

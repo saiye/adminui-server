@@ -30,7 +30,7 @@ class SettingController extends BaseController
         if($this->req->tid){
             $data=$data->whereTid($this->req->tid);
         }
-        $data=$data->orderBy('id','desc')->paginate(PaginateSet::LIMIT)->appends($this->req->except('page'));
+        $data=$data->paginate(PaginateSet::LIMIT)->appends($this->req->except('page'));
         $assign=compact('data');
         return $this->successJson($assign);
     }

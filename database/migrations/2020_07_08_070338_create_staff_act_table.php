@@ -13,7 +13,7 @@ class CreateStaffActTable extends Migration
      */
     public function up()
     {
-        Schema::create('staff_act', function (Blueprint $table) {
+        Schema::create('staff_acts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('act')->comment('权限路由');
             $table->unsignedInteger('role_id')->comment('角色id');
@@ -29,6 +29,6 @@ class CreateStaffActTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('staff_act');
+        Schema::dropIfExists('staff_acts');
     }
 }

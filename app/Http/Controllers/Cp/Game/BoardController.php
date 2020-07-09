@@ -27,7 +27,7 @@ class BoardController extends Controller
         if ($this->req->dup_id) {
             $data = $data->whereDupId($this->req->dup_id);
         }
-        $data = $data->orderBy('board_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

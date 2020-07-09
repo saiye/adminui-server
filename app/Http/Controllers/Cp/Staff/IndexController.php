@@ -46,7 +46,7 @@ class IndexController extends Controller
             $data = $data->where('store_id', $this->req->store_id);
         }
         $limit=$this->req->input('limit',PaginateSet::LIMIT);
-        $data = $data->orderBy('id', 'desc')->paginate($limit)->appends($this->req->except('page'));
+        $data = $data->paginate($limit)->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }
@@ -98,7 +98,7 @@ class IndexController extends Controller
         $data['store_id'] = $this->req->store_id;
         $staffObj = Staff::create($data);
         $staffObj->save();
-        
+
         //联系人入库
         $staff = [
             'account' => $this->req->account,

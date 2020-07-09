@@ -35,7 +35,7 @@ class IndexController extends Controller
         if ($this->req->staff_id) {
             $data = $data->where('staff_id', $this->req->staff_id);
         }
-        $data = $data->orderBy('roder_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
 
-Route::any('/', 'IndexController@home')->name('bs-home');
+
 Route::any('/user/login', 'Main\HomeController@postLogin')->name('bs-dologin');
 Route::any('/user/logout', 'Main\HomeController@getLogout')->name('bs-logout');
 Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('bs-cantAccess');

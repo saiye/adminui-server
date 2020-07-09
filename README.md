@@ -20,7 +20,7 @@
 因为项目基于composer管理依赖，需要进入目录，执行以下命令安装依赖。
 ```text
 依赖安装
-composer install 
+composer update 
 配置文件.env,可以执行下面命令生成!
 cp .env.example  .env
 生成安全key

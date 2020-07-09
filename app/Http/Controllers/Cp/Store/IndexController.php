@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\Cp\Store;
 
+use App\Constants\CacheKey;
 use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
+use App\Models\Image;
 use App\Models\Staff;
 use App\Models\Store;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Validator;
@@ -58,7 +62,7 @@ class IndexController extends Controller
         if ($this->req->real_name) {
             $data = $data->where('staff.real_name', 'like', '%' . $this->req->real_name . '%')->leftJoin('staff', 'store.staff_id', '=', 'staff.staff_id');
         }
-        $data = $data->orderBy('store.store_id', 'desc')->paginate($this->req->input('limit', $limit = $this->req->input('limit', PaginateSet::LIMIT)))->appends($this->req->except('page'));
+        $data = $data->paginate($this->req->input('limit', $limit = $this->req->input('limit', PaginateSet::LIMIT)))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }
@@ -112,6 +116,7 @@ class IndexController extends Controller
             $region_id = $area[2];
         }
 
+        $imagedata = $this->req->input('imageData', []);
         DB::beginTransaction();
         //联系人入库
         $staff = [
@@ -120,13 +125,13 @@ class IndexController extends Controller
             'sex' => $this->req->sex,
             'phone' => $this->req->phone,
             'lock' => 2,
-            'type' => 1,
+            'role_id' => 1,
             'company_id' => $this->req->company_id,
             'password' => Hash::make($this->req->password),
         ];
         $staffObj = Staff::create($staff);
-        $save_staff = $staffObj->save();
 
+        //图片处理
 
         //商家入库
         $data['store_name'] = $this->req->store_name;
@@ -138,12 +143,31 @@ class IndexController extends Controller
         $data['describe'] = $this->req->describe;
         $data['staff_id'] = $staffObj->staff_id;
         $store = Store::create($data);
-        $store->save();
+
         //联系人绑定到该店面
         $staffObj->store_id = $store->store_id;
         $save_store = $staffObj->save();
 
-        if ($save_store and $save_staff) {
+        if ($imagedata) {
+            //图片是你上传的,才关联。
+            $user = Auth::guard('cp-api')->user();
+            $key = CacheKey::CP_UPLOAD_KEY . $user->id;
+            $imageJson = Cache::get($key, '');
+            if ($imageJson) {
+                $tmp = json_decode($imageJson, true);
+                $tmp = array_uintersect($tmp, $imagedata, "strcasecmp");
+                if($tmp){
+                    Image::whereIn('id', $tmp)->update([
+                        'foreign_id' => $store->store_id
+                    ]);
+                }else{
+                    DB::rollBack();
+                    return $this->errorJson('营业执照入库失败！');
+                }
+            }
+        }
+
+        if ($save_store and $staffObj) {
             DB::commit();
             return $this->successJson([], '操作成功');
         } else {

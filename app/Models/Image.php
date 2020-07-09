@@ -11,14 +11,10 @@ class Image extends Model
 {
     use ModelDataFormat;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'path', 'name',
+    protected $guarded = [
+        'id'
     ];
+
 
     /**
      * The attributes that should be hidden for arrays.
@@ -29,15 +25,9 @@ class Image extends Model
 
     ];
 
-    public function getImagePathAttribute($value)
+    public function getPathAttribute($value)
     {
         return Storage::url($value);
     }
-
-    public function getImageCompressPathAttribute($value)
-    {
-        return Storage::url($value);
-    }
-
 
 }

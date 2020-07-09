@@ -23,7 +23,7 @@ class ChannelController extends Controller
         if ($this->req->channel_id) {
             $data = $data->whereChannelId($this->req->channel_id);
         }
-        $data = $data->orderBy('channel_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

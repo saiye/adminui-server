@@ -32,7 +32,7 @@ class DeviceController extends Controller
         if ($this->req->room_id) {
             $data = $data->where('room_id', $this->req->room_id);
         }
-        $data = $data->orderBy('id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

@@ -46,7 +46,7 @@ class IndexController extends Controller
         if ($this->req->real_name) {
             $data = $data->where('staff.real_name', 'like', '%' . $this->req->real_name . '%')->leftJoin('staff', 'company.staff_id', '=', 'staff.staff_id');
         }
-        $data = $data->orderBy('company.company_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         foreach ($data as &$v) {
             $v->state = $v->state();
         }
@@ -119,7 +119,7 @@ class IndexController extends Controller
         $isCompany = $company->save();
         $imagedata = $this->req->input('imageData', []);
         if ($imagedata) {
-            //图片是你上传的,才关联。其他没关联的，通过
+            //图片是你上传的,才关联
             $user = Auth::guard('cp-api')->user();
             $key = CacheKey::CP_UPLOAD_KEY . $user->id;
             $imageJson = Cache::get($key, '');

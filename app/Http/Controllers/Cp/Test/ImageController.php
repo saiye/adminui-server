@@ -27,7 +27,7 @@ class ImageController extends BaseController
         if ($this->req->type) {
             $data = $data->whereType($this->req->type);
         }
-        $data = $data->orderBy('id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->view('test.image.list', $assign);
     }
