@@ -293,5 +293,22 @@ if (!function_exists("scene_encode")) {
         return http_build_query($data);
     }
 }
+if (!function_exists("index_by")) {
+    function index_by($data,$key)
+    {
+        $post=[];
+        if(is_object($data)){
+            foreach ($data as $v){
+                $post[$v->$key]=$v;
+            }
+        }elseif (is_array($data)){
+            foreach ($data as $v){
+                $post[$v[$key]]=$v;
+            }
+        }
+
+        return $post;
+    }
+}
 
 

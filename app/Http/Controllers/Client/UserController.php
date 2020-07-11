@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Constants\CacheKey;
+use App\Models\PlayerCountRecord;
 use App\Models\User;
 use App\Modesl\Device;
 use Hyperf\Guzzle\CoroutineHandler;
@@ -24,32 +25,29 @@ class UserController extends Base
             ]);
         }
         $uerId = $this->request->input('userId');
-        $key = CacheKey::CLIENT_USER_INFO . $uerId;
-        $user = Cache::get($key);
-        if (!$user) {
-            $user = User::whereId($uerId)->first();
-        }
+        $user = User::whereId($uerId)->first();
         if ($user) {
-            return $this->json([
+            $player = PlayerCountRecord::whereUserId($uerId)->first();
+            $data = [
                 'errorMessage' => 'success',
                 "nickname" => $user->nickname,
                 "sex" => $user->sex,
                 "icon" => $user->icon ?? '',
                 "userId" => $user->id,
-                "playCount" => 120,//总局数
-                "successCount" => 110,//胜利局数
-                "failureCount" => 10,//失败局数
-                "mvpCount" => 100,//失败局数
-                "svpCount" => 10,//失败局数
-                "getPoliceShield" => 10,//得到警徽
-                "upPolice" => 10,//上警次数
+                "playCount" => $player ? $player->total_game : 0,//总局数
+                "successCount" => $player ? $player->win_game : 0,//胜利局数
+                "failureCount" => $player ? ($player->total_game - $player->win_game) : 0,//失败局数
+                "mvpCount" => $player ? $player->mvp : 0,
+                "svpCount" => $player ? $player->svp : 0,
+                "getPoliceShield" => $player ? $player->police : 0,//得到警徽
+                "upPolice" => $player ? $player->police : 0,//上警次数
                 'code' => ErrorCode::SUCCESS,
-            ]);
-        } else {
-            return $this->json([
-                'errorMessage' => '用户不存在',
-                'code' => ErrorCode::ACCOUNT_NOT_EXIST,
-            ]);
+            ];
+            return $this->json($data);
         }
+        return $this->json([
+            'errorMessage' => '用户不存在',
+            'code' => ErrorCode::ACCOUNT_NOT_EXIST,
+        ]);
     }
 }

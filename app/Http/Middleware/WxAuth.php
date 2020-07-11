@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Constants\CacheKey;
 use App\Constants\ErrorCode;
+use App\Models\User;
 use Closure;
 use Illuminate\Support\Facades\Cache;
 
@@ -28,6 +29,5 @@ class WxAuth
                 'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
             ], 200);
         }
-
     }
 }

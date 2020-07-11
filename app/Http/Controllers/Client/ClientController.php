@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Client;
 
-use App\Jobs\CallBackGameLogin;
 use App\Models\Channel;
 use App\Models\Device;
 use App\Models\PhysicsAddress;
 use App\Models\User;
+use App\Service\GameApi\LrsApi;
 use Illuminate\Support\Facades\Hash;
 use App\Constants\ErrorCode;
 
@@ -28,8 +28,6 @@ class ClientController extends Base
             'password' => 'required',
             'channelId' => 'required',
             'deviceShortId' => 'required',
-        ], [
-            'account.required' => '账号不能为空',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -40,7 +38,7 @@ class ClientController extends Base
         $user = User::whereAccount($this->request->input('account'))->first();
         if (!$user) {
             return $this->json([
-                'errorMessage' => '账号不存在',
+                'errorMessage' => 'account not find',
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
             ]);
         }
@@ -66,32 +64,19 @@ class ClientController extends Base
             }
             $chanel = Channel::whereChannelId($this->request->input('channelId'))->first();
             if ($chanel) {
-                $url = $chanel->loginCallBackAddr;
-                try {
-                    //立即调用接口队列
-                    dispatch_now(new CallBackGameLogin($url, [
-                        "deviceShortId" => $device->device_id,
-                        "account" => $user->account,
-                        "userId" => $user->id,
-                        "name" => $user->nickname,
-                        "sex" => $user->sex,
-                        "icon" => $user->icon ?? '',
-                        "roomId" => $device->room_id, // [可选] 房间唯一id
-                        "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
-                        "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
-                        "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
-                    ]));
-                } catch (\Exception $e) {
-                    return $this->json([
-                        'errorMessage' => $e->getMessage(),
-                        'code' => ErrorCode::CONNECTION_TIMEOUT,
-                    ]);
-                }
-                return $this->json([
-                    'errorMessage' => 'success',
-                    'gameSrvAddr' => $chanel->gameSrvAddr,
-                    'code' => ErrorCode::SUCCESS,
-                ]);
+               $api= new LrsApi($chanel);
+               return   $api->loginCallBack([
+                   "deviceShortId" => $device->device_id,
+                   "account" => $user->account,
+                   "userId" => $user->id,
+                   "name" => $user->nickname,
+                   "sex" => $user->sex,
+                   "icon" => $user->icon ?? '',
+                   "roomId" => $device->room_id, // [可选] 房间唯一id
+                   "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
+                   "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
+                   "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
+               ]);
             } else {
                 return $this->json([
                     'errorMessage' => '渠道不存在!',
@@ -105,35 +90,6 @@ class ClientController extends Base
         ]);
     }
 
-    public function queryDeviceRoomData()
-    {
-        $validator = $this->validationFactory->make($this->request->all(), [
-            'deviceShortId' => 'required',
-        ], [
-            'deviceShortId.required' => '设备短id不能为空',
-        ]);
-        if ($validator->fails()) {
-            return $this->json([
-                'errorMessage' => $validator->errors()->first(),
-                'code' => ErrorCode::VALID_FAILURE,
-            ]);
-        }
-        $device = Device::where('device_id', $this->request->input('deviceShortId'))->first();
-        if ($device) {
-            return $this->json([
-                'errorMessage' => '',
-                "roomId" => $device->room_id, // [可选] 房间唯一id
-                "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
-                "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
-                "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
-                'code' => ErrorCode::SUCCESS,
-            ]);
-        }
-        return $this->json([
-            'errorMessage' => '设备id未绑定房间',
-            'code' => ErrorCode::DEVICE_NOT_BINDING,
-        ]);
-    }
 
     public function checkDeviceBindStatus()
     {
@@ -164,7 +120,6 @@ class ClientController extends Base
                     "StoreName" => $device->store->store_name,
                     "RoomName" => $device->room->room_name,
                     "RoomId" => $device->room_id,
-                    "LoginUrl" => 'https://192.168.1.71/user/login',
                     "GameServerAddress" => '47.115.45.34:10002',
                 ]);
             }
@@ -176,91 +131,6 @@ class ClientController extends Base
         ]);
     }
 
-    /**
-     * 游戏结束
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function beginGame()
-    {
-        $validator = $this->validationFactory->make($this->request->all(), [
-            'roomId' => 'required|numeric',
-            'beginTime' => 'required|numeric',
-            'unitInfos' => 'required|array',
-        ]);
-        if ($validator->fails()) {
-            return $this->json([
-                'errorMessage' => $validator->errors()->first(),
-                'code' => ErrorCode::VALID_FAILURE,
-            ]);
-        }
-    }
-
-    /**
-     * 游戏结束
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function endGame()
-    {
-        $validator = $this->validationFactory->make($this->request->all(), [
-            'roomId' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->json([
-                'errorMessage' => $validator->errors()->first(),
-                'code' => ErrorCode::VALID_FAILURE,
-            ]);
-        }
-        return $this->json([
-            'errorMessage' => '',
-            'code' => ErrorCode::SUCCESS,
-        ]);
-    }
-
-    /**
-     * 更换板子
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function changeDup()
-    {
-        $validator = $this->validationFactory->make($this->request->all(), [
-            'roomId' => 'required|numeric',
-            'dupId' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->json([
-                'errorMessage' => $validator->errors()->first(),
-                'code' => ErrorCode::VALID_FAILURE,
-            ]);
-        }
-        return $this->json([
-            'errorMessage' => '',
-            'code' => ErrorCode::SUCCESS,
-        ]);
-    }
-
-    /**
-     * 战绩结果推送
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function gameResLog()
-    {
-        $validator = $this->validationFactory->make($this->request->all(), [
-            'id' => 'required|numeric',
-            'gameRes' => 'required',
-            'beginTick' => 'required',
-            'unitInfos' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->json([
-                'errorMessage' => $validator->errors()->first(),
-                'code' => ErrorCode::VALID_FAILURE,
-            ]);
-        }
-        return $this->json([
-            'errorMessage' => '',
-            'code' => ErrorCode::SUCCESS,
-        ]);
-    }
 
 }
 

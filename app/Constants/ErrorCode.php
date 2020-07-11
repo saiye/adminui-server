@@ -21,5 +21,6 @@ class ErrorCode
     const  THREE_ACCOUNT_NOT_LOGIN = -12; //第三方用户未登录，auth2 code验证失败
     const  CREATE_ACCOUNT_ERROR = -13; //创建用户失败
     const  CREATE_ERCODE_ERROR = -14; //二维码生成失败
+    const  DATA_NULL = -16; //数据不存在
     const  SUCCESS = 0; // 成功
 }

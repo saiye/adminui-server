@@ -29,11 +29,6 @@ class Company extends Model
     {
         return $this->hasOne('App\Models\Staff', 'staff_id', 'staff_id');
     }
-    public function getCheckAttribute($value)
-    {
-        return Config::get('deploy.check.'.$value);
-    }
-
     public function state(){
         return  Config::get('deploy.state.'.$this->state_id);
     }

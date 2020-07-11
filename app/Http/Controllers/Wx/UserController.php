@@ -2,25 +2,40 @@
 
 namespace App\Http\Controllers\Wx;
 
-use App\Jobs\CallBackGameLogin;
+
 use App\Models\Channel;
 use App\Models\Device;
+use App\Models\User;
+use App\Service\GameApi\LrsApi;
 use App\Service\LoginApi\LoginApi;
 use App\Constants\ErrorCode;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
-
 
 class UserController extends Base
 {
+
+
+    public function logout(){
+        $token=$this->request->header('token');
+        $user=$this->user();
+        if($user){
+            Cache::forget($token);
+            $channel=Channel::whereChannelId($user->channel_id)->first();
+            $api=new LrsApi($channel);
+            return  $api->logicLogout($user->id);
+        }
+        return $this->json([
+            'errorMessage' =>'你未登录!',
+            'code' => ErrorCode::VALID_FAILURE,
+        ]);
+    }
+
     /**
      * 微信小程序登录接口
      */
     public function login(LoginApi $loginApi)
     {
-        Log::info('wx-login');
-        Log::info($this->request->all());
         $validator = $this->validationFactory->make($this->request->all(), [
             //'scene' => 'required',
             'js_code' => 'required',
@@ -55,8 +70,8 @@ class UserController extends Base
         if ($scene) {
             //存在则需要回调游戏登录地址
             $data = scene_decode($scene);
-            $deviceShortId = (int) $data['d'] ?? 0;
-            $channelId = (int) $data['c'] ?? 0;
+            $deviceShortId = (int)$data['d'] ?? 0;
+            $channelId = (int)$data['c'] ?? 0;
             if (!is_numeric($deviceShortId) or $deviceShortId < 1) {
                 return $this->json([
                     'errorMessage' => 'scene值错误!',
@@ -78,19 +93,19 @@ class UserController extends Base
             }
             $channel = Channel::whereChannelId($channelId)->first();
             if ($channel) {
-                $url = $channel->loginCallBackAddr;
-                dispatch(new CallBackGameLogin($url, [
+                $api = new LrsApi($channel);
+                return $api->loginCallBack([
                     "deviceShortId" => $device->device_id,
                     "account" => $user->account,
                     "userId" => $user->id,
                     "name" => $user->nickname,
                     "sex" => $user->sex,
-                    "icon" => $user->icon??'',
+                    "icon" => $user->icon ?? '',
                     "roomId" => $device->room_id, // [可选] 房间唯一id
                     "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
                     "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
                     "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
-                ]));
+                ]);
             } else {
                 return $this->json([
                     'errorMessage' => '渠道' . $channelId . '不存在！',
@@ -105,19 +120,24 @@ class UserController extends Base
             'token' => $token,
             'code' => ErrorCode::SUCCESS,
         ]);
-
     }
 
     public function info()
     {
-        $token = $this->request->header('token');
-        $user = Cache::get($token);
+        $user = $this->user();
         if ($user) {
             return $this->json([
                 'errorMessage' => 'success',
+                'user_id' => $user->id,
                 'nickname' => $user->nickname,
                 'sex' => $user->sex,
                 'icon' => $user->icon,
+                'popularity' => $user->popularity,//人气
+                'attention' => $user->attention,//关注
+                'fans' => $user->fans,//粉丝
+                'remaining' => $user->remaining,//余额
+                'income' => $user->income,//收入
+                'withdrawal' => $user->withdrawal,//已提现
                 'code' => ErrorCode::SUCCESS,
             ]);
         } else {
@@ -126,5 +146,43 @@ class UserController extends Base
                 'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
             ]);
         }
+    }
+
+    /**
+     * 相册,circle
+     */
+    public function images()
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'limit' => 'required|numeric',
+            'page' => 'required|numeric',
+            'userId' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+       //$list=PlayerImage::whereuserId($this->request->input('userId'))->groupBy(DB::raw(''));
+        return $this->json([
+            'errorMessage' => 'success',
+            'code' => ErrorCode::SUCCESS,
+            'list' => [
+                [
+                    'month' => '5月',//月份
+                    'list' => [
+                        [
+                            'src' => 'http://lrs-tt.7955.com/storage/qrCode/1113.png',
+                            'title' => '1111',
+                        ],
+                        [
+                            'src' => 'http://lrs-tt.7955.com/storage/qrCode/1113.png',
+                            'title' => '222',
+                        ]
+                    ],
+                ]
+            ],
+        ]);
     }
 }

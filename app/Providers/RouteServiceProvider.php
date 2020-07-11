@@ -48,6 +48,8 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapClientRoutes();
 
+        $this->mapGameSrvRoutes();
+
         $this->mapWxRoutes();
 
         $this->mapBusinessRoutes();
@@ -68,6 +70,13 @@ class RouteServiceProvider extends ServiceProvider
         Route::prefix('client')->middleware('client')
             ->namespace($this->namespace . '\\Client')
             ->group(base_path('routes/client.php'));
+    }
+
+    protected function mapGameSrvRoutes()
+    {
+        Route::prefix('gamesrv')
+            ->namespace($this->namespace . '\\GameSrv')
+            ->group(base_path('routes/gamesrv.php'));
     }
 
     protected function mapWxRoutes()

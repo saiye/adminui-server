@@ -10,17 +10,13 @@ use Illuminate\Support\Facades\Config;
 
 class User extends Authenticatable
 {
-    use Notifiable,ModelDataFormat;
+    //如果垮库链表需要定义这个
+    protected $connection = 'mysql';
 
-
+    use Notifiable, ModelDataFormat;
 
     protected $guarded = [
         'id'
-    ];
-
-
-    protected $casts = [
-       // 'id' => 'string',
     ];
 
     /**
@@ -31,4 +27,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    public function getIconAttribute($v)
+    {
+        return $v ? $v : '';
+    }
 }

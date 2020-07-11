@@ -6,11 +6,10 @@
  * Time: 17:43
  */
 
-namespace App\Http\Controllers\Wx;
+namespace App\Http\Controllers\GameSrv;
 use \Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 
 class Base extends Controller
@@ -30,14 +29,13 @@ class Base extends Controller
         $this->validationFactory =$app->make('validator');
     }
 
+
+    public function  getBody(){
+
+    }
+
     public function json($data, $status = 200)
     {
         return response()->json($data, $status);
-    }
-
-    public function user(){
-        $token = $this->request->header('token');
-        return Cache::get($token);
-
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class GameBoard extends Model
 {
-    use ModelDataFormat;
+    protected $connection = 'mysql';
     public $primaryKey = 'board_id';
     protected $table = 'game_board';
     protected $guarded = [
