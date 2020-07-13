@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Cp\Game;
 
 use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
+use App\Imports\DupImport;
 use App\Models\GameBoard;
-use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 use Validator;
+use Illuminate\Support\Facades\Storage;
 
 /**
  *
@@ -96,14 +98,32 @@ class BoardController extends Controller
     public function excel()
     {
 
+        $validator = Validator::make($this->req->all(), [
+            'excel' => ['file', 'required', 'mimetypes:application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+        ], [
+            'excel.required' => '板子excel必须选择！',
+            'excel.mimetypes' => '必须是xlsx文件',
+        ]);
+        if ($validator->fails()) {
+            //返回默认支付
+            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
+        }
+        $file = $this->req->file('excel')->store('excel');
+        $path=Storage::disk('public')->path($file);
+        try {
+            Excel::import(new DupImport(), $path);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            foreach ($failures as $failure) {
+                $failure->row(); // row that went wrong
+                $failure->attribute(); // either heading key (if using heading row concern) or column index
+                $failure->errors(); // Actual error messages from Laravel validator
+                $failure->values(); // The values of the row that has failed.
+                return $this->errorJson( $failure->errors(),1001);
+            }
+        }
+        return $this->successJson(['path'=>$path], '导入成功');
     }
-
-
-
-
-
-
-
 
 
 }

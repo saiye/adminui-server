@@ -71,6 +71,7 @@ return array(
                     'boardList' => array('name' => '板子列表', 'checked' => false, 'display' => true, 'url' => 'game/board/boardList', 'act' => 'default'),
                     'addBoard' => array('name' => '添加板子', 'checked' => false, 'display' => true, 'url' => 'game/board/addBoard', 'act' => 'default'),
                     'editBoard' => array('name' => '编辑板子', 'checked' => false, 'display' => true, 'url' => 'game/board/editBoard', 'act' => 'default'),
+                    'excel' => array('name' => '导入板子', 'checked' => false, 'display' => true, 'url' => 'game/board/excel', 'act' => 'default'),
                 ),
             ),
         ),

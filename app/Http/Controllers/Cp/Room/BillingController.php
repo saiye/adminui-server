@@ -32,7 +32,7 @@ class BillingController extends Controller
             $data=$data->whereTimeUnit($this->req->time_unit);
         }
         if ($this->req->search_name) {
-            $data = $data->where('billing.billing_name', 'like', '%' . $this->req->search_name . '%')->orWhere('store.store_name', 'like', '%' . $this->req->search_name . '%');
+            $data = $data->where('billing.billing_name', 'like', '%' . $this->req->search_name . '%')->orWhere('store.store_name', 'like', '%' . $this->req->search_name . '%')->orWhere('company.company_name', 'like', '%' . $this->req->search_name . '%');
         }
         if ($this->req->time_type) {
             $data = $data->where('billing.time_type', $this->req->time_type);

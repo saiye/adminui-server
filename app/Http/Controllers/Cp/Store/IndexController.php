@@ -51,9 +51,10 @@ class IndexController extends Controller
             $data = $data->whereStaffId($this->req->staff_id);
         }
         if ($this->req->check) {
-            $data = $data->whereIn('check', $this->req->check);
+            $data = $data->whereIn('store.check', $this->req->check);
         }
-        if ($this->req->listDate) {
+        if (!empty($this->req->listDate)) {
+            if($this->req->listDate[0])
             $data = $data->whereBetween('store.created_at', $this->req->listDate);
         }
         if ($this->req->company_name) {

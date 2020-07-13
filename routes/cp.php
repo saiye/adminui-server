@@ -63,6 +63,7 @@ Route::group([
     Route::post('game/board/boardList', 'Game\BoardController@boardList')->name('cp-GameBoardList');
     Route::post('game/board/addBoard', 'Game\BoardController@addBoard')->name('cp-GameAddBoard');
     Route::post('game/board/editBoard', 'Game\BoardController@editBoard')->name('cp-GameEditBoard');
+    Route::post('game/board/excel', 'Game\BoardController@excel')->name('cp-GameExcelBoard');
 
     //工具类接口
     Route::post('tool/image/upload', 'Tool\ImageController@upload')->name('cp-toolImageUpload');

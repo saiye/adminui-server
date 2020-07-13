@@ -41,6 +41,7 @@ class IndexController extends Controller
             $data = $data->whereStatus($this->req->status);
         }
         if ($this->req->listDate) {
+            if($this->req->listDate[0])
             $data = $data->whereBetween('created_at', $this->req->listDate);
         }
         if ($this->req->real_name) {
