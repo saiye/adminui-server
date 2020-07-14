@@ -83,7 +83,7 @@ class WeiXinLoginApi extends BaseLoginApi
     {
         $cacheToken = Cache::get(CacheKey::WX_ACCESS_TOKEN_KEY);
         if ($cacheToken) {
-            Log::info('WX_ACCESS_TOKEN_KEY return');
+           // Log::info('WX_ACCESS_TOKEN_KEY return');
             return $cacheToken;
         }
         $url = 'https://api.weixin.qq.com/cgi-bin/token?';

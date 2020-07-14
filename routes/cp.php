@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/user/login', 'Main\HomeController@getLogin')->name('cp-login');
 Route::post('/user/login', 'Main\HomeController@postLogin')->name('cp-dologin');
 Route::any('/user/logout', 'Main\HomeController@getLogout')->name('cp-logout');
 Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('cp-cantAccess');

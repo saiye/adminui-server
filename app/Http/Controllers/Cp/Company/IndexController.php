@@ -93,7 +93,6 @@ class IndexController extends Controller
             'proportion.max' => '分成比例不能大于于100！',
         ]);
         if ($validator->fails()) {
-            //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
         DB::beginTransaction();
@@ -163,7 +162,6 @@ class IndexController extends Controller
             'reason.max' => '拒绝原因不能超过100字',
         ]);
         if ($validator->fails()) {
-            //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
         $success = Company::whereCompanyId($this->req->company_id)->update([
@@ -197,7 +195,6 @@ class IndexController extends Controller
             'status.in' => '禁封状态取值有误!',
         ]);
         if ($validator->fails()) {
-            //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
         $success = Company::whereCompanyId($this->req->company_id)->update([

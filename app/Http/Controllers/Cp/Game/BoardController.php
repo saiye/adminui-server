@@ -6,6 +6,7 @@ use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Imports\DupImport;
 use App\Models\GameBoard;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 use Illuminate\Support\Facades\Storage;
@@ -48,7 +49,6 @@ class BoardController extends Controller
             'dup_id.unique' => '板子id,已存在！',
         ]);
         if ($validator->fails()) {
-            //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
         $data = $this->req->only('dup_id', 'board_name');
@@ -76,7 +76,6 @@ class BoardController extends Controller
             'dup_id.unique' => '板子id,必须唯一！',
         ]);
         if ($validator->fails()) {
-            //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
         $hasBoard = GameBoard::where('board_id', '!=', $this->req->board_id)->whereDupId($this->req->dup_id)->first();
@@ -99,13 +98,9 @@ class BoardController extends Controller
     {
 
         $validator = Validator::make($this->req->all(), [
-            'excel' => ['file', 'required', 'mimetypes:application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-        ], [
-            'excel.required' => '板子excel必须选择！',
-            'excel.mimetypes' => '必须是xlsx文件',
+            'excel' => ['file', 'required', 'mimetypes:application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip'],
         ]);
         if ($validator->fails()) {
-            //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
         $file = $this->req->file('excel')->store('excel');

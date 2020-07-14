@@ -15,6 +15,7 @@ use App\Models\CpUser;
 use Auth;
 use Route;
 use Illuminate\Support\Str;
+use Validator;
 
 class HomeController extends BaseController
 {
@@ -34,10 +35,17 @@ class HomeController extends BaseController
      */
     public function postLogin()
     {
-        $this->validate($this->req, [
+        $validator = Validator::make($this->req->all(), [
             'user_name' => 'required|max:255',
             'password' => 'required|max:255',
+        ], [
+            'user_name.required' => '用户名不能为空！',
+            'password.required' => '密码不能为空！',
         ]);
+        if ($validator->fails()) {
+            //返回默认支付
+            return $this->errorJson($validator->errors()->first(), 2);
+        }
         $u1 = CpUser::whereUserName($this->req->user_name)->first();
         if ($u1) {
             if ($u1->lock) {

@@ -34,15 +34,15 @@ class ChannelController extends Controller
             'channel_id' => 'required|numeric|min:1|max:300000',
             'channel_name' => 'required',
             'gameSrvAddr' => 'required',
-            'loginCallBackAddr' => 'required|url',
+            'callBackServer' => 'required|url',
         ], [
             'channel_id.required' => '渠道id不能为空',
             'channel_id.min' => '渠道id不能小于1',
             'channel_id.max' => '渠道id不能大于30W',
             'channel_name.required' => '渠道名称不能为空',
             'gameSrvAddr.required' => '游戏服地址不能为空',
-            'loginCallBackAddr.required' => '登录回调地址不能为空',
-            'loginCallBackAddr.url' => '登录回调地址，不是url',
+            'callBackServer.required' => '登录回调地址不能为空',
+            'callBackServer.url' => '登录回调地址，不是url',
         ]);
         if ($validator->fails()) {
             return $this->errorJson('参数错误!',10001, $validator->errors()->toArray());
@@ -51,7 +51,7 @@ class ChannelController extends Controller
     }
 
     private function doEditOrAddChannel(){
-        $data = $this->req->only('channel_id','channel_name', 'gameSrvAddr', 'loginCallBackAddr');
+        $data = $this->req->only('channel_id','channel_name', 'gameSrvAddr', 'callBackServer');
         $hasChannel= Channel::whereChannelId($this->req->channel_id)->first();
         if($hasChannel){
             $res = Channel::whereChannelId($this->req->channel_id)->update($data);
@@ -75,7 +75,7 @@ class ChannelController extends Controller
             'channel_id' => 'required',
             'channel_name' => 'required',
             'gameSrvAddr' => 'required',
-            'loginCallBackAddr' => 'required|url',
+            'callBackServer' => 'required|url',
         ], [
             'channel_id.required' => '渠道id不能为空',
             'channel_id.min' => '渠道id不能小于1',
@@ -83,8 +83,8 @@ class ChannelController extends Controller
             'channel_id.required' => '渠道id不能为空',
             'channel_name.required' => '渠道名称不能为空',
             'gameSrvAddr.required' => '游戏服地址不能为空',
-            'loginCallBackAddr.required' => '登录回调地址不能为空',
-            'loginCallBackAddr.url' => '登录回调地址，不是url',
+            'callBackServer.required' => '登录回调地址不能为空',
+            'callBackServer.url' => '登录回调地址，不是url',
         ]);
         if ($validator->fails()) {
             return $this->errorJson('参数错误!',10001, $validator->errors()->toArray());

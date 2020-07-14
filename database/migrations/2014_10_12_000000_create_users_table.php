@@ -31,6 +31,9 @@ class CreateUsersTable extends Migration
             $table->decimal('income',2)->default(0)->comment('收入');
             $table->decimal('withdrawal',2)->default(0)->comment('已提现');
             $table->integer('channel_id')->default(0)->comment('最后登录渠道');
+            $table->tinyInteger('online')->default(0)->comment('是否在线0否1是');
+            $table->tinyInteger('play')->default(0)->comment('是否在游戏0否1是');
+            $table->tinyInteger('two_way')->default(0)->comment('是否仅双向好友发信息');
             $table->timestamps();
         });
     }

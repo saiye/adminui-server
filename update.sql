@@ -3,3 +3,7 @@
 
 
 ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `channel_id` INT(10) NULL AFTER `withdrawal`;
+
+ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `online` TINYINT(4) DEFAULT '0' NULL COMMENT '是否在线' AFTER `channel_id`;
+
+ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `two_way` TINYINT(4) DEFAULT '0' NULL COMMENT '是否仅双向好友发消息' AFTER `play`;
