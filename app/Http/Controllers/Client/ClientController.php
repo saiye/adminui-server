@@ -76,6 +76,7 @@ class ClientController extends Base
                    "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
                    "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
                    "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
+                   "deviceMqttTopic" => $device->room->deviceMqttTopic??'', // [可选]房间设备mqtt主题
                ]);
             } else {
                 return $this->json([

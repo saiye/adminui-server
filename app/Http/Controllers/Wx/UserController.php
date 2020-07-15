@@ -10,6 +10,7 @@ use App\Service\GameApi\LrsApi;
 use App\Service\LoginApi\LoginApi;
 use App\Constants\ErrorCode;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class UserController extends Base
@@ -36,6 +37,7 @@ class UserController extends Base
      */
     public function login(LoginApi $loginApi)
     {
+        Log::info($this->request->all());
         $validator = $this->validationFactory->make($this->request->all(), [
             //'scene' => 'required',
             'js_code' => 'required',
@@ -105,6 +107,7 @@ class UserController extends Base
                     "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
                     "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
                     "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
+                    "deviceMqttTopic" => $device->room->deviceMqttTopic??'', // [可选]房间设备mqtt主题
                 ]);
             } else {
                 return $this->json([

@@ -63,11 +63,11 @@ class WeiXinLoginApi extends BaseLoginApi
                         'nickname' => $this->request->input('nickName', ''),
                     ]];
                 }
-                Log::info('刷新小程序refreshAccessToken:res');
+                Log::info('code2Session:res');
                 Log::info($res);
             }
         } catch (\Exception $e) {
-            Log::info('刷新小程序refreshAccessToken:error');
+            Log::info('code2Session:error');
             Log::info($e->getMessage());
             return [ErrorCode::THREE_ACCOUNT_NOT_LOGIN, ['message' => $e->getMessage()]];
         }
@@ -109,13 +109,13 @@ class WeiXinLoginApi extends BaseLoginApi
                     Cache::put(CacheKey::WX_ACCESS_TOKEN_KEY, $access_token, $expires_in);
                     return $access_token;
                 }
-                Log::info('刷新小程序refreshAccessToken:res');
+                Log::info('refreshAccessToken:res');
                 Log::info($res);
             } else {
-                Log::info('刷新小程序refreshAccessToken:status code not 200!');
+                Log::info('refreshAccessToken:status code not 200!');
             }
         } catch (\Exception $e) {
-            Log::info('刷新小程序refreshAccessToken:error!');
+            Log::info('refreshAccessToken:error!');
             Log::info($e->getMessage());
         }
         return '';
@@ -170,10 +170,10 @@ class WeiXinLoginApi extends BaseLoginApi
                 ]);
                 return ['image_path' => $image_path, 'full_path' => $full_path];
             } else {
-                Log::info('获取小程序二维码失败:status code not 200!');
+                Log::info('getQrCode:status code not 200!');
             }
         } catch (\Exception $e) {
-            Log::info('获取小程序二维码失败:error!');
+            Log::info('getQrCode:error!');
             Log::info($e->getMessage());
         }
         return false;
