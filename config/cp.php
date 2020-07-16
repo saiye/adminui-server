@@ -20,6 +20,8 @@ return array(
                     'error' => array('name' => '程序log列表', 'checked' => false, 'display' => true, 'url' => 'main/log/error', 'act' => 'default'),
                     'show' => array('name' => '日志详情', 'checked' => false, 'display' => false, 'url' => 'main/log/show', 'act' => 'default'),
                     'action-log-list' => array('name' => '后台访问log', 'checked' => false, 'display' => true, 'url' => 'main/log/action-log-list', 'act' => 'default'),
+                    'api-log-list' => array('name' => 'api调试log', 'checked' => false, 'display' => true, 'url' => 'main/log/api-log-list', 'act' => 'default'),
+                    'set-api-log-switch' => array('name' => 'api调试记录开关', 'checked' => false, 'display' => true, 'url' => 'main/log/set-api-log-switch', 'act' => 'default'),
                 ),
             ),
         ),

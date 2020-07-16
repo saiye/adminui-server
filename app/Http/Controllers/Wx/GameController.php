@@ -100,6 +100,7 @@ class GameController extends Base
                     'room_game_id' => $v->room_game_id,
                     'dup_id' => $v->dup_id,//评分
                     'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
+                    'user_id' => $v->user_id
                 ]);
             }
             return $this->json([
@@ -143,6 +144,7 @@ class GameController extends Base
                     'room_game_id' => $v->room_game_id,
                     'dup_id' => $v->dup_id,//评分
                     'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
+                    'user_id' => $v->user_id,
                 ]);
             }
             return $this->json([

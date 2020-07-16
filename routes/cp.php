@@ -34,7 +34,8 @@ Route::group([
     Route::post('main/log/error', 'Main\LogController@getError')->name('cp-error');
     Route::post('main/log/show', 'Main\LogController@showLog')->name('cp-showLog');
     Route::post('main/log/action-log-list', 'Main\LogController@getActionLog')->name('cp-actionLog');
-
+    Route::post('main/log/api-log-list', 'Main\LogController@getApiLog')->name('cp-ApiLog');
+    Route::post('main/log/set-api-log-switch', 'Main\LogController@setApiLog')->name('cp-ApiSetLogSwitch');
     //商户管理
     Route::post('company/index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');
     Route::post('company/index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');

@@ -52,6 +52,7 @@ class Kernel extends HttpKernel
      */
     protected $routeMiddleware = [
         'rbac'=>\App\Http\Middleware\Rbac::class,
+        'ApiLogRecord'=>\App\Http\Middleware\ApiLogRecord::class,
         'client'=>\App\Http\Middleware\Client::class,
         'WxAuth'=>\App\Http\Middleware\WxAuth::class,
         'action.log' => \App\Http\Middleware\ActionLog::class,
