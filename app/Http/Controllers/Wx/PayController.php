@@ -13,25 +13,23 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class CartController extends Base
+class PayController extends Base
 {
 
-
     /**
-     * 添加到购物车
+     * 微信支付回调
      */
-    public function addCart()
-    {
+    public function callWx(){
 
     }
 
     /**
-     * 清空购物车
+     * 支付宝回调
      */
-    public function clearCart()
-    {
+    public function callAli(){
 
     }
+
 
 
 }

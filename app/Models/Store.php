@@ -42,4 +42,8 @@ class Store extends Model
     public function company(){
         return $this->hasOne('App\Models\Company', 'company_id','company_id');
     }
+
+    public function category(){
+         return   $this->hasMany('App\Models\GoodsCategory','store_id','store_id');
+    }
 }

@@ -33,15 +33,13 @@ class GameController extends Base
             return $this->json([
                 'errorMessage' => 'success',
                 'code' => ErrorCode::SUCCESS,
-                'list' => [
-                    [
-                        'total_game' => $user->total_game,
-                        'win_game' => $user->win_game,
-                        'mvp' => $user->mvp,
-                        'svp' => $user->svp,
-                        'police' => $user->police,
-                    ],
-                ],
+                'list' =>[
+                    'total_game' => $user->total_game,
+                    'win_game' => $user->win_game,
+                    'mvp' => $user->mvp,
+                    'svp' => $user->svp,
+                    'police' => $user->police,
+                ]
             ]);
         }
         return $this->json([
@@ -100,6 +98,7 @@ class GameController extends Base
                     'room_game_id' => $v->room_game_id,
                     'dup_id' => $v->dup_id,//评分
                     'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
+                    'sex' => $v->user->sex,//0男,1女
                     'user_id' => $v->user_id
                 ]);
             }
@@ -173,4 +172,54 @@ class GameController extends Base
             ],
         ]);
     }
+
+    /**
+     * 游戏中
+     */
+    public function nowGame(){
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'limit' => 'required|numeric|max:100|min:1',
+            'page' => 'required|numeric|min:1',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $limit = $this->request->input('limit', 10);
+        $page = $this->request->input('page', 1);
+        $list = PlayerGameLog::with('user')->with('board');
+        $skip = ceil($page - 1) * $limit;
+        $list = $list->skip($skip)->take($limit)->get();
+        if (!empty($list->toArray())) {
+            $data = [];
+            foreach ($list as $v) {
+                array_push($data, [
+                    'nickname' => $v->user->nickname,//头像
+                    'icon' => $v->user->icon,//头像
+                    'dup_name' => $v->board ? $v->board->board_name : '板子' . $v->dup_id,//板子名称
+                    'date' => $v->begin_tick->format('m-d H:i'),//时间
+                    'score' => $v->score,//评分
+                    'room_game_id' => $v->room_game_id,
+                    'dup_id' => $v->dup_id,//评分
+                    'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
+                    'sex' => $v->user->sex,//0男,1女
+                    'user_id' => $v->user_id
+                ]);
+            }
+            return $this->json([
+                'errorMessage' => '',
+                'code' => ErrorCode::SUCCESS,
+                'list' => $data,
+            ]);
+        }
+        return $this->json([
+            'errorMessage' => '我是有底线的!',
+            'code' => ErrorCode::DATA_NULL,
+            'list' => [],
+        ]);
+    }
+
+
 }

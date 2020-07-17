@@ -25,6 +25,8 @@ class CreateStoreTable extends Migration
             $table->string('reason', 100)->nullable()->comment('拒绝原因');
             $table->unsignedInteger('staff_id')->comment('店面联系人id，对应staff表id');
             $table->tinyInteger('check')->default(0)->comment('审核状态0未审核，1审核通过，2审核不通过');
+            $table->tinyInteger('open_at')->default(0)->comment('营业开始时间');
+            $table->tinyInteger('close_at')->default(24)->comment('营业结束时间');
             $table->timestamps();
         });
     }

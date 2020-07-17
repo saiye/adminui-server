@@ -22,6 +22,8 @@ class CreateOrderTable extends Migration
             $table->unsignedInteger('company_id')->default(0)->comment('所属公司id');
             $table->unsignedInteger('staff_id')->comment('下单员工');
             $table->unsignedInteger('play_time')->default(0)->comment('支付时间');
+            $table->unsignedInteger('coupon_id')->default(0)->comment('券id');
+            $table->decimal('coupon_price')->default(0)->comment('券减金额');
             $table->tinyInteger('play_type')->default(0)->comment('支付方式');
             $table->tinyInteger('play_status')->default(0)->comment('支付状态');
             $table->timestamps();
