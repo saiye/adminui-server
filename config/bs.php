@@ -19,10 +19,6 @@ return array(
         'child' => array(
             'index' => array('name' => '商户列表', 'checked' => false, 'display' => true, 'act' => 'login', 'class' => 'fa fa-circle-o',
                 'child' => array(
-                    'companyList' => array('name' => '商户列表', 'checked' => false, 'display' => true, 'url' => 'company/index/companyList', 'act' => 'default'),
-                    'addCompany' => array('name' => '添加商户', 'checked' => false, 'display' => true, 'url' => 'company/index/addCompany', 'act' => 'default'),
-                    'checkCompany' => array('name' => '审核商户', 'checked' => false, 'display' => true, 'url' => 'company/index/checkCompany', 'act' => 'default'),
-                    'lockCompany' => array('name' => '锁定商户', 'checked' => false, 'display' => true, 'url' => 'company/index/lockCompany', 'act' => 'default'),
                     'getState' => array('name' => '国家列表', 'checked' => false, 'display' => true, 'url' => 'company/index/getState', 'act' => 'login'),
                     'areaList' => array('name' => '省市区', 'checked' => false, 'display' => true, 'url' => 'company/index/areaList', 'act' => 'login')
                 )

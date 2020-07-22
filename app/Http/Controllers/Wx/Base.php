@@ -38,6 +38,5 @@ class Base extends Controller
     public function user(){
         $token = $this->request->header('token');
         return Cache::get($token);
-
     }
 }

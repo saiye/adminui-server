@@ -15,11 +15,10 @@ Route::group([
     Route::any('game/nowGame', 'GameController@nowGame');
     Route::any('user/images', 'UserController@images');
     Route::any('user/scene', 'UserController@scene');
+    Route::any('store/detail', 'StoreController@detail');
+    Route::any('store/storeList', 'StoreController@storeList');
+    Route::any('store/goodsList', 'StoreController@goodsList');
 });
-
-Route::any('store/detail', 'StoreController@detail');
-Route::any('store/storeList', 'StoreController@storeList');
-Route::any('store/goodsList', 'StoreController@goodsList');
 
 Route::any('user/login', 'UserController@login')->middleware('ApiLogRecord');
 Route::any('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');

@@ -3,7 +3,7 @@ return [
     /*
      * rabc,该类型路由忽略rabc权限，
      * */
-    'rbac'=>['guest'],
+    'rbac'=>['guest','login'],
 
     /*
       超级用户,忽略rabc权限过滤,一般是开发人员的email数组

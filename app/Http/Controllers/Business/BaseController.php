@@ -10,12 +10,20 @@
 namespace App\Http\Controllers\Business;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 
 class BaseController extends Controller
 {
+    public $loginUser=null;
+
+    public function  __construct(Request $req)
+    {
+        parent::__construct($req);
+        $this->loginUser=AUth::guard('staff')->user();
+    }
+
     public function project(){
         return 'business';
     }
-
 }

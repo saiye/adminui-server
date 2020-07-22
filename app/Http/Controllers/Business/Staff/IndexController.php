@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Business\Staff;
 
 use App\Constants\PaginateSet;
-use  App\Http\Controllers\Cp\BaseController as Controller;
+use  App\Http\Controllers\Business\BaseController as Controller;
 use App\Models\Staff;
 use Validator;
 

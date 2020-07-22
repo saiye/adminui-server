@@ -72,7 +72,6 @@ class IndexController extends Controller
             'store_name' => 'required|max:30',
             'area' => 'required|array',
             'address' => 'required|max:100',
-            'company_id' => 'required',
             'describe' => 'max:100',
             'account' => ['regex:/^[0-9A-Za-z]+$/', 'required', 'max:20', 'unique:staff,account'],
             'password' => 'required|max:100',
@@ -80,7 +79,6 @@ class IndexController extends Controller
             'sex' => 'required|in:1,2',
             'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/', 'unique:staff,phone'],
         ], [
-            'company_id.required' => '商户必须选择！',
             'store_name.required' => '门店名称，不能为空！',
             'store_name.max' => '门店名称最大长度30！',
             'area.required' => '所在地区，不能为空！',
@@ -104,6 +102,8 @@ class IndexController extends Controller
             //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
+        $company_id=$this->loginUser->company_id;
+
         $area = $this->req->area;
         $region_id = $city_id = $province_id = 0;
         if (count($area) == 3) {
@@ -120,8 +120,8 @@ class IndexController extends Controller
             'sex' => $this->req->sex,
             'phone' => $this->req->phone,
             'lock' => 1,
-            'type' => 1,
-            'company_id' => $this->req->company_id,
+            'role_id' => 3,
+            'company_id' => $company_id,
             'password' => Hash::make($this->req->password),
         ];
         $staffObj = Staff::create($staff);
@@ -134,7 +134,7 @@ class IndexController extends Controller
         $data['province_id'] = $province_id;
         $data['city_id'] = $city_id;
         $data['address'] = $this->req->address;
-        $data['company_id'] = $this->req->company_id;
+        $data['company_id'] =$company_id;
         $data['describe'] = $this->req->describe;
         $data['staff_id'] = $staffObj->staff_id;
         $store = Store::create($data);

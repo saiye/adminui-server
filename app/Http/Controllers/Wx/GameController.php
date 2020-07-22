@@ -7,9 +7,7 @@ use App\Models\Channel;
 use App\Models\GameBoard;
 use App\Models\PlayerCountRecord;
 use App\Models\PlayerGameLog;
-use App\Models\User;
 use App\Service\GameApi\LrsApi;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
 class GameController extends Base
@@ -33,7 +31,7 @@ class GameController extends Base
             return $this->json([
                 'errorMessage' => 'success',
                 'code' => ErrorCode::SUCCESS,
-                'list' =>[
+                'list' => [
                     'total_game' => $user->total_game,
                     'win_game' => $user->win_game,
                     'mvp' => $user->mvp,
@@ -43,8 +41,15 @@ class GameController extends Base
             ]);
         }
         return $this->json([
-            'errorMessage' => '用户不存在',
-            'code' => ErrorCode::ACCOUNT_NOT_EXIST,
+            'errorMessage' => 'success',
+            'code' => ErrorCode::SUCCESS,
+            'list' => [
+                'total_game' => 0,
+                'win_game' => 0,
+                'mvp' => 0,
+                'svp' => 0,
+                'police' => 0,
+            ]
         ]);
     }
 
@@ -95,6 +100,7 @@ class GameController extends Base
                     'dup_name' => $v->board ? $v->board->board_name : '板子' . $v->dup_id,//板子名称
                     'date' => $v->begin_tick->format('m-d H:i'),//时间
                     'score' => $v->score,//评分
+                    'seat' => $v->seat,//位置
                     'room_game_id' => $v->room_game_id,
                     'dup_id' => $v->dup_id,//评分
                     'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
@@ -114,6 +120,7 @@ class GameController extends Base
             'list' => [],
         ]);
     }
+
     /**
      * 对局详情
      */
@@ -128,7 +135,7 @@ class GameController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $room_game_id = $this->request->input('room_game_id',0);
+        $room_game_id = $this->request->input('room_game_id', 0);
         $list = PlayerGameLog::with('user')->with('board')->whereRoomGameId($room_game_id)->get();
         if (!empty($list->toArray())) {
             $data = [];
@@ -140,6 +147,7 @@ class GameController extends Base
                     'dup_name' => $v->board ? $v->board->board_name : '板子' . $v->dup_id,//板子名称
                     'date' => $v->begin_tick->format('m-d H:i'),//时间
                     'score' => $v->score,//评分
+                    'seat' => $v->seat,//位置
                     'room_game_id' => $v->room_game_id,
                     'dup_id' => $v->dup_id,//评分
                     'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
@@ -161,7 +169,7 @@ class GameController extends Base
 
     public function conf()
     {
-        $dupList = GameBoard::select(['board_id as dup_id', 'board_name as dup_name'])->get();
+        $dupList = GameBoard::select(['dup_id', 'board_name as dup_name'])->get();
         return $this->json([
             'errorMessage' => '',
             'code' => ErrorCode::SUCCESS,
@@ -176,50 +184,26 @@ class GameController extends Base
     /**
      * 游戏中
      */
-    public function nowGame(){
-        $validator = $this->validationFactory->make($this->request->all(), [
-            'limit' => 'required|numeric|max:100|min:1',
-            'page' => 'required|numeric|min:1',
-        ]);
-        if ($validator->fails()) {
-            return $this->json([
-                'errorMessage' => $validator->errors()->first(),
-                'code' => ErrorCode::VALID_FAILURE,
-            ]);
-        }
-        $limit = $this->request->input('limit', 10);
-        $page = $this->request->input('page', 1);
-        $list = PlayerGameLog::with('user')->with('board');
-        $skip = ceil($page - 1) * $limit;
-        $list = $list->skip($skip)->take($limit)->get();
-        if (!empty($list->toArray())) {
-            $data = [];
-            foreach ($list as $v) {
-                array_push($data, [
-                    'nickname' => $v->user->nickname,//头像
-                    'icon' => $v->user->icon,//头像
-                    'dup_name' => $v->board ? $v->board->board_name : '板子' . $v->dup_id,//板子名称
-                    'date' => $v->begin_tick->format('m-d H:i'),//时间
-                    'score' => $v->score,//评分
-                    'room_game_id' => $v->room_game_id,
-                    'dup_id' => $v->dup_id,//评分
-                    'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
-                    'sex' => $v->user->sex,//0男,1女
-                    'user_id' => $v->user_id
-                ]);
+    public function nowGame()
+    {
+        $user = $this->user();
+        if ($user) {
+            if ($user->channel_id) {
+                $channel = Channel::whereChannelId($user->channel_id)->first();
+                if ($channel) {
+                    $api = new LrsApi($channel);
+                    return $api->logicQueryGameInfo($user->id);
+                }
             }
             return $this->json([
-                'errorMessage' => '',
-                'code' => ErrorCode::SUCCESS,
-                'list' => $data,
+                'errorMessage' => '你未登录过游戏!',
+                'code' => ErrorCode::DATA_NULL,
             ]);
         }
         return $this->json([
-            'errorMessage' => '我是有底线的!',
+            'errorMessage' => '你未登录',
             'code' => ErrorCode::DATA_NULL,
-            'list' => [],
         ]);
     }
-
 
 }

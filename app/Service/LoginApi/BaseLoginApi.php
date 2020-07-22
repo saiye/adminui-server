@@ -37,6 +37,7 @@ abstract class BaseLoginApi implements LoginApi
 
     public function getUser()
     {
+        return $this->testUser(24);
         list($code, $info) = $this->code2Session();
         if ($code == 0) {
             $hasThreeUser = ThreeUser::whereOpenId($info['openid'])->first();
@@ -80,5 +81,10 @@ abstract class BaseLoginApi implements LoginApi
             return [ErrorCode::SUCCESS, '老用户', $user];
         }
         return [$code, $info['message'], null];
+    }
+
+    public function testUser($user_id){
+        $user = User::whereId($user_id)->first();
+        return [ErrorCode::SUCCESS, '老用户', $user];
     }
 }

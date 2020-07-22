@@ -6,7 +6,9 @@ use App\Models\Channel;
 use App\Models\Device;
 use App\Models\PhysicsAddress;
 use App\Models\User;
+use App\Models\WebConfig;
 use App\Service\GameApi\LrsApi;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use App\Constants\ErrorCode;
 
@@ -62,22 +64,27 @@ class ClientController extends Base
                     'code' => ErrorCode::FAIL_LOGIN_CURRENT_DEVICE,
                 ]);
             }
-            $chanel = Channel::whereChannelId($this->request->input('channelId'))->first();
+            $channelId = $this->request->input('channelId');
+            $chanel = Channel::whereChannelId($channelId)->first();
             if ($chanel) {
-               $api= new LrsApi($chanel);
-               return   $api->loginCallBack([
-                   "deviceShortId" => $device->device_id,
-                   "account" => $user->account,
-                   "userId" => $user->id,
-                   "name" => $user->nickname,
-                   "sex" => $user->sex,
-                   "icon" => $user->icon ?? '',
-                   "roomId" => $device->room_id, // [可选] 房间唯一id
-                   "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
-                   "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
-                   "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
-                   "deviceMqttTopic" => $device->room->deviceMqttTopic??'', // [可选]房间设备mqtt主题
-               ]);
+                //更新最后登录的渠道
+                User::whereId($user->id)->update([
+                    'channel_id' => $channelId,
+                ]);
+                $api = new LrsApi($chanel);
+                return $api->loginCallBack([
+                    "deviceShortId" => $device->device_id,
+                    "account" => $user->account,
+                    "userId" => $user->id,
+                    "name" => $user->nickname,
+                    "sex" => $user->sex,
+                    "icon" => $user->icon ?? '',
+                    "roomId" => $device->room_id, // [可选] 房间唯一id
+                    "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
+                    "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
+                    "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
+                    "deviceMqttTopic" => $device->room->deviceMqttTopic ?? '', // [可选]房间设备mqtt主题
+                ]);
             } else {
                 return $this->json([
                     'errorMessage' => '渠道不存在!',
@@ -121,6 +128,7 @@ class ClientController extends Base
                     "StoreName" => $device->store->store_name,
                     "RoomName" => $device->room->room_name,
                     "RoomId" => $device->room_id,
+                    "SeatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
                     "GameServerAddress" => '47.115.45.34:10002',
                 ]);
             }
@@ -132,6 +140,14 @@ class ClientController extends Base
         ]);
     }
 
+    public function conf()
+    {
+        $data=WebConfig::getKeyByFile('version');
+        return $this->json(array_merge([
+            'code' => ErrorCode::SUCCESS,
+            'errorMessage' => 'success',
+        ],$data));
+    }
 
 }
 

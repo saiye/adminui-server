@@ -26,6 +26,9 @@ Route::group([
     Route::post('store/index/addStore', 'Store\IndexController@addStore')->name('bs-addStore');
     Route::post('store/index/checkStore', 'Store\IndexController@checkStore')->name('bs-checkStore');
 
+    Route::post('company/index/getState', 'Company\IndexController@getState')->name('bs-getState');
+    Route::post('company/index/areaList', 'Company\IndexController@areaList')->name('bs-areaList');
+
     //新增会员
     Route::post('game/index/userList', 'Game\IndexController@userList')->name('bs-GameUserList');
     Route::post('game/index/addUser', 'Game\IndexController@addUser')->name('bs-GameAddUser');

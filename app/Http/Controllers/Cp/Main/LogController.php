@@ -16,7 +16,6 @@ use App\Models\ApiLog;
 use Illuminate\Http\Request;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use Config;
-use App\Models\LoginLog;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 

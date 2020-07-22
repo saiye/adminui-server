@@ -4,11 +4,7 @@ namespace App\Http\Controllers\Cp\Game;
 
 use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
-use App\Models\Device;
-use App\Models\PhysicsAddress;
-use App\Models\Room;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Validator;
 
@@ -146,6 +142,26 @@ class IndexController extends Controller
             return $this->successJson([], '操作成功');
         }
         return $this->errorJson('审核失败！');
+    }
+
+    public function setJudge()
+    {
+        $validator = Validator::make($this->req->all(), [
+            'user_id' => 'required|numeric',
+            'judge' => 'required|numeric|in:1,2',
+        ]);
+        if ($validator->fails()) {
+            //返回默认支付
+            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
+        }
+        $success = User::whereId($this->req->user_id)->update([
+            'judge' => $this->req->judge,
+        ]);
+        if ($success) {
+            return $this->successJson([], '操作成功');
+        } else {
+            return $this->errorJson('操作失败！');
+        }
     }
 }
 

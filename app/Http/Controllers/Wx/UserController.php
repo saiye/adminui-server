@@ -10,7 +10,6 @@ use App\Service\GameApi\LrsApi;
 use App\Service\LoginApi\LoginApi;
 use App\Constants\ErrorCode;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class UserController extends Base
@@ -58,6 +57,10 @@ class UserController extends Base
         }
         $channel = Channel::whereChannelId($channelId)->first();
         if ($channel) {
+            //更新最后登录的渠道
+            User::whereId($user->id)->update([
+                'channel_id' => $channelId,
+            ]);
             (new LrsApi($channel))->loginCallBack([
                 "deviceShortId" => $device->device_id,
                 "account" => $user->account,
@@ -107,10 +110,7 @@ class UserController extends Base
             'js_code' => 'required',
             'nickName' => 'required',
             'avatarUrl' => 'required',
-            'gender' => 'required',
-            'province' => 'required',
-            'city' => 'required',
-            'country' => 'required',
+           // 'gender' => 'required', //可选
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -127,6 +127,12 @@ class UserController extends Base
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
             ]);
         }
+        if(!$user){
+            return $this->json([
+                'errorMessage' => '未找到用户',
+                'code' => ErrorCode::ACCOUNT_NOT_EXIST,
+            ]);
+        }
         if ($user->lock == 2) {
             return $this->json([
                 'errorMessage' => '账号已锁定!',
@@ -134,7 +140,7 @@ class UserController extends Base
             ]);
         }
         $token = Str::random(32);
-        Cache::put($token, $user, 7200);
+        Cache::put($token, $user, 18000);
         return $this->json([
             'errorMessage' => 'success',
             'token' => $token,
@@ -184,7 +190,6 @@ class UserController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        //$list=PlayerImage::whereuserId($this->request->input('userId'))->groupBy(DB::raw(''));
         return $this->json([
             'errorMessage' => 'success',
             'code' => ErrorCode::SUCCESS,

@@ -8,11 +8,11 @@ use Config;
 use Route;
 use App\TraitInterface\BaseTrait;
 
-class Rbac
+class StaffRbac
 {
     use BaseTrait;
 
-    private $prefix='admin';
+    private $prefix='bs';
 
     /**
      * Handle an incoming request.
@@ -39,15 +39,13 @@ class Rbac
         if ($user->lock) {
             return false;
         }
-        //超级管理员，一般是开发者账号，直接跳过数据库权限判断
-        $super_admin = Config::get('role.super_admin', []);
-        if (in_array($user->user_name, $super_admin)) {
+        if(in_array($user->role_id, [1])){
             return true;
         }
         //去掉$prefix
-        $path =substr($request->path(),6);
+        $path =substr($request->path(),3);
         //不需要rbac权限的路由,pass
-        if ($this->checkAct($path,'cp')) {
+        if ($this->checkAct($path,$guard)) {
             return true;
         }
         $acts = $user->acts->pluck('act')->toArray();

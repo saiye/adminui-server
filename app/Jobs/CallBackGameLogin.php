@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Constants\CacheKey;
 use App\Constants\ErrorCode;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
@@ -9,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class CallBackGameLogin implements ShouldQueue
@@ -68,6 +70,9 @@ class CallBackGameLogin implements ShouldQueue
             Log::info('call game login success!' . $this->url);
         } else {
             Log::info('call game login error! url:' . $this->url);
+            Log::info($this->post);
+        }
+        if(Cache::get(CacheKey::API_LOG_RECORD)){
             Log::info($this->post);
         }
     }

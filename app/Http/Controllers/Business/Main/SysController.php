@@ -11,8 +11,6 @@ namespace App\Http\Controllers\Business\Main;
 
 use App\Constants\PaginateSet;
 use App\Http\Controllers\Business\BaseController;
-use App\Models\CpAct;
-use App\Models\CpRole;
 use App\Models\Staff;
 use App\Models\StaffAct;
 use Config;
@@ -29,7 +27,7 @@ class SysController extends BaseController
     {
         $data = $user->where('staff.company_id','=',$this->loginUser->company_id);
         if(in_array($this->loginUser->role_id,[3,4])){
-            $data=$data->whereStoreId($this->loginUser->store_id);
+            $data=$data->where('staff.store_id',$this->loginUser->store_id);
         }
         if($this->req->search_name){
             $data = $data->where('staff.account', 'like', '%' . $this->req->search_name. '%')->orWhere('staff.real_name', 'like', '%' . $this->req->search_name. '%')->orWhere('store.store_name','like','%'.$this->req->search_name.'%');

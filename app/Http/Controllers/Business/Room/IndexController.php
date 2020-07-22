@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Business\Room;
 
 use App\Constants\PaginateSet;
-use  App\Http\Controllers\Cp\BaseController as Controller;
+use  App\Http\Controllers\Business\BaseController as Controller;
 use App\Models\Company;
 use App\Models\Device;
 use App\Models\PhysicsAddress;
 use App\Models\Room;
 use App\Models\Store;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Validator;
 
 /**
@@ -25,7 +24,11 @@ class IndexController extends Controller
     {
         $data = new Room();
 
-        $data=$data->with('devices')->with('company')->with('store')->with('billing');
+        $data=$data->whereCompanyId($this->loginUser->company_id)->with('devices')->with('company')->with('store')->with('billing');
+
+        if(in_array($this->loginUser->role_id,[3,4])){
+            $data=$data->whereStoreId($this->loginUser->store_id);
+        }
 
         if ($this->req->room_name) {
             $data = $data->where('room.room_name', 'like', '%' . $this->req->room_name . '%');

@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Business\Room;
 
 use App\Constants\PaginateSet;
-use  App\Http\Controllers\Cp\BaseController as Controller;
-use App\Models\Billing;
+use  App\Http\Controllers\Business\BaseController as Controller;
 use App\Models\Device;
 use Validator;
 

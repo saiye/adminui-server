@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Business\Order;
 
 use App\Constants\PaginateSet;
 use  App\Http\Controllers\Business\BaseController as Controller;
-use App\Models\Room;
 use Validator;
 
 /**
@@ -39,31 +38,11 @@ class IndexController extends Controller
     }
 
     /**
-     * 添加房间
+     * 后台下单
      */
-    public function addOrder()
+    public function createOrder()
     {
-        $validator = Validator::make($this->req->all(), [
-            'room_id' => 'required',
-            'store_id' => 'required',
-            'company_id' => 'required',
-            'staff_id' => 'required',
-        ], [
-            'room_id.required' => '房间号不能为空！',
-            'store_id.required' => '门店id，不能为空！',
-            'company_id.required' => '商户id，不能为空！',
-        ]);
-        if ($validator->fails()) {
-            //返回默认支付
-            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
-        }
-        $data = $this->req->except('play_type', 'play_time', 'play_status');
-        $room = Room::create($data);
-        if ($room) {
-            return $this->successJson([], '操作成功');
-        } else {
-            return $this->errorJson('入库失败');
-        }
+
     }
 
 

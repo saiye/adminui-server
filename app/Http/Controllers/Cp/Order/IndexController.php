@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Cp\Order;
 use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Room;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Validator;
 
 /**
@@ -39,35 +37,6 @@ class IndexController extends Controller
         $assign = compact('data');
         return $this->successJson($assign);
     }
-
-    /**
-     * 添加房间
-     */
-    public function addOrder()
-    {
-        $validator = Validator::make($this->req->all(), [
-            'room_id' => 'required',
-            'store_id' => 'required',
-            'company_id' => 'required',
-            'staff_id' => 'required',
-        ], [
-            'room_id.required' => '房间号不能为空！',
-            'store_id.required' => '门店id，不能为空！',
-            'company_id.required' => '商户id，不能为空！',
-        ]);
-        if ($validator->fails()) {
-            //返回默认支付
-            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
-        }
-        $data = $this->req->except('play_type', 'play_time', 'play_status');
-        $room = Room::create($data);
-        if ($room) {
-            return $this->successJson([], '操作成功');
-        } else {
-            return $this->errorJson('入库失败');
-        }
-    }
-
 
 }
 

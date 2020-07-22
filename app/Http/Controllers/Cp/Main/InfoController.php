@@ -9,7 +9,6 @@
 
 namespace App\Http\Controllers\Cp\Main;
 
-use Illuminate\Http\Request;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use Cache;
 /**

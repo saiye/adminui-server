@@ -36,6 +36,14 @@ Route::group([
     Route::post('main/log/action-log-list', 'Main\LogController@getActionLog')->name('cp-actionLog');
     Route::post('main/log/api-log-list', 'Main\LogController@getApiLog')->name('cp-ApiLog');
     Route::post('main/log/set-api-log-switch', 'Main\LogController@setApiLog')->name('cp-ApiSetLogSwitch');
+
+    //站点配置
+    Route::post('main/set/getList', 'Main\SettingController@getList')->name('cp-WebConfigList');
+    Route::post('main/set/add', 'Main\SettingController@postAdd')->name('cp-WebConfigPostAdd');
+    Route::post('main/set/edit', 'Main\SettingController@postEdit')->name('cp-WebConfigPostEdit');
+    Route::post('main/set/edit', 'Main\SettingController@postEdit')->name('cp-WebConfigPostEdit');
+    Route::post('main/set/putFile', 'Main\SettingController@putConfigToFile')->name('cp-WebConfigPutFile');
+
     //商户管理
     Route::post('company/index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');
     Route::post('company/index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');
@@ -53,6 +61,7 @@ Route::group([
     Route::post('game/index/addUser', 'Game\IndexController@addUser')->name('cp-GameAddUser');
     Route::post('game/index/editUser', 'Game\IndexController@editUser')->name('cp-GameEditUser');
     Route::post('game/index/lockUser', 'Game\IndexController@lockUser')->name('cp-GameLockUser');
+    Route::post('game/index/setJudge', 'Game\IndexController@setJudge')->name('cp-GameSetJudge');
 
     //新增渠道
     Route::post('game/channel/channelList', 'Game\ChannelController@channelList')->name('cp-GameChannelList');

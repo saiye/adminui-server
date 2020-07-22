@@ -42,6 +42,7 @@ class Room extends Model
         return $this->hasMany('App\Models\Device', 'room_id', 'room_id')->orderBy('seat_num','asc');
     }
 
+
     public function getIsUseAttribute($value)
     {
         return Config::get('deploy.is_use.'.$value,$value);

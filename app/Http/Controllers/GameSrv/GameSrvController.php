@@ -6,9 +6,6 @@ namespace App\Http\Controllers\GameSrv;
 
 use App\Constants\ErrorCode;
 use App\Jobs\RoomGameLogJob;
-use App\Models\PlayerGameLog;
-use App\Models\RoomGameLog;
-use Illuminate\Support\Facades\Log;
 
 class GameSrvController extends Base
 {
@@ -95,7 +92,6 @@ class GameSrvController extends Base
     public function gameResLog()
     {
          $json= file_get_contents('php://input');
-        // $json='{ "_t" : "GameResInfo", "gameRes" : 3, "dupId" : 103, "beginTick" : "1594371340506", "unitInfos" : [{ "userId" : 24, "job" : 1, "seat" : 1, "mvp" : 0, "svp" : 0, "res" : 2, "score" : 0, "police" : 0, "status" : 1 }, { "userId" : 67, "job" : 2, "seat" : 3, "mvp" : 0, "svp" : 0, "res" : 3, "score" : 0, "police" : 0, "status" : 2 }, { "userId" : 66, "job" : 1, "seat" : 2, "mvp" : 0, "svp" : 0, "res" : 2, "score" : 0, "police" : 0, "status" : 1 }] }';
          $data=[];
          if($json){
              $data=  json_decode($json,true);
