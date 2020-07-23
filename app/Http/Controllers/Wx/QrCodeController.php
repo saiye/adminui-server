@@ -40,8 +40,8 @@ class QrCodeController extends Base
         }
         $full_path='';
         if ($hasDevice->qrCodePath) {
-            if(Storage::disk('public')->exists($hasDevice->qrCodePath)){
-                $full_path = Storage::disk('public')->url($hasDevice->qrCodePath);
+            if(Storage::exists($hasDevice->qrCodePath)){
+                $full_path = Storage::url($hasDevice->qrCodePath);
             }
         }
         if(!$full_path) {

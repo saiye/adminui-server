@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::group([
-  'middleware' => ['WxAuth','ApiLogRecord']
+    'middleware' => ['WxAuth', 'ApiLogRecord']
 ], function () {
     Route::any('user/info', 'UserController@info');
     Route::any('user/logout', 'UserController@logout');
@@ -23,6 +23,10 @@ Route::group([
 Route::any('user/login', 'UserController@login')->middleware('ApiLogRecord');
 Route::any('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
 Route::any('qrCode/test', 'QrCodeController@testQrCode')->name('wx-QrCodeTestQrCode');
+//微信支付回调
+Route::any('call/wx', 'PayController@callWx')->name('wx-callWx');
+//余额支付回调
+Route::any('call/balance', 'PayController@callBalance')->name('wx-callCallBalance');
 
 
 

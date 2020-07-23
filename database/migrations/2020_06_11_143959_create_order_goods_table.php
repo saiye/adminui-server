@@ -18,10 +18,13 @@ class CreateOrderGoodsTable extends Migration
             $table->unsignedInteger('order_id')->comment('订单id');
             $table->unsignedInteger('goods_id')->comment('商品id');
             $table->unsignedInteger('goods_num')->comment('购买数量');
-            $table->decimal('goods_price',8,3)->comment('商品价格');
+            $table->decimal('goods_price', 8, 3)->comment('商品单价');
+            //type:1普通商品,2房费
+            $table->tinyInteger('type')->default(1)->comment('商品类型');
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

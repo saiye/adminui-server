@@ -15,7 +15,8 @@ class CreateOrderTable extends Migration
     {
         Schema::create('order', function (Blueprint $table) {
             $table->increments('order_id')->comment('order_id');
-            $table->char('order_sn',15)->comment('订单号');
+            $table->string('order_sn',80)->comment('订单号');
+            $table->string('prepay_id',80)->comment('第三方订单号');
             $table->decimal('total_price',8,3)->comment('订单总价');
             $table->unsignedInteger('room_id')->comment('所属房间');
             $table->unsignedInteger('store_id')->comment('所属店面');

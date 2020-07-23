@@ -56,7 +56,6 @@ class Kernel extends HttpKernel
         'client'=>\App\Http\Middleware\Client::class,
         'WxAuth'=>\App\Http\Middleware\WxAuth::class,
         'action.log' => \App\Http\Middleware\ActionLog::class,
-        'filter' => \App\Http\Middleware\Filter::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,

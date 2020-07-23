@@ -1,12 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: chenyuansai
- * Email:714433615@qq.com
- * Date: 2018/4/25
- * Time: 17:04
- */
-
 namespace App\Http\Controllers\Cp\Main;
 
 use App\Constants\PaginateSet;
@@ -37,8 +29,12 @@ class SettingController extends BaseController
     public function postAdd()
     {
         $validator = Validator::make($this->req->all(), [
-            'key' => 'required|max:30|unique:web_config',
+            'key' => 'required|max:30|min:1|unique:web_config',
             'value' => 'required|array',
+        ], [
+            'key.unique' => 'key重复',
+            'key.max' => 'key长度不能超过30',
+            'key.min' => 'key长度不能小于1',
         ]);
         if ($validator->fails()) {
             return $this->errorJson($validator->errors()->first(), 2);
@@ -80,10 +76,10 @@ class SettingController extends BaseController
         if (!$this->checkValue($valueData)) {
             return $this->errorJson('配置不能为空!', 2);
         }
-        $hasItem = WebConfig::whereKey($this->req->key)->first();
+        $hasItem = WebConfig::where('key', $this->req->key)->first();
         if ($hasItem) {
-            if ($hasItem->id !== $this->req->id) {
-                return $this->errorJson('key重复！');
+            if (!($hasItem->id == $this->req->id)) {
+                return $this->errorJson('key值重复！');
             }
         }
         $data = $this->req->only(['key', 'value']);
@@ -96,15 +92,15 @@ class SettingController extends BaseController
      */
     public function putConfigToFile()
     {
-        $webConfig=WebConfig::cache_file;
-        $res=WebConfig::all();
-        $data=[];
-        foreach ($res as $val){
-            $data[$val->key]=$val->format;
+        $webConfig = WebConfig::cache_file;
+        $res = WebConfig::all();
+        $data = [];
+        foreach ($res as $val) {
+            $data[$val->key] = $val->format;
         }
-        $content="<?php\n return\t".var_export($data,true).';';
-        $isOK= Storage::disk('local')->put($webConfig,$content);
-        if($isOK){
+        $content = "<?php\n return\t" . var_export($data, true) . ';';
+        $isOK = Storage::disk('local')->put($webConfig, $content);
+        if ($isOK) {
             return $this->successJson([], '刷新成功！');
         }
         return $this->errorJson('刷新失败');

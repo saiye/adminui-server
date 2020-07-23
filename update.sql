@@ -19,9 +19,13 @@ ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `two_way` TINYINT(4) DEFAULT '0'
  ALTER TABLE `lrs_manage`.`order`     ADD COLUMN `coupon_price` DECIMAL(8,3) NULL COMMENT '券减金额' AFTER `coupon_id`;
 
 
-
- ALTER TABLE `lrs_manage`.`store`
+ALTER TABLE `lrs_manage`.`store`
 ADD COLUMN `close_at` TINYINT(4) DEFAULT '24' NULL AFTER `staff_id`,
 ADD COLUMN `open_at` TINYINT(4) DEFAULT '0' NULL AFTER `close_at`;
 
 ALTER TABLE `lrs_manage`.`goods`     ADD COLUMN `info` VARCHAR(80) NULL COMMENT '描述' AFTER `goods_price`;
+ALTER TABLE `lrs_manage`.`order_goods`     ADD COLUMN `type` TINYINT(4) DEFAULT '1' NULL AFTER `goods_price`;
+
+ALTER TABLE `lrs_manage`.`order`
+ADD COLUMN `prepay_id` VARCHAR(80) NULL COMMENT '第三方支付订单' AFTER `order_sn`,
+CHANGE `order_sn` `order_sn` VARCHAR(80) NOT NULL COMMENT '订单号';

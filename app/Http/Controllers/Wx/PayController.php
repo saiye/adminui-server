@@ -9,17 +9,16 @@ class PayController extends Base
     /**
      * 微信支付回调
      */
-    public function callWx(){
+    public function callWx()
+    {
 
     }
 
     /**
-     * 支付宝回调
+     * 余额支付回调
      */
-    public function callAli(){
+    public function callBalance()
+    {
 
     }
-
-
-
 }

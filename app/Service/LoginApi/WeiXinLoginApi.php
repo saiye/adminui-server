@@ -161,9 +161,9 @@ class WeiXinLoginApi extends BaseLoginApi
             ]);
             if ($response->getStatusCode() == 200) {
                 $str = $response->getBody()->getContents();
-                $image_path = 'qrCode/' . $data['deviceShortId'] . '.png';
-                Storage::disk('public')->put($image_path, $str);
-                $full_path = Storage::disk('public')->url($image_path);
+                $image_path = 'qrCode/' . $data['deviceShortId'].'c'.$data['channelId'].'.png';
+                Storage::put($image_path, $str);
+                $full_path = Storage::url($image_path);
                 //二维码入库
                 PhysicsAddress::whereId($data['deviceShortId'])->update([
                     'qrCodePath' => $image_path,
