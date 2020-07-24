@@ -16,7 +16,8 @@ use Illuminate\Support\Str;
 final class WeiXinPayApi extends PayApi
 {
 
-    const postOrderUrl = 'https://api.mch.weixin.qq.com';
+  //  const postOrderUrl = 'https://api.mch.weixin.qq.com';
+    const postOrderUrl = 'https://api.mch.weixin.qq.com/sandboxnew';
 
     private static $config;
 
@@ -62,7 +63,6 @@ final class WeiXinPayApi extends PayApi
     function createOrder()
     {
         $price = $this->order->total_price * 100;
-        $name = Config::get('pay.company_name');
         $appid = self::$config['appId'];
         $mch_id = self::$config['mchId'];
         $time = date('YmdHis');
@@ -71,7 +71,7 @@ final class WeiXinPayApi extends PayApi
             'mch_id' => $mch_id,
             'nonce_str' => Str::random(32),
             'sign_type' => 'MD5',
-            'body' => $name . '消费',
+            'body' => $this->order->store->store_name. '消费',
             'out_trade_no' => $this->order->order_sn,
             'fee_type' => 'CNY',
             'total_fee' => $price,

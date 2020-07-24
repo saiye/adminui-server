@@ -86,6 +86,7 @@ class LrsApi extends BaseGameApi
                     $roomId = $res['roomId'];
                     $dupId = $res['dupId'];
                     $dupName = $res['dupName'];
+                    $selfJob = $res['selfJob'];
                     $userIdArr = [];
                     $seatArr = [];
                     foreach ($res['users'] as $item) {
@@ -112,11 +113,13 @@ class LrsApi extends BaseGameApi
                                 'dup_id' => $dupId,
                                 'mvp' => 0,// 0 - ⽆， 1 mvp
                                 'user_id' => $v->id,
+                                'self_job' =>0,
                                 'room_name' => $roomName,
                                 'status' => $status,
                             ];
                             if ($v->id == $userId) {
                                 $item = $tmp;
+                                $item['self_job']=$selfJob;
                             }
                             array_push($data, $tmp);
                         }

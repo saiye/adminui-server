@@ -33,12 +33,61 @@ class IndexController extends Controller
 
     public function addGoods()
     {
+        $validator = Validator::make($this->req->all(), [
+            'goods_name' => 'required|max:50',
+            'goods_price' => 'required|numeric|min:0.01',
+            'info' => 'required|max:80',
+            'category_id' => 'required|numeric',
+            'image' => 'required|max:100',
+            'tag' => 'required|max:100',
+            'tagArr' => 'required|array',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
+        }
+        $data = $this->req->only('goods_name', 'goods_price', 'info', 'category_id', 'image', 'tag');
+        $data['store_id'] = 0;
+        $data['company_id'] = 0;
+        $board = Goods::create($data);
 
+        if ($board) {
+            return $this->successJson([], '添加成功');
+        } else {
+            return $this->errorJson('入库失败');
+        }
     }
 
     public function editGoods()
     {
+        $validator = Validator::make($this->req->all(), [
+            'goods_id' => 'required|numeric',
+            'goods_name' => 'required|max:50',
+            'goods_price' => 'required|numeric|min:0.01',
+            'info' => 'required|max:80',
+            'category_id' => 'required|numeric',
+            'image' => 'required|max:100',
+            'tag' => 'required|max:100',
+            'tagArr' => 'required|array',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
+        }
+        $data = $this->req->only('goods_name', 'goods_price', 'info', 'category_id', 'image', 'tag');
+        $goodsId = $this->req->input('goods_id');
+        $board = Goods::whereGoodsId($goodsId)->update($data);
+        if ($board) {
+            return $this->successJson([], '修改成功');
+        } else {
+            return $this->errorJson('修改失败');
+        }
+    }
+
+    public function addTag($array){
 
     }
+
+
+
+
 }
 

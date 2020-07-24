@@ -65,5 +65,7 @@ Route::group([
     Route::post('room/billing/billingList', 'Room\BillingController@billingList')->name('bs-billingList');
     Route::post('room/billing/addBilling', 'Room\BillingController@addBilling')->name('bs-addBilling');
     Route::post('room/billing/billingConfig', 'Room\BillingController@billingConfig')->name('bs-billingConfig');
+
+    //商品管理
 });
 

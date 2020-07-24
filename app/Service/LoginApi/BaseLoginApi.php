@@ -37,8 +37,16 @@ abstract class BaseLoginApi implements LoginApi
 
     public function getUser()
     {
+       /* $user = User::whereId(1)->first();
+        return [ErrorCode::SUCCESS, '老用户', $user];*/
+
         list($code, $info) = $this->code2Session();
         if ($code == 0) {
+            //经度
+            $longitude =$this->request->input('longitude',0);
+            //维度
+            $latitude =$this->request->input('latitude',0);
+
             $hasThreeUser = ThreeUser::whereOpenId($info['openid'])->first();
             if (!$hasThreeUser) {
                 DB::beginTransaction();
@@ -51,6 +59,8 @@ abstract class BaseLoginApi implements LoginApi
                     'judge' => 2,
                     'lock' => 1,
                     'icon' => $info['icon'],
+                    'lon' => $longitude,
+                    'lat' => $latitude,
                 ]);
                 if ($user) {
                     $threeUser = ThreeUser::create([
@@ -75,6 +85,8 @@ abstract class BaseLoginApi implements LoginApi
                 $user->sex = $info['sex'];
                 $user->nickname = $info['nickname'];
                 $user->icon = $info['icon'];
+                $user->lon =$longitude;
+                $user->lat =$latitude;
                 $user->save();
             }
             return [ErrorCode::SUCCESS, '老用户', $user];

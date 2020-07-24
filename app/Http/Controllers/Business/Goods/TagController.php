@@ -18,7 +18,6 @@ class TagController extends Controller
     {
 
     }
-
     public function addTag()
     {
 

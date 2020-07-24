@@ -18,9 +18,7 @@ abstract class PayApi
     {
 
     }
-    /**
-     * 获取银行卡支持
-     */
+
     public static function make(Order $order, Request $req)
     {
         switch ($order->pay_type) {

@@ -110,7 +110,9 @@ class UserController extends Base
             'js_code' => 'required',
             'nickName' => 'required',
             'avatarUrl' => 'required',
-           // 'gender' => 'required', //可选
+            'gender' => 'nullable|numeric', //可选
+            'longitude' => 'nullable|numeric', //可选 经度 longitude
+            'latitude' => 'nullable|numeric', //可选 纬度
         ]);
         if ($validator->fails()) {
             return $this->json([

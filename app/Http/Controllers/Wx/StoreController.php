@@ -8,6 +8,7 @@ use App\Models\GoodsCategory;
 use App\Models\Store;
 use App\Constants\ErrorCode;
 use App\Models\StoreTag;
+use Illuminate\Support\Facades\DB;
 
 class StoreController extends Base
 {
@@ -28,7 +29,7 @@ class StoreController extends Base
             ]);
         }
         $storeId = $this->request->input('store_id');
-        $store = Store::select(['store_id', 'store_name','open_at','close_at'])->whereStoreId($storeId)->whereCheck(1)->first();
+        $store = Store::select(['store_id', 'store_name', 'open_at', 'close_at'])->whereStoreId($storeId)->whereCheck(1)->first();
         if (!$store) {
             return $this->json(
                 [
@@ -37,8 +38,8 @@ class StoreController extends Base
                 ]
             );
         }
-        $store->category=GoodsCategory::whereStoreId($storeId)->select(['category_id','category_name'])->get();
-        $store->tags=StoreTag::whereStoreId($storeId)->select(['tag_id','tag_name'])->get();
+        $store->category = GoodsCategory::whereStoreId($storeId)->select(['category_id', 'category_name'])->get();
+        $store->tags = StoreTag::whereStoreId($storeId)->select(['tag_id', 'tag_name'])->get();
         return $this->json(
             [
                 'errorMessage' => '',
@@ -49,7 +50,7 @@ class StoreController extends Base
     }
 
     /**
-     * 商店列表
+     * 商店列表,
      * @return \Illuminate\Http\JsonResponse
      */
     public function storeList()
@@ -64,10 +65,39 @@ class StoreController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
+        /**
+         *   5千米以内的店铺
+         *   $distance =5 ;
+         * ->havingRaw('distance < ' . $distance)
+         */
         $limit = $this->request->input('limit', 10);
         $page = $this->request->input('page', 1);
         $skip = ceil($page - 1) * $limit;
-        $list = Store::select(['store_name', 'store_id','describe','close_at','open_at'])->skip($skip)->take($limit)->get();
+        $user = $this->user();
+        $lon = $user->lon;
+        $lat = $user->lat;
+        $list = Store::select(['store_name', 'store_id', 'describe','address', 'close_at', 'open_at', DB::raw(" ROUND(
+        6378.138 * 2 * ASIN(
+            SQRT(
+                POW(
+                    SIN(
+                        (
+                           $lat* PI() / 180 - lat * PI() / 180
+                        ) / 2
+                    ),
+                    2
+                ) + COS($lat* PI() / 180) * COS(lat * PI() / 180) * POW(
+                    SIN(
+                        (
+                            $lon * PI() / 180 - lon * PI() / 180
+                        ) / 2
+                    ),
+                    2
+                )
+            )
+        ),2
+    ) AS distance")])->orderBy('distance', 'asc')->skip($skip)->take($limit)->get();
+
         if ($list) {
             return $this->json(
                 [
@@ -77,9 +107,10 @@ class StoreController extends Base
                 ]
             );
         }
+
         return $this->json(
             [
-                'errorMessage' => '没有更多的店铺了!',
+                'errorMessage' => '你附近没发现更多店铺了!',
                 'code' => ErrorCode::DATA_NULL,
                 'list' => [],
             ]
@@ -106,7 +137,7 @@ class StoreController extends Base
         $page = $this->request->input('page', 1);
         $category_id = $this->request->input('category_id', 1);
         $skip = ceil($page - 1) * $limit;
-        $list = Goods::select(['goods_name', 'goods_price', 'goods_id', 'image','info'])->whereStoreId($category_id)->whereStatus(1)->skip($skip)->take($limit)->get();
+        $list = Goods::select(['goods_name', 'goods_price', 'goods_id', 'image', 'info','tag'])->whereStoreId($category_id)->whereStatus(1)->skip($skip)->take($limit)->get();
         if ($list) {
             return $this->json(
                 [

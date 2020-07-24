@@ -13,6 +13,7 @@ ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `two_way` TINYINT(4) DEFAULT '0'
 
  ALTER TABLE `lrs_manage`.`goods`     ADD COLUMN `category_id` INT(10) DEFAULT '0' NULL COMMENT '分类id' AFTER `company_id`;
 
+
  ALTER TABLE `lrs_manage`.`goods`     ADD COLUMN `image` VARCHAR(100) NULL AFTER `category_id`;
 
  ALTER TABLE `lrs_manage`.`order`     ADD COLUMN `coupon_id` INT(10) UNSIGNED NOT NULL COMMENT '券id' AFTER `play_time`;
@@ -29,3 +30,28 @@ ALTER TABLE `lrs_manage`.`order_goods`     ADD COLUMN `type` TINYINT(4) DEFAULT 
 ALTER TABLE `lrs_manage`.`order`
 ADD COLUMN `prepay_id` VARCHAR(80) NULL COMMENT '第三方支付订单' AFTER `order_sn`,
 CHANGE `order_sn` `order_sn` VARCHAR(80) NOT NULL COMMENT '订单号';
+
+
+ALTER TABLE `lrs_manage`.`users`
+ADD COLUMN `lon` DECIMAL(8,6) DEFAULT '0.0' NULL COMMENT '经度' AFTER `two_way`,
+ADD COLUMN `lat` DECIMAL(8,6) DEFAULT '0.0' NULL COMMENT '维度' AFTER `lon`;
+
+
+ALTER TABLE `lrs_manage`.`store`
+ADD COLUMN `lon` DECIMAL(8,6) DEFAULT '0' NOT NULL AFTER `check`,
+ADD COLUMN `lat` DECIMAL(8,6) DEFAULT '0' NOT NULL AFTER `lon`;
+
+
+ALTER TABLE `lrs_manage`.`goods`
+ADD COLUMN `tag` VARCHAR(100) NULL COMMENT '默认标签' AFTER `image`;
+
+
+ALTER TABLE `lrs_manage`.`goods_sku`
+ ADD COLUMN `is_act` TINYINT(4) DEFAULT '0' NULL COMMENT '是否默认' AFTER `is_del`;
+
+ALTER TABLE `lrs_manage`.`order_goods`
+ADD COLUMN `image` VARCHAR(100) NULL COMMENT '商品图' AFTER `type`,
+ADD COLUMN `tag` VARCHAR(100) NULL COMMENT '商品标签' AFTER `image`;
+
+ ALTER TABLE `lrs_manage`.`goods_category`
+     ADD COLUMN `count` INT(10) DEFAULT '0' NULL COMMENT '商品数量' AFTER `company_id`;

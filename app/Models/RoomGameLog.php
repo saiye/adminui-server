@@ -15,4 +15,9 @@ class RoomGameLog extends Model
     protected $guarded = [
         'id'
     ];
+
+    public function getScoreAttribute($value)
+    {
+        return $value/10;
+    }
 }

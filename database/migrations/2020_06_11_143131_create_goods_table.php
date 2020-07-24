@@ -23,6 +23,7 @@ class CreateGoodsTable extends Migration
             $table->unsignedInteger('company_id')->default(0)->comment('所属公司id');
             $table->unsignedInteger('sku_id')->default(0)->comment('默认skuId');
             $table->string('image',100)->nullable()->comment('商品图片');
+            $table->string('tag',100)->nullable()->comment('默认规格字符');
             $table->timestamps();
         });
     }
