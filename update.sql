@@ -25,6 +25,9 @@ ADD COLUMN `close_at` TINYINT(4) DEFAULT '24' NULL AFTER `staff_id`,
 ADD COLUMN `open_at` TINYINT(4) DEFAULT '0' NULL AFTER `close_at`;
 
 ALTER TABLE `lrs_manage`.`goods`     ADD COLUMN `info` VARCHAR(80) NULL COMMENT '描述' AFTER `goods_price`;
+
+
+
 ALTER TABLE `lrs_manage`.`order_goods`     ADD COLUMN `type` TINYINT(4) DEFAULT '1' NULL AFTER `goods_price`;
 
 ALTER TABLE `lrs_manage`.`order`
@@ -55,3 +58,14 @@ ADD COLUMN `tag` VARCHAR(100) NULL COMMENT '商品标签' AFTER `image`;
 
  ALTER TABLE `lrs_manage`.`goods_category`
      ADD COLUMN `count` INT(10) DEFAULT '0' NULL COMMENT '商品数量' AFTER `company_id`;
+
+/*ALTER TABLE `lrs_manage`.`users`
+CHANGE `real_name` `real_name` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' NOT NULL COMMENT '真实姓名',
+CHANGE `nickname` `nickname` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' NOT NULL COMMENT '昵称',
+CHANGE `email` `email` VARCHAR(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' NOT NULL COMMENT '邮箱',
+CHANGE `icon` `icon` VARCHAR(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' NOT NULL COMMENT '头像',
+CHANGE `channel_id` `channel_id` INT(10) DEFAULT '0' NOT NULL,     CHANGE `online` `online` TINYINT(4) DEFAULT '0' NOT NULL COMMENT '是否在线',
+CHANGE `play` `play` TINYINT(4) DEFAULT '0' NOT NULL COMMENT '是否在游戏',
+CHANGE `two_way` `two_way` TINYINT(4) DEFAULT '0' NOT NULL COMMENT '是否仅双向好友发消息',
+CHANGE `lon` `lon` DECIMAL(8,6) DEFAULT '0.000000' NOT NULL COMMENT '经度',
+CHANGE `lat` `lat` DECIMAL(8,6) DEFAULT '0.000000' NOT NULL COMMENT '维度';*/

@@ -20,13 +20,14 @@ class BillingController extends Controller
     {
         $data = new Billing();
 
-        $data = $data->select(['billing.*', 'store.store_name', 'company.company_name'])->leftJoin('store', 'billing.store_id', '=', 'store.store_id')->leftJoin('company', 'billing.company_id', '=', 'company.company_id');
-
         $company_id = $this->loginUser->company_id;
+
         $store_id = $this->loginUser->store_id;
 
-        $data = $data->where('billing.company_id', $company_id);
+        $data = $data->select(['billing.*', 'store.store_name', 'company.company_name'])->leftJoin('store', 'billing.store_id', '=', 'store.store_id')->leftJoin('company', 'billing.company_id', '=', 'company.company_id');
 
+        $data = $data->where('billing.company_id', $company_id);
+        
         if ($store_id) {
             $data = $data->where('billing.store_id', $store_id);
         }
@@ -74,16 +75,12 @@ class BillingController extends Controller
             //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $storeArr = $this->req->storeArr;
-        if (count($storeArr) !== 2) {
-            return $this->errorJson('你未选择门店!!', 2);
-        }
-        $data = $this->req->except('use_time', 'storeArr');
+        $data = $this->req->except('use_time');
 
         $company_id = $this->loginUser->company_id;
         $store_id = $this->loginUser->store_id;
         if (!$store_id) {
-            return $this->errorJson('非店长或店员，无法添加计费模式!', 2);
+            return $this->errorJson('抱歉，仅仅支持店长或店员账号加计费模式!', 2);
         }
         $data['company_id'] = $company_id;
         $data['store_id'] = $store_id;

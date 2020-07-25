@@ -1,37 +1,7 @@
 <?php
 
-/*$arr=[
-    'age'=>'10',
-    'name'=>'buffer',
-];
+$lat='113.32775';
+$lon='23.116433';
+$sql='SELECT * FROM users WHERE latitude > '.$lat.'-1 AND latitude < '.$lat.'+1 AND longitude > '.$lon.'-1 AND longitude < '.$lon.'+1 ORDER BY ACOS(SIN(('.$lat.' * 3.1415) / 180 ) *SIN((latitude * 3.1415) / 180 ) +COS(('.$lat.' * 3.1415) / 180 ) * COS((latitude * 3.1415) / 180 ) *COS(('.$lon.'* 3.1415) / 180 - (longitude * 3.1415) / 180 ) ) * 6380 ASC LIMIT 10;';
 
-
-function scene_decode($code)
-{
-    $res = explode('&', $code);
-    $post = [];
-    foreach ($res as $val) {
-        $v = explode('=', $val);
-        if (count($v) == 2)
-            $post[$v[0]]=$v[1];
-    }
-    return $post;
-}
-
-    function scene_encode($data)
-    {
-        $str='';
-        foreach ($data as $k=>$v){
-            $str.=$k.'@'.$v;
-        }
-        $str=implode('|',$data);
-        return $str;
-    }
-
-    $str=scene_encode($arr);
-
-    echo $str;*/
-
-
-echo "str=str.split('?')[1].substring(6)";
-
+echo $sql;

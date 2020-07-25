@@ -22,7 +22,6 @@ class BoardController extends Controller
         if ($this->req->board_name) {
             $data = $data->where('board_name', 'like', '%' . $this->req->board_name . '%');
         }
-
         if ($this->req->dup_id) {
             $data = $data->whereDupId($this->req->dup_id);
         }
@@ -54,7 +53,6 @@ class BoardController extends Controller
         } else {
             return $this->errorJson('入库失败');
         }
-
     }
 
     public function editBoard()
@@ -88,12 +86,5 @@ class BoardController extends Controller
         }
     }
 
-    /**
-     * 从excel导入,板子
-     */
-    public function excel()
-    {
-
-    }
 }
 

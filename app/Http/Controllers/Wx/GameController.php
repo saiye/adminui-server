@@ -86,7 +86,7 @@ class GameController extends Base
             $list = $list->whereJob($job);
         }
         if ($fightType) {
-            $list = $list->whereStatus($fightType);
+            $list = $list->whereRes($fightType);
         }
         $skip = ceil($page - 1) * $limit;
         $list = $list->skip($skip)->take($limit)->get();

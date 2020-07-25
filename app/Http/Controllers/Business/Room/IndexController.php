@@ -24,12 +24,10 @@ class IndexController extends Controller
     {
         $data = new Room();
 
-        $data=$data->whereCompanyId($this->loginUser->company_id)->with('devices')->with('company')->with('store')->with('billing');
-
-        if(in_array($this->loginUser->role_id,[3,4])){
-            $data=$data->whereStoreId($this->loginUser->store_id);
+        $data = $data->whereCompanyId($this->loginUser->company_id)->with('devices')->with('company')->with('store')->with('billing');
+        if ($this->loginUser->store_id) {
+            $data = $data->whereStoreId($this->loginUser->store_id);
         }
-
         if ($this->req->room_name) {
             $data = $data->where('room.room_name', 'like', '%' . $this->req->room_name . '%');
         }
@@ -40,10 +38,10 @@ class IndexController extends Controller
             $data = $data->where('store.store_name', 'like', '%' . $this->req->store_name . '%')->leftJoin('store', 'room.store_id', '=', 'store.company_id');
         }
         $data = $data->orderBy('room.room_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
-        $game=[
-            'playing_count'=>100,//游戏中人数
-            'use_room_count'=>Room::whereIsUse(1)->count(),//使用中房间数
-            'leisure_room_count'=>Room::whereIsUse(0)->count(),//空闲房间数
+        $game = [
+            'playing_count' => 100,//游戏中人数
+            'use_room_count' => Room::whereIsUse(1)->count(),//使用中房间数
+            'leisure_room_count' => Room::whereIsUse(0)->count(),//空闲房间数
         ];
         $assign = compact('data');
         return $this->successJson($assign);
@@ -55,7 +53,7 @@ class IndexController extends Controller
     public function addRoom()
     {
         $validator = Validator::make($this->req->all(), [
-            'room_name' =>['required','max:30'],
+            'room_name' => ['required', 'max:30'],
             'seats_num' => 'required|numeric|max:16|min:1',
             'description' => 'max:150',
             'billing_id' => 'required',
@@ -75,23 +73,23 @@ class IndexController extends Controller
             //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $storeArr=$this->req->input('storeArr',[]);
-        if(count($storeArr)!==2){
+        $storeArr = $this->req->input('storeArr', []);
+        if (count($storeArr) !== 2) {
             return $this->errorJson('你未请选择门店!');
         }
-        $data = $this->req->except('use_time','storeArr','devices','room_id','seat_num','device_id','delDevicesIds');
+        $data = $this->req->except('use_time', 'storeArr', 'devices', 'room_id', 'seat_num', 'device_id', 'delDevicesIds');
         DB::beginTransaction();
-        $data['company_id']=$storeArr[0];
-        $data['store_id']=$storeArr[1];
+        $data['company_id'] = $storeArr[0];
+        $data['store_id'] = $storeArr[1];
         $room = Room::create($data);
 
-        list($status,$deviceData)=$this->checkDevices($this->req->devices,$room);
-        if(!$status){
+        list($status, $deviceData) = $this->checkDevices($this->req->devices, $room);
+        if (!$status) {
             DB::rollBack();
-            return $this->errorJson('设备id重复'.$deviceData.',入库失败!',10001);
+            return $this->errorJson('设备id重复' . $deviceData . ',入库失败!', 10001);
         }
         //设备入库
-        $flag= Device::insert($deviceData);
+        $flag = Device::insert($deviceData);
         if ($room and $flag) {
             DB::commit();
             return $this->successJson([], '操作成功');
@@ -105,38 +103,41 @@ class IndexController extends Controller
      * 批量添加设备id
      * @param $arr
      */
-    private function checkDevices($arr,$room){
+    private function checkDevices($arr, $room)
+    {
         //删除该房间所有设备，重新install
         Device::whereRoomId($room->room_id)->delete();
-        $data=[];
-        $message='';
-        foreach ($arr as $val){
-            $item=[
-                'device_id'=>$val['device_id'],
-                'seat_num'=>$val['seat_num'],
-                'device_name'=>$val['device_name'],
-                'room_id'=>$room->room_id,
-                'store_id'=>$room->store_id,
-                'company_id'=>$room->company_id,
+        $data = [];
+        $message = '';
+        foreach ($arr as $val) {
+            $item = [
+                'device_id' => $val['device_id'],
+                'seat_num' => $val['seat_num'],
+                'device_name' => $val['device_name'],
+                'room_id' => $room->room_id,
+                'store_id' => $room->store_id,
+                'company_id' => $room->company_id,
             ];
-            $hasItem=Device::whereDeviceId($item['device_id'])->first();
-            if($hasItem){
-                $message.='('.$val['device_name'].':'.$val['device_id'].')-重复录入';
+            $hasItem = Device::whereDeviceId($item['device_id'])->first();
+            if ($hasItem) {
+                $message .= '(' . $val['device_name'] . ':' . $val['device_id'] . ')-重复录入';
                 continue;
             }
-           $hasPy=PhysicsAddress::whereId($item['device_id'])->first();
-            if($hasPy){
-                array_push($data,$item);
-            }else{
-                $message.='('.$val['device_name'].':'.$val['device_id'].')-设备短id不存在';
+            $hasPy = PhysicsAddress::whereId($item['device_id'])->first();
+            if ($hasPy) {
+                array_push($data, $item);
+            } else {
+                $message .= '(' . $val['device_name'] . ':' . $val['device_id'] . ')-设备短id不存在';
             }
         }
-        if($message){
-            return [false,$message];
+        if ($message) {
+            return [false, $message];
         }
-        return [true,$data];
+        return [true, $data];
     }
-    public function editRoom(){
+
+    public function editRoom()
+    {
         $validator = Validator::make($this->req->all(), [
             'room_id' => 'required',
             'room_name' => 'required|max:30',
@@ -160,24 +161,24 @@ class IndexController extends Controller
             //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $storeArr=$this->req->input('storeArr',[]);
-        if(count($storeArr)!==2){
+        $storeArr = $this->req->input('storeArr', []);
+        if (count($storeArr) !== 2) {
             return $this->errorJson('你未请选择门店!');
         }
-        $data = $this->req->except('use_time','storeArr','devices','seat_num','device_id','delDevicesIds');
-        $data['company_id']=$storeArr[0];
-        $data['store_id']=$storeArr[1];
+        $data = $this->req->except('use_time', 'storeArr', 'devices', 'seat_num', 'device_id', 'delDevicesIds');
+        $data['company_id'] = $storeArr[0];
+        $data['store_id'] = $storeArr[1];
         DB::beginTransaction();
         $room = Room::whereRoomId($this->req->room_id)->first();
         $room->fill($data);
         $room->save();
-        list($status,$deviceData)=$this->checkDevices($this->req->devices,$room);
-        if(!$status){
+        list($status, $deviceData) = $this->checkDevices($this->req->devices, $room);
+        if (!$status) {
             DB::rollBack();
-            return $this->errorJson('设备id重复'.$deviceData.',入库失败!',10001);
+            return $this->errorJson('设备id重复' . $deviceData . ',入库失败!', 10001);
         }
         //设备入库
-        $flag= Device::insert($deviceData);
+        $flag = Device::insert($deviceData);
         if ($room and $flag) {
             DB::commit();
             return $this->successJson([], '修改成功');
@@ -199,13 +200,12 @@ class IndexController extends Controller
             'level.numeric' => 'level一个数字',
         ]);
         if ($validator->fails()) {
-            //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $data=[];
-        switch ($this->req->level){
+        $data = [];
+        switch ($this->req->level) {
             case 0:
-                $company = Company::orderBy('company_id','desc')->limit(50)->get();
+                $company = Company::whereCompanyId($this->loginUser->company_id)->get();
                 $data = [];
                 foreach ($company as $val) {
                     array_push($data, [
@@ -213,12 +213,12 @@ class IndexController extends Controller
                         'label' => $val->company_name,
                         'parent_id' => $val->company_id,
                         'level' => 0,
-                        'leaf' =>false
+                        'leaf' => false
                     ]);
                 }
                 break;
             case 1:
-                $company = Store::whereCompanyId($this->req->parent_id)->orderBy('store_id','desc')->get();
+                $company = Store::whereCompanyId($this->loginUser->company_id)->orderBy('store_id', 'desc')->get();
                 $data = [];
                 foreach ($company as $val) {
                     array_push($data, [
@@ -226,7 +226,7 @@ class IndexController extends Controller
                         'label' => $val->store_name,
                         'parent_id' => $val->store_id,
                         'level' => 1,
-                        'leaf' =>true
+                        'leaf' => true
                     ]);
                 }
                 break;
@@ -234,9 +234,6 @@ class IndexController extends Controller
         $assign = compact('data');
         return $this->successJson($assign);
     }
-
-
-
 
 
 }

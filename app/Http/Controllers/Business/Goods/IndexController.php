@@ -15,10 +15,14 @@ use Validator;
 class IndexController extends Controller
 {
 
-    public function storeList()
+    public function goodsList()
     {
         $data = new Goods();
 
+        $data = $data->whereCompanyId($this->loginUser->company_id);
+        if ($this->loginUser->store_id) {
+            $data = $data->whereStoreId($this->loginUser->store_id);
+        }
         if ($this->req->goods_name) {
             $data = $data->where('goods_name', 'like', '%' . $this->req->goods_name . '%');
         }
@@ -26,7 +30,7 @@ class IndexController extends Controller
             $data = $data->where('goods_info', 'like', '%' . $this->req->goods_info . '%');
         }
 
-        $data = $data->orderBy('store.store_id', 'desc')->paginate($this->req->input('limit', $limit = $this->req->input('limit', PaginateSet::LIMIT)))->appends($this->req->except('page'));
+        $data = $data->orderBy('goods.goods_id', 'desc')->paginate($this->req->input('limit', $limit = $this->req->input('limit', PaginateSet::LIMIT)))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }
@@ -81,13 +85,6 @@ class IndexController extends Controller
             return $this->errorJson('修改失败');
         }
     }
-
-    public function addTag($array){
-
-    }
-
-
-
 
 }
 

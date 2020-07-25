@@ -67,5 +67,16 @@ Route::group([
     Route::post('room/billing/billingConfig', 'Room\BillingController@billingConfig')->name('bs-billingConfig');
 
     //商品管理
+    Route::post('goods/index/list', 'Goods\IndexController@goodsList')->name('bs-goodsList');
+    Route::post('goods/index/add', 'Goods\IndexController@addGoods')->name('bs-addGoods');
+    Route::post('goods/index/edit', 'Goods\IndexController@editGoods')->name('bs-editGoods');
+
+    //商品分类
+    Route::post('goods/cat/list', 'Goods\CategoryController@categoryList')->name('bs-catList');
+    Route::post('goods/cat/add', 'Goods\CategoryController@addCat')->name('bs-addCat');
+    Route::post('goods/cat/edit', 'Goods\CategoryController@editCat')->name('bs-editCat');
+
+   // goods/category/list
+
 });
 

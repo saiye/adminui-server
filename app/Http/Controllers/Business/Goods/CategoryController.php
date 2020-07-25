@@ -31,7 +31,7 @@ class CategoryController extends Controller
     }
 
 
-    public function addCategory()
+    public function addCat()
     {
         $validator = Validator::make($this->req->all(), [
             'category_name' => 'required|max:50',
@@ -49,7 +49,7 @@ class CategoryController extends Controller
 
     }
 
-    public function editCategory()
+    public function editCat()
     {
         $validator = Validator::make($this->req->all(), [
             'category_name' => 'required|max:50',
