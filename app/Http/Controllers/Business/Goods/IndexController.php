@@ -26,6 +26,9 @@ class IndexController extends Controller
         if ($this->req->goods_name) {
             $data = $data->where('goods_name', 'like', '%' . $this->req->goods_name . '%');
         }
+        if ($this->req->cat_id) {
+            $data = $data->whereCategoryId($this->req->cat_id);
+        }
         if ($this->req->goods_info) {
             $data = $data->where('goods_info', 'like', '%' . $this->req->goods_info . '%');
         }
@@ -53,7 +56,6 @@ class IndexController extends Controller
         $data['store_id'] = 0;
         $data['company_id'] = 0;
         $board = Goods::create($data);
-
         if ($board) {
             return $this->successJson([], '添加成功');
         } else {

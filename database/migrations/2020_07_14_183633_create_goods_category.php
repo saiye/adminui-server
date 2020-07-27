@@ -19,6 +19,7 @@ class CreateGoodsCategory extends Migration
             $table->unsignedInteger('store_id')->default(0)->comment('所属店面');
             $table->unsignedInteger('company_id')->default(0)->comment('所属公司id');
             $table->unsignedInteger('count')->default(0)->comment('商品数量');
+            $table->tinyInteger('is_del')->default(0)->comment('是否删除!');
             $table->timestamps();
         });
     }

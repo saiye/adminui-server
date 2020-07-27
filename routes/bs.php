@@ -75,8 +75,12 @@ Route::group([
     Route::post('goods/cat/list', 'Goods\CategoryController@categoryList')->name('bs-catList');
     Route::post('goods/cat/add', 'Goods\CategoryController@addCat')->name('bs-addCat');
     Route::post('goods/cat/edit', 'Goods\CategoryController@editCat')->name('bs-editCat');
+    Route::post('goods/cat/del', 'Goods\CategoryController@del')->name('bs-delCat');
+    Route::post('goods/cat/move', 'Goods\CategoryController@move')->name('bs-moveCat');
+    //快速标签
+    Route::post('goods/quick/list', 'Goods\QuickCatController@quickCatList')->name('bs-quickCatList');
+    Route::post('goods/quick/add', 'Goods\QuickCatController@addQuickCat')->name('bs-addQuickCat');
 
-   // goods/category/list
 
 });
 

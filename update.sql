@@ -56,8 +56,8 @@ ALTER TABLE `lrs_manage`.`order_goods`
 ADD COLUMN `image` VARCHAR(100) NULL COMMENT '商品图' AFTER `type`,
 ADD COLUMN `tag` VARCHAR(100) NULL COMMENT '商品标签' AFTER `image`;
 
- ALTER TABLE `lrs_manage`.`goods_category`
-     ADD COLUMN `count` INT(10) DEFAULT '0' NULL COMMENT '商品数量' AFTER `company_id`;
+ALTER TABLE `lrs_manage`.`goods_category`
+ADD COLUMN `count` INT(10) DEFAULT '0' NULL COMMENT '商品数量' AFTER `company_id`;
 
 /*ALTER TABLE `lrs_manage`.`users`
 CHANGE `real_name` `real_name` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' NOT NULL COMMENT '真实姓名',
@@ -69,3 +69,6 @@ CHANGE `play` `play` TINYINT(4) DEFAULT '0' NOT NULL COMMENT '是否在游戏',
 CHANGE `two_way` `two_way` TINYINT(4) DEFAULT '0' NOT NULL COMMENT '是否仅双向好友发消息',
 CHANGE `lon` `lon` DECIMAL(8,6) DEFAULT '0.000000' NOT NULL COMMENT '经度',
 CHANGE `lat` `lat` DECIMAL(8,6) DEFAULT '0.000000' NOT NULL COMMENT '维度';*/
+
+//2020.7.27
+ALTER TABLE `lrs_manage`.`goods_category`     ADD COLUMN `is_del` TINYINT(4) DEFAULT '0' NULL COMMENT '是否删除' AFTER `count`;
