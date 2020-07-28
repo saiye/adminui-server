@@ -112,7 +112,7 @@ class SysController extends BaseController
         if ($validator->fails()) {
             return $this->errorJson('参数错误！', 2, $validator->errors()->toArray());
         }
-        $data = $this->req->except('_token','staff_id', 'password','role_name');
+        $data = $this->req->except('_token','staff_id', 'password','role_name','store_name');
         if ($this->req->password)
             $data['password'] = Hash::make($this->req->password);
         $Staff->where('staff_id', $this->req->staff_id)->update($data);
