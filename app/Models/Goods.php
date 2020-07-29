@@ -8,6 +8,7 @@ class Goods extends Model
 {
     use ModelDataFormat;
     protected $table = 'goods';
+    public  $primaryKey='goods_id';
 
     protected $guarded = [
         'goods_id'

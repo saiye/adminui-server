@@ -30,28 +30,27 @@ class QuickCatController extends Controller
         return $this->successJson($assign);
     }
 
-
     public function addQuickCat()
     {
         $validator = Validator::make($this->req->all(), [
-            'tag_name' => 'required|max:30',
             'config' => 'required|array',
+            'tag_name' => 'required|max:30',
         ], [
-            'tag_name.required' => '标签名不能为空',
-            'tag_name.max' => '标签不能超过30字符',
-            'config.required' => '配置不能为空',
-            'config.array' => '配置只能是个数组',
+            'config.required' => '配置不能为空!',
+            'config.array' => '配置只能是个数组!',
+            'tag_name.required' => '组名不能为空!',
+            'tag_name.max' => '组名最长30字符!',
         ]);
         if ($validator->fails()) {
-            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
+            return $this->errorJson($validator->errors()->first(), 2);
         }
         $config=$this->req->input('config');
         list($status,$message)= GoodsQuickCat::checkConfig($config);
         if(!$status){
             return $this->errorJson($message, 2);
         }
-        if (!$this->loginUser->store_id) {
-            return $this->errorJson('仅仅店长，或者店员可以添加', 2);
+        if(!in_array($this->loginUser->role_id,[3,4])){
+            return $this->errorJson('仅仅店长，或者店员可以添加快速标签!', 2);
         }
         $tagName = $this->req->input('tag_name');
         $hasQuick=GoodsQuickCat::whereStoreId($this->loginUser->store_id)->where('tag_name',$tagName)->first();

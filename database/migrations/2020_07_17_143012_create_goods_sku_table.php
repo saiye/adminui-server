@@ -20,7 +20,7 @@ class CreateGoodsSkuTable extends Migration
             $table->unsignedInteger('goods_id')->default(0)->comment('goods_id');
             $table->unsignedInteger('tag_id')->default(0)->comment('tag_id');
             $table->tinyInteger('is_del')->default(0)->comment('是否删除');
-            $table->tinyInteger('is_act')->default(0)->comment('是否默认选中');
+            $table->tinyInteger('active')->default(0)->comment('是否默认选中');
             $table->timestamps();
         });
     }

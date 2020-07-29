@@ -72,3 +72,6 @@ CHANGE `lat` `lat` DECIMAL(8,6) DEFAULT '0.000000' NOT NULL COMMENT '维度';*/
 
 //2020.7.27
 ALTER TABLE `lrs_manage`.`goods_category`     ADD COLUMN `is_del` TINYINT(4) DEFAULT '0' NULL COMMENT '是否删除' AFTER `count`;
+
+ ALTER TABLE `lrs_manage`.`goods_sku`
+CHANGE `is_act` `is_act` TINYINT(4) DEFAULT '0' NOT NULL COMMENT '是否默认';
