@@ -129,7 +129,7 @@ class ClientController extends Base
                     "RoomName" => $device->room->room_name,
                     "RoomId" => $device->room_id,
                     "SeatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
-                    "GameServerAddress" => '47.115.45.34:10002',
+                    "GameServerAddress" => WebConfig::getKeyByFile('GameServer.GameServerAddress'),
                 ]);
             }
         }

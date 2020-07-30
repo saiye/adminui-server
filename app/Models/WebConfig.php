@@ -42,13 +42,13 @@ class WebConfig extends Model
         return $this->attributes['format'] = $data;
     }
 
-    public static function getKeyByFile($key)
+    public static function getKeyByFile($key,$default='')
     {
         $file = Storage::disk('local')->path(WebConfig::cache_file);
         $data = [];
         if (is_file($file)) {
             $array = include $file;
-            $data = Arr::get($array, $key);
+            $data = Arr::get($array, $key,$default);
         }
         return $data;
     }

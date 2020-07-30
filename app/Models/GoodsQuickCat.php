@@ -29,16 +29,14 @@ class GoodsQuickCat extends Model
     {
         $price=0;
         $defaultTagArr=[];
+        $sumPriceCount=0;
         foreach ($config as $item) {
             $validator2 = Validator::make($item, [
                 'tag_name' => 'required|max:50',
-                'tag_id' => 'required|numeric|min:0',
                 'tags' => 'required|array',
             ], [
                 'tag_name.required' => '标签名不能为空',
                 'tag_name.max' => '标签不能超过50字符',
-                'tag_id.required' => '标签id必须的',
-                'tag_id.numeric' => '标签id是一个数字',
                 'tags.required' => '规格不能为空',
                 'tags.array' => '规格只能是个数组',
             ]);
@@ -48,13 +46,11 @@ class GoodsQuickCat extends Model
             foreach ($item['tags'] as $sub) {
                 $validator3 = Validator::make($sub, [
                     'sku_name' => 'required|max:50',
-                    'sku_id' => 'required|numeric|min:0',
                     'goods_price' => 'required|numeric|min:0.01',
+                    'active' => 'required|numeric|in:0,1',
                 ], [
                     'sku_name.required' => '规格名称不能为空',
                     'sku_name.max' => '规格名称最长50字符',
-                    'sku_id.min' => '规格id最小只能是0',
-                    'sku_id.numeric' => '规格id只能个数字',
                     'goods_price.required' => '规格id最小只能是0',
                     'goods_price.numeric' => '价格只能是数字',
                     'goods_price.min' => '价格最小只能是0.01',
@@ -62,9 +58,15 @@ class GoodsQuickCat extends Model
                 if ($validator3->fails()) {
                     return [false, $validator3->errors()->first(),[]];
                 }
-                $price+=$sub['goods_price'];
+                if($sub['active']==1){
+                    $sumPriceCount+=1;
+                    $price+=$sub['goods_price'];
+                }
                 array_push($defaultTagArr,$sub['sku_name']);
             }
+        }
+        if($sumPriceCount!=count($config)){
+            return [false,'默认规格漏选!',[]];
         }
         return [true, 'success',[
             'price'=>$price,

@@ -75,3 +75,11 @@ ALTER TABLE `lrs_manage`.`goods_category`     ADD COLUMN `is_del` TINYINT(4) DEF
 
  ALTER TABLE `lrs_manage`.`goods_sku`
 CHANGE `is_act` `is_act` TINYINT(4) DEFAULT '0' NOT NULL COMMENT '是否默认';
+
+ALTER TABLE `lrs_manage`.`goods_image`
+ADD COLUMN `store_id` INT(10) DEFAULT '0' NOT NULL COMMENT '门店id' AFTER `goods_id`,
+ADD COLUMN `company_id` INT(10) DEFAULT '0' NOT NULL COMMENT '商家id' AFTER `store_id`,
+CHANGE `created_at` `created_at` TIMESTAMP NULL ;
+
+ALTER TABLE `lrs_manage`.`goods_image`
+ADD COLUMN `is_del` TINYINT(4) DEFAULT '0' NULL COMMENT '是否删除' AFTER `company_id`;

@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('password')->comment('登录密码');
             $table->string('real_name',20)->nullable()->comment('真实姓名');
             $table->string('nickname',20)->nullable()->comment('昵称');
-            $table->string('email',30)->nullable()->unique()->comment('邮箱');
+            $table->string('email',30)->nullable()->comment('邮箱');
             $table->string('icon',100)->nullable()->comment('头像');
             $table->tinyInteger('sex')->default(1)->comment('性别0男,1女');
             $table->tinyInteger('judge')->default(2)->comment('是否为法官1是,2否');

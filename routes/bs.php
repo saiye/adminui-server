@@ -49,6 +49,9 @@ Route::group([
     Route::post('tool/image/upload', 'Tool\ImageController@upload')->name('bs-toolImageUpload');
     Route::post('tool/image/delete', 'Tool\ImageController@delete')->name('bs-toolImageDelete');
 
+    Route::post('tool/goods/upload', 'Tool\GoodsController@upload')->name('bs-toolGoodsUpload');
+    Route::post('tool/goods/delete', 'Tool\GoodsController@delete')->name('bs-toolGoodsDelete');
+
     //订单管理
     Route::post('order/index/orderList', 'Order\IndexController@orderList')->name('bs-GameOrderList');
     Route::post('order/index/addOrder', 'Order\IndexController@addOrder')->name('bs-GameAddOrder');

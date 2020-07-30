@@ -55,6 +55,8 @@ class CallBackGameLogin implements ShouldQueue
      */
     public function handle()
     {
+        //总管端开启记录log,立即打印log
+
         $client = new Client([
             'timeout' => 3,
         ]);
@@ -67,10 +69,14 @@ class CallBackGameLogin implements ShouldQueue
             'json' => $this->post
         ]);
         if ($response->getStatusCode() == 200) {
-            Log::info('call game login success!' . $this->url);
+            if(Cache::get(CacheKey::API_LOG_RECORD)){
+                Log::info('call game login success!' . $this->url);
+            }
         } else {
-            Log::info('call game login error! url:' . $this->url);
-            Log::info($this->post);
+            if(Cache::get(CacheKey::API_LOG_RECORD)){
+                Log::info('call game login error! url:' . $this->url);
+                Log::info($this->post);
+            }
         }
         if(Cache::get(CacheKey::API_LOG_RECORD)){
             Log::info($this->post);

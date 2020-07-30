@@ -14,6 +14,9 @@ class CacheKey
     //cp
     const CP_UPLOAD_KEY ='UPLOAD_KEY';
 
+    //staff
+    const STAFF_UPLOAD_KEY ='STAFF_UPLOAD_KEY';
+
     //api调用记录开关
     const API_LOG_RECORD='API_LOG_RECORD';
 

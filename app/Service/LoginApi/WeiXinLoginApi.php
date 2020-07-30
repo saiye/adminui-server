@@ -6,6 +6,7 @@ use App\Constants\CacheKey;
 use App\Constants\ErrorCode;
 use App\Models\PhysicsAddress;
 use Illuminate\Cache\DynamoDbStore;
+use Illuminate\Support\Str;
 use Log;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;

@@ -17,6 +17,9 @@ class CreateGoodsImageTable extends Migration
             $table->increments('goods_image_id')->comment('goods_image_id');
             $table->string('image',100)->comment('图片地址');
             $table->unsignedInteger('goods_id')->default(0)->comment('商品id');
+            $table->unsignedInteger('store_id')->default(0)->comment('门店id');
+            $table->unsignedInteger('company_id')->default(0)->comment('商家id');
+            $table->tinyInteger('is_del')->default(0)->comment('是否删除!');
             $table->timestamps();
         });
     }

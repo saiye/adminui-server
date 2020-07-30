@@ -26,7 +26,7 @@ class GoodsSku extends Model
                 'company_id' => $user->company_id,
                 'category_id' => $goods->category_id,
             ];
-            $saveTag = GoodsTag::create($item);
+            $saveTag = GoodsTag::firstOrCreate($item);
             if ($saveTag) {
                 //save ku
                 $skuArr = [];
@@ -46,7 +46,15 @@ class GoodsSku extends Model
                 return false;
             }
         }
+        //修改goods
         return true;
+    }
+
+    /**
+     * 修改sku
+     */
+    public static function editSku(){
+
     }
 
 }
