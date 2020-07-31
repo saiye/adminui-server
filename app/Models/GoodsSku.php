@@ -19,6 +19,8 @@ class GoodsSku extends Model
     {
         //1.add goods_tag
         $date=date('Y-m-d H:i:s');
+        //库存统计
+        $totalStock=0;
         foreach ($config as $val) {
             $item = [
                 'tag_name' => $val['tag_name'],
@@ -36,18 +38,18 @@ class GoodsSku extends Model
                     $sku['goods_id'] = $goods->goods_id;
                     $sku['created_at'] = $date;
                     $sku['updated_at'] = $date;
+                    $totalStock+=$sku['stock'];
                     array_push($skuArr, $sku);
                 }
                 $saveSku = GoodsSku::insert($skuArr);
                 if (!$saveSku) {
-                    return false;
+                    return [false,$totalStock];
                 }
             } else {
-                return false;
+                return [false,$totalStock];
             }
         }
-        //修改goods
-        return true;
+        return [true,$totalStock];
     }
 
     /**

@@ -21,6 +21,7 @@ class CreateGoodsSkuTable extends Migration
             $table->unsignedInteger('tag_id')->default(0)->comment('tag_id');
             $table->tinyInteger('is_del')->default(0)->comment('是否删除');
             $table->tinyInteger('active')->default(0)->comment('是否默认选中');
+            $table->unsignedInteger('stock')->default(0)->comment('库存');
             $table->timestamps();
         });
     }

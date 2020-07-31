@@ -22,6 +22,9 @@ class CreateGoodsTable extends Migration
             $table->unsignedInteger('store_id')->default(0)->comment('所属店面');
             $table->unsignedInteger('company_id')->default(0)->comment('所属公司id');
             $table->unsignedInteger('sku_id')->default(0)->comment('默认skuId');
+            $table->unsignedInteger('stock')->default(0)->comment('库存');
+            $table->unsignedInteger('daily_sales')->default(0)->comment('日销量');
+            $table->unsignedInteger('monthly_sales')->default(0)->comment('月销量');
             $table->string('image',100)->nullable()->comment('商品图片');
             $table->string('tag',100)->nullable()->comment('默认规格字符');
             $table->timestamps();

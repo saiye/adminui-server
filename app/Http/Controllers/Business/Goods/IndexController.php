@@ -8,6 +8,7 @@ use App\Models\Goods;
 use App\Models\GoodsImage;
 use App\Models\GoodsQuickCat;
 use App\Models\GoodsSku;
+use Illuminate\Support\Facades\DB;
 use Validator;
 
 /**
@@ -59,7 +60,7 @@ class IndexController extends Controller
             'imageIds.array' => '商品图片数据格式错误!',
         ]);
         if ($validator->fails()) {
-            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
+            return $this->errorJson($validator->errors()->first());
         }
         $imageIds = $this->req->input('imageIds', []);
         if ($imageIds) {
@@ -70,13 +71,13 @@ class IndexController extends Controller
             }
         }
         $config = $this->req->input('quickTags');
-        list($status, $message, $data) = GoodsQuickCat::checkConfig($config);
+        list($status, $message, $info) = GoodsQuickCat::checkConfig($config);
         if (!$status) {
             return $this->errorJson($message, 2);
         }
         //计算默认价格
-        $price = $data['price'];
-        $tag = implode('/', $data['defaultTagArr']);
+        $price = $info['price'];
+        $tag = implode('/', $info['defaultTagArr']);
         $data = $this->req->only('goods_name', 'info', 'category_id');
         if (!in_array($this->loginUser->role_id, [3, 4])) {
             return $this->errorJson('仅店长，或者店员可添加商品!', 2);
@@ -85,8 +86,10 @@ class IndexController extends Controller
         $data['company_id'] = $this->loginUser->company_id;
         $data['goods_price'] = $price;
         $data['tag'] = $tag;
-        $data['image'] ='';
+        $data['image'] = '';
         $data['status'] = 2;//默认未上架
+        $data['stock'] = 1;//默认库存1个,下单不扣减库存。为以后做准备.
+        DB::beginTransaction();
         $goods = Goods::create($data);
         if ($imageIds) {
             //绑定图片
@@ -101,12 +104,18 @@ class IndexController extends Controller
         }
         //添加规格数据
         if ($goods) {
-            $saveSuk = GoodsSku::addSku($goods, $config, $this->loginUser);
+            list($saveSuk, $totalStock) = GoodsSku::addSku($goods, $config, $this->loginUser);
             if ($saveSuk) {
-                return $this->successJson([], '添加成功');
+                //修改库存
+                // $goods->stock = $totalStock;
+                // $goods->save();
+                DB::commit();
+                return $this->successJson([], '添加成功!');
             }
-            return $this->errorJson($message);
+            DB::rollBack();
+            return $this->errorJson('规格添加失败！');
         }
+        DB::rollBack();
         return $this->errorJson('商品入库失败!');
     }
 
@@ -115,25 +124,120 @@ class IndexController extends Controller
         $validator = Validator::make($this->req->all(), [
             'goods_id' => 'required|numeric',
             'goods_name' => 'required|max:50',
-            'goods_price' => 'required|numeric|min:0.01',
             'info' => 'required|max:80',
             'category_id' => 'required|numeric',
-            'image' => 'required|max:100',
-            'tag' => 'required|max:100',
-            'tagArr' => 'required|array',
+            'quickTags' => 'required|array',
+            'imageIds' => 'array',
+        ], [
+            'category_id.required' => '你未选择分类!',
+            'goods_name.required' => '商品名称不能为空!',
+            'info.required' => '商品描述不能为空!',
+            'info.max' => '商品描述不能超过80字符!',
+            'quickTags.required' => '商品规格参数不能为空!',
+            'quickTags.array' => '商品规格必须是个数组!',
+            'imageIds.array' => '商品图片数据格式错误!',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorJson( $validator->errors()->first() );
+        }
+        $imageIds = $this->req->input('imageIds', []);
+        if ($imageIds) {
+            foreach ($imageIds as $id) {
+                if (!is_numeric($id) or $id < 1) {
+                    return $this->errorJson('图片数据错误！', 2);
+                }
+            }
+        }
+        $config = $this->req->input('quickTags');
+        list($status, $message, $info) = GoodsQuickCat::checkConfig($config);
+        if (!$status) {
+            return $this->errorJson($message, 2);
+        }
+        //计算默认价格
+        $price = $info['price'];
+        $tag = implode('/', $info['defaultTagArr']);
+        $data = $this->req->only('goods_name', 'info', 'category_id');
+        if (!in_array($this->loginUser->role_id, [3, 4])) {
+            return $this->errorJson('仅店长，或者店员可修改商品!', 2);
+        }
+        $goodsId = $this->req->input('goods_id', 0);
+        $data['store_id'] = $this->loginUser->store_id;
+        $data['company_id'] = $this->loginUser->company_id;
+        $data['goods_price'] = $price;
+        $data['tag'] = $tag;
+        $data['image'] = '';
+        $data['status'] = 2;//默认未上架
+        $data['stock'] = 1;//默认库存1个,下单不扣减库存。为以后做准备.
+        DB::beginTransaction();
+        $goods = Goods::whereGoodsId($goodsId)->update($data);
+        if ($imageIds) {
+            //绑定图片
+            GoodsImage::whereCompanyId($this->loginUser->company_id)->whereStoreId($this->loginUser->store_id)->whereIn('goods_image_id', $imageIds)->update([
+                'goods_id' => $goods->goods_id
+            ]);
+            $newImage = GoodsImage::whereCompanyId($this->loginUser->company_id)->whereStoreId($this->loginUser->store_id)->whereGoodsId($goods->goods_id)->orderBy('goods_image_id', 'desc')->first();
+            if ($newImage) {
+                $goods->image = $newImage->image;
+                $goods->save();
+            }
+        }
+        //添加规格数据
+        if ($goods) {
+            GoodsSku::whereGoodsId($goods->goods_id)->update(['is_del']);
+            list($saveSuk, $totalStock) = GoodsSku::addSku($goods, $config, $this->loginUser);
+            if ($saveSuk) {
+                //修改库存
+                // $goods->stock = $totalStock;
+                // $goods->save();
+                DB::commit();
+                return $this->successJson([], '添加成功!');
+            }
+            DB::rollBack();
+            return $this->errorJson('规格添加失败！');
+        }
+        DB::rollBack();
+        return $this->errorJson('商品入库失败!');
+    }
+
+    /**
+     * 售罄功能,直接改库存为0,后期可能有库存功能需求
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setStock()
+    {
+        $validator = Validator::make($this->req->all(), [
+            'goods_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $data = $this->req->only('goods_name', 'goods_price', 'info', 'category_id', 'image', 'tag');
-        $goodsId = $this->req->input('goods_id');
-        $board = Goods::whereGoodsId($goodsId)->update($data);
-        if ($board) {
-            return $this->successJson([], '修改成功');
-        } else {
-            return $this->errorJson('修改失败');
+        $isUp = Goods::whereGoodsId($this->req->goods_id)->whereCompanyId($this->loginUser->company_id)->whereStoreId($this->loginUser->store_id)->update([
+            'stock' => 0,
+        ]);
+        if ($isUp) {
+            return $this->successJson([], '操作成功');
         }
+        return $this->errorJson('操作失败');
     }
 
+    public function setStatus()
+    {
+        $validator = Validator::make($this->req->all(), [
+            'goods_id' => 'required|numeric',
+            'status' => 'required|numeric|in:1,2',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
+        }
+        $stock = $this->req->input('status') == 1 ? 1 : 0;
+        $isUp = Goods::whereGoodsId($this->req->goods_id)->whereCompanyId($this->loginUser->company_id)->whereStoreId($this->loginUser->store_id)->update([
+            'status' => $this->req->status,
+            'stock' => $stock,
+        ]);
+        if ($isUp) {
+            return $this->successJson([], '操作成功');
+        }
+        return $this->errorJson('操作失败');
+    }
 }
 

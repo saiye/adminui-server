@@ -6,6 +6,7 @@ use App\Constants\CacheKey;
 use App\Constants\ErrorCode;
 use App\Models\PhysicsAddress;
 use Illuminate\Cache\DynamoDbStore;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Log;
 use GuzzleHttp\Client;
@@ -162,7 +163,8 @@ class WeiXinLoginApi extends BaseLoginApi
             ]);
             if ($response->getStatusCode() == 200) {
                 $str = $response->getBody()->getContents();
-                $image_path = 'qrCode/' . $data['deviceShortId'].'c'.$data['channelId'].'.png';
+                $env=Config::get('app.env');
+                $image_path = 'app/'.$env.'/qrCode/'.$data['deviceShortId'].'c'.$data['channelId'].'.png';
                 Storage::put($image_path, $str);
                 $full_path = Storage::url($image_path);
                 //二维码入库

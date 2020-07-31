@@ -54,6 +54,7 @@ class RoomGameLogJob implements ShouldQueue
         // 插入对局数据
         $gameLog = RoomGameLog::create([
             'gameRes' => $this->post['gameRes'],
+            'replayContentJson' => $this->post['replayContentJson']??'{}',
         ]);
         $playerlogs = [];
         $playercounts = [];

@@ -73,6 +73,8 @@ Route::group([
     Route::post('goods/index/list', 'Goods\IndexController@goodsList')->name('bs-goodsList');
     Route::post('goods/index/add', 'Goods\IndexController@addGoods')->name('bs-addGoods');
     Route::post('goods/index/edit', 'Goods\IndexController@editGoods')->name('bs-editGoods');
+    Route::post('goods/index/stock', 'Goods\IndexController@setStock')->name('bs-setStock');
+    Route::post('goods/index/status', 'Goods\IndexController@setStatus')->name('bs-setStatus');
 
     //商品分类
     Route::post('goods/cat/list', 'Goods\CategoryController@categoryList')->name('bs-catList');

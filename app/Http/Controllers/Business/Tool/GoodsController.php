@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Business\Tool;
 use App\Constants\CacheKey;
 use  App\Http\Controllers\Business\BaseController as Controller;
 use App\Models\GoodsImage;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Validator;
 use Illuminate\Support\Facades\Storage;
 
@@ -33,7 +33,8 @@ class GoodsController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $path = $this->req->file('file')->store('images');
+        $env=Config::get('app.env');
+        $path = $this->req->file('file')->store('app/'.$env.'/goods');
         if (!$path) {
             $this->errorJson('图片上传失败！');
         }

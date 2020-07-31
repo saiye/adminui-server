@@ -83,3 +83,16 @@ CHANGE `created_at` `created_at` TIMESTAMP NULL ;
 
 ALTER TABLE `lrs_manage`.`goods_image`
 ADD COLUMN `is_del` TINYINT(4) DEFAULT '0' NULL COMMENT '是否删除' AFTER `company_id`;
+
+ALTER TABLE `lrs_manage`.`goods`
+ADD COLUMN `stock` INT(10) DEFAULT '0' NOT NULL COMMENT '库存' AFTER `category_id`;
+
+ALTER TABLE `lrs_manage`.`goods_sku`
+ADD COLUMN `stock` INT(10) DEFAULT '0' NOT NULL COMMENT '规格库存' AFTER `active`;
+
+ALTER TABLE `lrs_manage`.`goods`
+ADD COLUMN `daily_sales` INT(10) DEFAULT '0' NOT NULL COMMENT '日销量' AFTER `tag`,
+ADD COLUMN `monthly_sales` INT(10) DEFAULT '0' NOT NULL COMMENT '月销量' AFTER `daily_sales`;
+
+
+ALTER TABLE `lrs_game_logs`.`room_game_log`     ADD COLUMN `replayContentJson` TEXT NULL COMMENT '结果' AFTER `gameRes`;

@@ -102,7 +102,7 @@ class BoardController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $file = $this->req->file('excel')->store('excel');
+        $file = $this->req->file('excel')->store('excel','public');
         $path=Storage::disk('public')->path($file);
         try {
             Excel::import(new DupImport(), $path);
@@ -116,6 +116,7 @@ class BoardController extends Controller
                 return $this->errorJson( $failure->errors(),1001);
             }
         }
+        Storage::disk('public')->delete($file);
         return $this->successJson(['path'=>$path], '导入成功');
     }
 
