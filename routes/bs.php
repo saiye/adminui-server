@@ -70,7 +70,7 @@ Route::group([
     Route::post('room/billing/billingConfig', 'Room\BillingController@billingConfig')->name('bs-billingConfig');
 
     //商品管理
-    Route::post('goods/index/list', 'Goods\IndexController@goodsList')->name('bs-goodsList');
+    Route::any('goods/index/list', 'Goods\IndexController@goodsList')->name('bs-goodsList');
     Route::post('goods/index/add', 'Goods\IndexController@addGoods')->name('bs-addGoods');
     Route::post('goods/index/edit', 'Goods\IndexController@editGoods')->name('bs-editGoods');
     Route::post('goods/index/stock', 'Goods\IndexController@setStock')->name('bs-setStock');

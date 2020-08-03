@@ -13,22 +13,28 @@ class Goods extends Model
     protected $table = 'goods';
     public $primaryKey = 'goods_id';
 
-    protected $appends = ['img100', 'img50'];
-
     protected $guarded = [
         'goods_id'
     ];
-
+    protected $appends = ['img100', 'img50','img'];
 
     public function images()
     {
         return $this->hasMany(GoodsImage::class, 'goods_id', 'goods_id');
     }
 
-    public function getImageAttribute($val)
+    public function getImgAttribute()
     {
-        if ($val) {
-            return Storage::url($val);
+        if ($this->image) {
+            return $this->attributes['img100'] = Storage::url($this->image);
+        }
+        return '';
+    }
+
+    public function getImageAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
         }
         return '';
     }
@@ -39,7 +45,6 @@ class Goods extends Model
             return $this->attributes['img100'] = $this->image . '?x-oss-process=image/resize,m_lfit,h_100,w_100/format,png';
         }
         return '';
-
     }
 
     public function getImg50Attribute()
@@ -49,4 +54,14 @@ class Goods extends Model
         }
         return '';
     }
+
+
+    public function sku(){
+        return $this->hasMany(GoodsSku::class,'goods_id','goods_id');
+    }
+
+    public function tag(){
+        return $this->hasManyThrough(GoodsTag::class, GoodsSku::class,'tag_id','tag_id');
+    }
+
 }

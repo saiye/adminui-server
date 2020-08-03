@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class GoodsSku extends Model
 {
     protected $table = 'goods_sku';
-    public  $primaryKey='sku_id';
+    public $primaryKey = 'sku_id';
     protected $guarded = [
         'sku_id'
     ];
@@ -18,9 +18,9 @@ class GoodsSku extends Model
     public static function addSku($goods, $config, $user)
     {
         //1.add goods_tag
-        $date=date('Y-m-d H:i:s');
+        $date = date('Y-m-d H:i:s');
         //库存统计
-        $totalStock=0;
+        $totalStock = 0;
         foreach ($config as $val) {
             $item = [
                 'tag_name' => $val['tag_name'],
@@ -33,30 +33,40 @@ class GoodsSku extends Model
                 //save ku
                 $skuArr = [];
                 foreach ($val['tags'] as $sku) {
-                    unset($sku['sku_id']);
-                    $sku['tag_id'] = $saveTag->tag_id;
-                    $sku['goods_id'] = $goods->goods_id;
-                    $sku['created_at'] = $date;
-                    $sku['updated_at'] = $date;
-                    $totalStock+=$sku['stock'];
-                    array_push($skuArr, $sku);
+                    $totalStock += $sku['stock'];
+                    array_push($skuArr, [
+                        'tag_id'=>$saveTag->tag_id,
+                        'goods_id'=>$goods->goods_id,
+                        'stock'=>$sku['stock'],
+                        'goods_price'=>$sku['goods_price'],
+                        'sku_name'=>$sku['sku_name'],
+                        'active'=>$sku['active'],
+                        'created_at'=>$date,
+                        'updated_at'=>$date,
+                    ]);
                 }
                 $saveSku = GoodsSku::insert($skuArr);
                 if (!$saveSku) {
-                    return [false,$totalStock];
+                    return [false, $totalStock];
                 }
             } else {
-                return [false,$totalStock];
+                return [false, $totalStock];
             }
         }
-        return [true,$totalStock];
+        return [true, $totalStock];
     }
 
     /**
      * 修改sku
      */
-    public static function editSku(){
+    public static function editSku()
+    {
 
+    }
+
+    public function tag()
+    {
+        return $this->hasOne(GoodsTag::class, 'tag_id', 'tag_id');
     }
 
 }
