@@ -96,3 +96,6 @@ ADD COLUMN `monthly_sales` INT(10) DEFAULT '0' NOT NULL COMMENT '月销量' AFTE
 
 
 ALTER TABLE `lrs_game_logs`.`room_game_log`     ADD COLUMN `replayContentJson` TEXT NULL COMMENT '结果' AFTER `gameRes`;
+
+ALTER TABLE `lrs_manage`.`goods`     CHANGE `goods_price` `goods_price` DECIMAL(8,2) NOT NULL COMMENT '商品单价';
+ALTER TABLE `lrs_manage`.`goods_sku`     CHANGE `goods_price` `goods_price` DECIMAL(8,2) NOT NULL COMMENT '规格单价';

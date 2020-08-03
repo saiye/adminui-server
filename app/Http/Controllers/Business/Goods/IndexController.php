@@ -8,6 +8,7 @@ use App\Models\Goods;
 use App\Models\GoodsImage;
 use App\Models\GoodsQuickCat;
 use App\Models\GoodsSku;
+use App\Models\GoodsTag;
 use Illuminate\Support\Facades\DB;
 use Validator;
 
@@ -22,8 +23,9 @@ class IndexController extends Controller
     public function goodsList()
     {
         $data = new Goods();
-
-        $data = $data->whereCompanyId($this->loginUser->company_id);
+        $data = $data->whereCompanyId($this->loginUser->company_id)->with(['images' => function ($query) {
+            $query->select('image', 'goods_image_id', 'goods_id')->whereIsDel(0);
+        }]);
         if ($this->loginUser->store_id) {
             $data = $data->whereStoreId($this->loginUser->store_id);
         }
@@ -36,8 +38,29 @@ class IndexController extends Controller
         if ($this->req->goods_info) {
             $data = $data->where('goods_info', 'like', '%' . $this->req->goods_info . '%');
         }
-
         $data = $data->orderBy('goods.goods_id', 'desc')->paginate($this->req->input('limit', $limit = $this->req->input('limit', PaginateSet::LIMIT)))->appends($this->req->except('page'));
+
+        $skuArr = [];
+        $goodsIdArr = $data->pluck('goods_id');
+        if ($goodsIdArr) {
+            $skus = GoodsSku::select('goods_sku.sku_id', 'goods_sku.active', 'goods_sku.stock', 'goods_sku.sku_name', 'goods_sku.goods_price', 'goods_sku.goods_id', 'goods_sku.tag_id', 'goods_tag.tag_name')->whereIn('goods_id', $goodsIdArr)->leftJoin('goods_tag', 'goods_sku.tag_id', '=', 'goods_tag.tag_id')->where('goods_sku.is_del', 0)->get();
+            foreach ($skus as $sk) {
+                if (!isset($skuArr[$sk->goods_id])) {
+                    $skuArr[$sk->goods_id] = [];
+                }
+                if (!isset($skuArr[$sk->goods_id][$sk->tag_id])) {
+                    $skuArr[$sk->goods_id][$sk->tag_id] = [
+                        'tag_id' => $sk->tag_id,
+                        'tag_name' => $sk->tag_name,
+                        'tags' => [],
+                    ];
+                }
+                array_push($skuArr[$sk->goods_id][$sk->tag_id]['tags'], $sk);
+            }
+        }
+        foreach ($data as &$goods) {
+            $goods->goodsTags = isset($skuArr[$goods->goods_id]) ? array_values($skuArr[$goods->goods_id]) : [];
+        }
         $assign = compact('data');
         return $this->successJson($assign);
     }
@@ -138,7 +161,7 @@ class IndexController extends Controller
             'imageIds.array' => '商品图片数据格式错误!',
         ]);
         if ($validator->fails()) {
-            return $this->errorJson( $validator->errors()->first() );
+            return $this->errorJson($validator->errors()->first());
         }
         $imageIds = $this->req->input('imageIds', []);
         if ($imageIds) {
@@ -161,42 +184,37 @@ class IndexController extends Controller
             return $this->errorJson('仅店长，或者店员可修改商品!', 2);
         }
         $goodsId = $this->req->input('goods_id', 0);
-        $data['store_id'] = $this->loginUser->store_id;
-        $data['company_id'] = $this->loginUser->company_id;
         $data['goods_price'] = $price;
         $data['tag'] = $tag;
-        $data['image'] = '';
         $data['status'] = 2;//默认未上架
         $data['stock'] = 1;//默认库存1个,下单不扣减库存。为以后做准备.
         DB::beginTransaction();
-        $goods = Goods::whereGoodsId($goodsId)->update($data);
+        $goods = Goods::whereGoodsId($goodsId)->whereCompanyId($this->loginUser->company_id)->whereStoreId($this->loginUser->store_id)->first();
+        if (!$goods) {
+            return $this->errorJson('不存在商品,修改失败!', 2);
+        }
         if ($imageIds) {
             //绑定图片
             GoodsImage::whereCompanyId($this->loginUser->company_id)->whereStoreId($this->loginUser->store_id)->whereIn('goods_image_id', $imageIds)->update([
-                'goods_id' => $goods->goods_id
+                'goods_id' => $goodsId
             ]);
-            $newImage = GoodsImage::whereCompanyId($this->loginUser->company_id)->whereStoreId($this->loginUser->store_id)->whereGoodsId($goods->goods_id)->orderBy('goods_image_id', 'desc')->first();
+            $newImage = GoodsImage::whereGoodsId($goodsId)->orderBy('goods_image_id', 'desc')->first();
             if ($newImage) {
-                $goods->image = $newImage->image;
-                $goods->save();
+                $data['image'] = $newImage->image;
             }
         }
-        //添加规格数据
-        if ($goods) {
-            GoodsSku::whereGoodsId($goods->goods_id)->update(['is_del']);
-            list($saveSuk, $totalStock) = GoodsSku::addSku($goods, $config, $this->loginUser);
-            if ($saveSuk) {
-                //修改库存
-                // $goods->stock = $totalStock;
-                // $goods->save();
-                DB::commit();
-                return $this->successJson([], '添加成功!');
-            }
-            DB::rollBack();
-            return $this->errorJson('规格添加失败！');
+        $upGoods = Goods::whereGoodsId($goodsId)->update($data);
+        GoodsSku::whereGoodsId($goods->goods_id)->update(['is_del' => 1]);
+        list($saveSuk, $totalStock) = GoodsSku::addSku($goods, $config, $this->loginUser);
+        if ($upGoods and $saveSuk) {
+            //修改库存
+            // $goods->stock = $totalStock;
+            // $goods->save();
+            DB::commit();
+            return $this->successJson([], '修改成功!');
         }
         DB::rollBack();
-        return $this->errorJson('商品入库失败!');
+        return $this->errorJson('修改失败！');
     }
 
     /**
