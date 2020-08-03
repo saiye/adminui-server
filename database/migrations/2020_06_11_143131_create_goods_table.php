@@ -21,6 +21,7 @@ class CreateGoodsTable extends Migration
             $table->tinyInteger('status')->default(1)->comment('商品状态1正常销售，2暂停销售');
             $table->unsignedInteger('store_id')->default(0)->comment('所属店面');
             $table->unsignedInteger('company_id')->default(0)->comment('所属公司id');
+            $table->unsignedInteger('category_id')->default(0)->comment('分类id');
             $table->unsignedInteger('sku_id')->default(0)->comment('默认skuId');
             $table->unsignedInteger('stock')->default(0)->comment('库存');
             $table->unsignedInteger('daily_sales')->default(0)->comment('日销量');
