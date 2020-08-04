@@ -55,6 +55,10 @@ class Goods extends Model
         return '';
     }
 
+    public function cat(){
+        return $this->hasOne(GoodsCategory::class,'category_id','category_id');
+    }
+
 
     public function sku(){
         return $this->hasMany(GoodsSku::class,'goods_id','goods_id');

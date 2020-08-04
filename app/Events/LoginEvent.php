@@ -36,6 +36,6 @@ class LoginEvent
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('ActionLogEvent');
+        return new PrivateChannel('LoginEvent');
     }
 }

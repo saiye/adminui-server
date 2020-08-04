@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Business\Goods;
 
 use App\Constants\PaginateSet;
+use App\Events\TotalGoodsEvent;
 use  App\Http\Controllers\Business\BaseController as Controller;
 use App\Models\Goods;
 use App\Models\GoodsImage;
@@ -133,6 +134,7 @@ class IndexController extends Controller
                 // $goods->stock = $totalStock;
                 // $goods->save();
                 DB::commit();
+                event(new TotalGoodsEvent($goods));
                 return $this->successJson([], '添加成功!');
             }
             DB::rollBack();

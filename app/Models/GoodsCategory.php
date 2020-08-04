@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class GoodsCategory extends Model
 {
     protected $table = 'goods_category';
+    protected $primaryKey='category_id';
     protected $guarded = [
         'category_id'
     ];

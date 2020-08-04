@@ -156,6 +156,12 @@ class CategoryController extends Controller
                 'category_id' => $move_cat_id,
             ]);
             if ($isMove) {
+                $moveCat->count+=$hasCat->count;
+                $moveCat->save();
+
+                $hasCat->count=0;
+                $hasCat->save();
+
                 return $this->successJson([], '移动成功');
             }
         }
