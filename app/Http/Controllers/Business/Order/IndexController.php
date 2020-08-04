@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Business\Order;
 
 use App\Constants\PaginateSet;
 use  App\Http\Controllers\Business\BaseController as Controller;
+use App\Models\Order;
 use Validator;
+use Illuminate\Support\Facades\Config;
 
 /**
  *
@@ -32,7 +34,7 @@ class IndexController extends Controller
         if ($this->req->staff_id) {
             $data = $data->where('staff_id', $this->req->staff_id);
         }
-        $data = $data->orderBy('roder_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->orderBy('order_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }
@@ -42,15 +44,65 @@ class IndexController extends Controller
      */
     public function createOrder()
     {
-
+        return $this->errorJson('订单不存在');
     }
+
     /**
      * 退款
      */
-    public function  refund(){
-
+    public function refund()
+    {
+        return $this->errorJson('订单不存在');
     }
 
+    /**
+     * 搜索条件
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function selectConfig()
+    {
+        $data = Config::get('pay.selectConf');
 
+        return $this->successJson($data);
+    }
+
+    public function orderDetail()
+    {
+        $validator = Validator::make($this->req->all(), [
+            'order_id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorJson($validator->errors()->first(), 2);
+        }
+        $data = Order::whereCompanyId($this->loginUser->company_id)->whereId($this->req->order_id)->first();
+        if (!$data) {
+            return $this->errorJson('订单不存在');
+        }
+        $assign = compact('data');
+        return $this->successJson($assign);
+    }
+
+    /**
+     * 修改订单为完成状态
+     */
+    public function setOrder()
+    {
+        $validator = Validator::make($this->req->all(), [
+            'order_id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorJson($validator->errors()->first(), 2);
+        }
+        $data = Order::whereCompanyId($this->loginUser->company_id)->whereOrderId($this->req->order_id)->first();
+        if (!$data) {
+            return $this->errorJson('订单不存在');
+        }
+        if ($data->pay_status != 1) {
+            return $this->errorJson('该订单未支付,操作失败!');
+        }
+        $data->status = 3;
+        $data->save();
+        return $this->successJson([], '操作成功！');
+    }
 }
 

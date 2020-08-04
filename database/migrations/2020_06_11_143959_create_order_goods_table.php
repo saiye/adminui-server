@@ -23,6 +23,7 @@ class CreateOrderGoodsTable extends Migration
             //type:1普通商品,2房费
             $table->tinyInteger('type')->default(1)->comment('商品类型');
             $table->string('tag',100)->nullable()->comment('默认规格字符');
+            $table->string('goods_name',50)->nullable()->comment('商品名称');
             $table->string('image',100)->nullable()->comment('商品图片');
             $table->timestamps();
         });

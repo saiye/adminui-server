@@ -99,3 +99,8 @@ ALTER TABLE `lrs_game_logs`.`room_game_log`     ADD COLUMN `replayContentJson` T
 
 ALTER TABLE `lrs_manage`.`goods`     CHANGE `goods_price` `goods_price` DECIMAL(8,2) NOT NULL COMMENT '商品单价';
 ALTER TABLE `lrs_manage`.`goods_sku`     CHANGE `goods_price` `goods_price` DECIMAL(8,2) NOT NULL COMMENT '规格单价';
+
+
+ALTER TABLE `lrs_manage`.`order_goods`     ADD COLUMN `goods_name` VARCHAR(50) NULL COMMENT '商品名称' AFTER `tag`;
+
+ALTER TABLE `lrs_manage`.`order`     ADD COLUMN `info` VARCHAR(100) NOT NULL COMMENT '订单简讯' AFTER `prepay_id`;

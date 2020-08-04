@@ -6,7 +6,7 @@ Route::any('/user/login', 'Main\HomeController@postLogin')->name('bs-dologin');
 Route::any('/user/logout', 'Main\HomeController@getLogout')->name('bs-logout');
 Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('bs-cantAccess');
 Route::get('/', 'Main\HomeController@getHome')->name('bs-home')->middleware('auth:staff');
-Route::get('/user/info', 'Main\HomeController@getUserInfo')->name('bs-getUserInfo')->middleware('auth:staff');
+Route::post('/user/info', 'Main\HomeController@getUserInfo')->name('bs-getUserInfo')->middleware('auth:staff');
 Route::group([
     'middleware' => ['auth:staff']
 ], function () {
@@ -53,8 +53,11 @@ Route::group([
     Route::post('tool/goods/delete', 'Tool\GoodsController@delete')->name('bs-toolGoodsDelete');
 
     //订单管理
-    Route::post('order/index/orderList', 'Order\IndexController@orderList')->name('bs-GameOrderList');
-    Route::post('order/index/addOrder', 'Order\IndexController@addOrder')->name('bs-GameAddOrder');
+    Route::post('order/index/orderList', 'Order\IndexController@orderList')->name('bs-OrderList');
+    Route::post('order/index/addOrder', 'Order\IndexController@createOrder')->name('bs-CreateOrder');
+    Route::post('order/index/conf', 'Order\IndexController@selectConfig')->name('bs-OrderSelectConfig');
+    Route::post('order/index/detail', 'Order\IndexController@orderDetail')->name('bs-orderDetail');
+    Route::post('order/index/set', 'Order\IndexController@setOrder')->name('bs-setOrder');
     //房间管理
     Route::post('room/index/roomList', 'Room\IndexController@roomList')->name('bs-RoomList');
     Route::post('room/index/addRoom', 'Room\IndexController@addRoom')->name('bs-addRoom');
@@ -85,7 +88,6 @@ Route::group([
     //快速标签
     Route::post('goods/quick/list', 'Goods\QuickCatController@quickCatList')->name('bs-quickCatList');
     Route::post('goods/quick/add', 'Goods\QuickCatController@addQuickCat')->name('bs-addQuickCat');
-
 
 });
 
