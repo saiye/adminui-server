@@ -231,7 +231,7 @@ class IndexController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $isUp = Goods::whereGoodsId($this->req->goods_id)->whereCompanyId($this->loginUser->company_id)->whereStoreId($this->loginUser->store_id)->update([
+        $isUp = Goods::whereGoodsId($this->req->goods_id)->whereCompanyId($this->loginUser->company_id)->update([
             'stock' => 0,
         ]);
         if ($isUp) {
@@ -249,10 +249,9 @@ class IndexController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $stock = $this->req->input('status') == 1 ? 1 : 0;
-        $isUp = Goods::whereGoodsId($this->req->goods_id)->whereCompanyId($this->loginUser->company_id)->whereStoreId($this->loginUser->store_id)->update([
+        $isUp = Goods::whereGoodsId($this->req->goods_id)->whereCompanyId($this->loginUser->company_id)->update([
             'status' => $this->req->status,
-            'stock' => $stock,
+            'stock' => 1,
         ]);
         if ($isUp) {
             return $this->successJson([], '操作成功');

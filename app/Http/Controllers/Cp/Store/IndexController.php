@@ -126,7 +126,7 @@ class IndexController extends Controller
             'sex' => $this->req->sex,
             'phone' => $this->req->phone,
             'lock' => 2,
-            'role_id' => 1,
+            'role_id' => 3,
             'company_id' => $this->req->company_id,
             'password' => Hash::make($this->req->password),
         ];
