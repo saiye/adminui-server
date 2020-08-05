@@ -20,8 +20,6 @@ use function GuzzleHttp\default_user_agent;
  */
 class WeiXinLoginApi extends BaseLoginApi
 {
-
-
     public function type()
     {
         return 'wx';
@@ -137,6 +135,7 @@ class WeiXinLoginApi extends BaseLoginApi
         $sceneData = scene_encode([
             'd' => $data['deviceShortId'],
             'c' => $data['channelId'],
+            't' => $data['type'],//1进游戏，2.成为法官
         ]);
         $post = [
             'scene' => $sceneData,
@@ -164,7 +163,7 @@ class WeiXinLoginApi extends BaseLoginApi
             if ($response->getStatusCode() == 200) {
                 $str = $response->getBody()->getContents();
                 $env=Config::get('app.env');
-                $image_path = 'app/'.$env.'/qrCode/'.$data['deviceShortId'].'c'.$data['channelId'].'.png';
+                $image_path = 'app/'.$env.'/qrCode/'.md5(http_build_query($data)).'.png';
                 Storage::put($image_path, $str);
                 $full_path = Storage::url($image_path);
                 //二维码入库

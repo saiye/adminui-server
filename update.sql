@@ -104,3 +104,7 @@ ALTER TABLE `lrs_manage`.`goods_sku`     CHANGE `goods_price` `goods_price` DECI
 ALTER TABLE `lrs_manage`.`order_goods`     ADD COLUMN `goods_name` VARCHAR(50) NULL COMMENT '商品名称' AFTER `tag`;
 
 ALTER TABLE `lrs_manage`.`order`     ADD COLUMN `info` VARCHAR(100) NOT NULL COMMENT '订单简讯' AFTER `prepay_id`;
+
+
+ ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `api_token` VARCHAR(80) NULL COMMENT 'token' AFTER `lat`;
+ ALTER TABLE `lrs_manage`.`users` ADD INDEX `api_token` (`api_token`);

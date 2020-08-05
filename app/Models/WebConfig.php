@@ -45,12 +45,11 @@ class WebConfig extends Model
     public static function getKeyByFile($key,$default='')
     {
         $file = Storage::disk('local')->path(WebConfig::cache_file);
-        $data = [];
         if (is_file($file)) {
             $array = include $file;
-            $data = Arr::get($array, $key,$default);
+            return  Arr::get($array, $key,$default);
         }
-        return $data;
+        return $default;
     }
 
 }

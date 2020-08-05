@@ -108,7 +108,7 @@ class GameSrvController extends Base
             'beginTick' => 'required|numeric',
             'gameRes' => 'required|in:0,1,2,3',
             'unitInfos' => 'required|array',
-            'replayContentJson' => 'required',
+          //  'replayContentJson' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->json([

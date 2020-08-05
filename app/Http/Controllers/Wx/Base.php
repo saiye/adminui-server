@@ -10,8 +10,7 @@ namespace App\Http\Controllers\Wx;
 use \Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-
+use Illuminate\Support\Facades\Auth;
 
 class Base extends Controller
 {
@@ -36,7 +35,6 @@ class Base extends Controller
     }
 
     public function user(){
-        $token = $this->request->header('token');
-        return Cache::get($token);
+        Auth::guard('users')->user();
     }
 }

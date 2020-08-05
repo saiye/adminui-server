@@ -97,9 +97,6 @@ class IndexController extends Controller
         if (!$data) {
             return $this->errorJson('订单不存在');
         }
-        if ($data->pay_status != 1) {
-            return $this->errorJson('该订单未支付,操作失败!');
-        }
         $data->status = 3;
         $data->save();
         return $this->successJson([], '操作成功！');

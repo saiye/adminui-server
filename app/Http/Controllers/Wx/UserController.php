@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Service\GameApi\LrsApi;
 use App\Service\LoginApi\LoginApi;
 use App\Constants\ErrorCode;
+use App\Service\SceneAction\SceneFactory;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
@@ -29,60 +30,7 @@ class UserController extends Base
         //对扫码获取的参数验证合法性
         $scene = $this->request->input('scene');
         $data = scene_decode($scene);
-        $validator2 = $this->validationFactory->make($data, [
-            'd' => 'required|numeric|min:1',
-            'c' => 'required|numeric|min:1',
-        ]);
-        if ($validator2->fails()) {
-            return $this->json([
-                'errorMessage' => '二维码有问题:' . $validator2->errors()->first(),
-                'code' => ErrorCode::VALID_FAILURE,
-            ]);
-        }
-        $user = $this->user();
-        $deviceShortId = $data['d'];
-        $channelId = $data['c'];
-        $device = Device::whereDeviceId($deviceShortId)->first();
-        if (!$device) {
-            return $this->json([
-                'errorMessage' => '设备未绑定房间',
-                'code' => ErrorCode::DEVICE_NOT_BINDING,
-            ]);
-        }
-        if ($device->seat_num == 0 and $user->judge !== 1) {
-            return $this->json([
-                'errorMessage' => '普通账号,无法登陆法官设备',
-                'code' => ErrorCode::ACCOUNT_NO_PREVILEGE,
-            ]);
-        }
-        $channel = Channel::whereChannelId($channelId)->first();
-        if ($channel) {
-            //更新最后登录的渠道
-            User::whereId($user->id)->update([
-                'channel_id' => $channelId,
-            ]);
-            (new LrsApi($channel))->loginCallBack([
-                "deviceShortId" => $device->device_id,
-                "account" => $user->account,
-                "userId" => $user->id,
-                "name" => $user->nickname,
-                "sex" => $user->sex,
-                "icon" => $user->icon ?? '',
-                "roomId" => $device->room_id, // [可选] 房间唯一id
-                "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
-                "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
-                "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
-                "deviceMqttTopic" => $device->room->deviceMqttTopic ?? '', // [可选]房间设备mqtt主题
-            ]);
-            return $this->json([
-                'errorMessage' => '扫码成功，马上进入游戏!',
-                'code' => ErrorCode::SUCCESS,
-            ]);
-        }
-        return $this->json([
-            'errorMessage' => '渠道' . $channelId . '不存在！',
-            'code' => ErrorCode::CHANNEL_NONENTITY,
-        ]);
+        return SceneFactory::make($data)->run();
     }
 
     public function logout()
@@ -129,7 +77,7 @@ class UserController extends Base
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
             ]);
         }
-        if(!$user){
+        if (!$user) {
             return $this->json([
                 'errorMessage' => '未找到用户',
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
@@ -142,7 +90,8 @@ class UserController extends Base
             ]);
         }
         $token = Str::random(32);
-        Cache::put($token, $user, 18000);
+        $user->api_token = $token;
+        $user->save();
         return $this->json([
             'errorMessage' => 'success',
             'token' => $token,

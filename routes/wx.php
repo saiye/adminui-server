@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::group([
-    'middleware' => ['WxAuth', 'ApiLogRecord']
+    'middleware' => ['auth:wx', 'ApiLogRecord']
 ], function () {
     Route::any('user/info', 'UserController@info');
     Route::any('user/logout', 'UserController@logout');

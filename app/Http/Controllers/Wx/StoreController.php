@@ -137,7 +137,7 @@ class StoreController extends Base
         $page = $this->request->input('page', 1);
         $category_id = $this->request->input('category_id', 1);
         $skip = ceil($page - 1) * $limit;
-        $list = Goods::select(['goods_name', 'goods_price', 'goods_id', 'image', 'info','tag'])->whereStoreId($category_id)->whereStatus(1)->skip($skip)->take($limit)->get();
+        $list = Goods::select(['goods_name', 'goods_price', 'goods_id', 'image', 'info','tag'])->whereCategoryId($category_id)->whereStatus(1)->skip($skip)->take($limit)->get();
         if ($list) {
             return $this->json(
                 [

@@ -11,11 +11,9 @@ namespace App\Service\GameApi;
 
 use App\Constants\ErrorCode;
 use App\Jobs\CallBackGameLogin;
-use App\Models\PlayerGameLog;
 use App\Models\Room;
 use App\Models\User;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Log;
 
 class LrsApi extends BaseGameApi
 {

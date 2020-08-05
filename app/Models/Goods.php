@@ -16,19 +16,11 @@ class Goods extends Model
     protected $guarded = [
         'goods_id'
     ];
-    protected $appends = ['img100', 'img50','img'];
+    protected $appends = ['img100', 'img50'];
 
     public function images()
     {
         return $this->hasMany(GoodsImage::class, 'goods_id', 'goods_id');
-    }
-
-    public function getImgAttribute()
-    {
-        if ($this->image) {
-            return $this->attributes['img100'] = Storage::url($this->image);
-        }
-        return '';
     }
 
     public function getImageAttribute($value)
@@ -36,7 +28,7 @@ class Goods extends Model
         if ($value) {
             return Storage::url($value);
         }
-        return '';
+        return WebConfig::getKeyByFile('goods.image','');
     }
 
     public function getImg100Attribute()

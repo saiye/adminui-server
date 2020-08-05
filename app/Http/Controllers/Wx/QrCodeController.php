@@ -45,6 +45,7 @@ class QrCodeController extends Base
             }
         }
         if(!$full_path) {
+            $data['type']=1;//表示登录游戏
             $imageRes = $api->getQrCode($data);
             if ($imageRes) {
                 $full_path = $imageRes['full_path'];

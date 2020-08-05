@@ -88,6 +88,5 @@ Route::group([
     //快速标签
     Route::post('goods/quick/list', 'Goods\QuickCatController@quickCatList')->name('bs-quickCatList');
     Route::post('goods/quick/add', 'Goods\QuickCatController@addQuickCat')->name('bs-addQuickCat');
-
 });
 
