@@ -9,6 +9,7 @@
 namespace App\Service\SceneAction;
 
 
+use App\Constants\ErrorCode;
 use Illuminate\Http\Request;
 
 class SceneFactory
@@ -25,14 +26,18 @@ class SceneFactory
      * @param $data
      * @return SceneBase
      */
-    public static function make($data)
+    public static function make($scene)
     {
+        $data=scene_decode($scene);
         $type = isset($data['t']) ? $data['t'] : 1;
         if (in_array($type, static::type)) {
             $class = '\\App\\Service\\SceneAction\\Action' . $type;
             $obj = new $class($data);
-            return $obj->run();
+            return $obj;
         }
-        throw new \Exception('该扫码功能未开放!');
+        return response()->json([
+            'errorMessage' => '该扫码功能未开放!',
+            'code' => ErrorCode::VALID_FAILURE,
+        ], 200);
     }
 }

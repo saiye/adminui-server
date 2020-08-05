@@ -8,7 +8,6 @@
 
 namespace App\Service\SceneAction;
 
-
 abstract  class SceneBase implements Scene
 {
     protected $data = null;
@@ -17,7 +16,7 @@ abstract  class SceneBase implements Scene
     public function __construct($data)
     {
         $this->data = $data;
-        $this->validationFactory =app()->make('validator');
+        $this->validationFactory =app('validator');
     }
 
     public function json($data, $status = 200)

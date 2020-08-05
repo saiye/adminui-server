@@ -29,8 +29,8 @@ class UserController extends Base
         }
         //对扫码获取的参数验证合法性
         $scene = $this->request->input('scene');
-        $data = scene_decode($scene);
-        return SceneFactory::make($data)->run();
+
+        return SceneFactory::make($scene)->run();
     }
 
     public function logout()
