@@ -35,6 +35,6 @@ class Base extends Controller
     }
 
     public function user(){
-        Auth::guard('users')->user();
+       return  Auth::guard('wx')->user();
     }
 }

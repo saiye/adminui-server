@@ -27,7 +27,7 @@ class SceneFactory
      */
     public static function make($data)
     {
-        $type = isset($data['type']) ? $data['type'] : 1;
+        $type = isset($data['t']) ? $data['t'] : 1;
         if (in_array($type, static::type)) {
             $class = '\\App\\Service\\SceneAction\\Action' . $type;
             $obj = new $class($data);

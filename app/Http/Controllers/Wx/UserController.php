@@ -89,8 +89,8 @@ class UserController extends Base
                 'code' => ErrorCode::ACCOUNT_LOCK,
             ]);
         }
-        $token = Str::random(32);
-        $user->api_token = $token;
+        $token = hash('sha256', Str::random(32));
+        $user->token = $token;
         $user->save();
         return $this->json([
             'errorMessage' => 'success',

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Auth\TokenGuard;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
@@ -27,8 +28,10 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
         Auth::extend('jwt', function($app, $name, array $config) {
-            // 返回一个Illuminate\Contracts\Auth\Guard实例...
-            return new JwtGuard(Auth::createUserProvider($config['provider']));
+            return new JwtGuard(Auth::createUserProvider($config['provider']),$app['request'],
+                $config['input_key'] ?? 'token',
+                $config['storage_key'] ?? 'token',
+                $config['hash'] ?? false);
         });
 
     }

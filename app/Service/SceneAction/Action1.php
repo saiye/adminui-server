@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  *
- * 登录游戏
+ * 扫描登录游戏
  *
  * Class Action1
  * @package App\Service\SceneAction

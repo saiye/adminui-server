@@ -9,12 +9,14 @@
 namespace App\Http\Controllers\Www;
 
 
+use App\Constants\ErrorCode;
+
 class HomeController extends BaseController
 {
 
     public function home()
     {
-        return 'welcome boy';
+        return response()->json(['message' =>'你未登录', 'code' =>ErrorCode::ACCOUNT_NOT_LOGIN], 200);
     }
 
 }

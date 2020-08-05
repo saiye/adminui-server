@@ -8,9 +8,12 @@
 
 namespace App\Service\SceneAction;
 
+use App\Constants\ErrorCode;
+use Illuminate\Support\Facades\Auth;
+
 /**
  *
- * 成为法官
+ * 扫描成为法官
  *
  * Class Action1
  * @package App\Service\SceneAction
@@ -19,6 +22,18 @@ class Action2 extends SceneBase
 {
     public function run()
     {
-        // TODO: Implement run() method.
+        $user = Auth::guard('wx')->user();
+        if ($user) {
+            $user->judge = 1;
+            $user->save();
+            return $this->json([
+                'errorMessage' => '你已经成为法官',
+                'code' => ErrorCode::SUCCESS,
+            ]);
+        }
+        return $this->json([
+            'errorMessage' => '你未登录',
+            'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
+        ]);
     }
 }

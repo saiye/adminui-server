@@ -37,7 +37,7 @@ abstract class BaseLoginApi implements LoginApi
 
     public function getUser()
     {
-        $user = User::whereId(24)->first();
+        $user = User::whereId(1)->first();
         return [ErrorCode::SUCCESS, '老用户', $user];
 
         list($code, $info) = $this->code2Session();
