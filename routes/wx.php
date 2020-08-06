@@ -19,6 +19,7 @@ Route::group([
     Route::any('store/storeList', 'StoreController@storeList');
     Route::any('store/goodsList', 'StoreController@goodsList');
 });
+
 Route::any('user/login', 'UserController@login')->middleware('ApiLogRecord');
 Route::any('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
 Route::any('qrCode/test', 'QrCodeController@testQrCode')->name('wx-QrCodeTestQrCode');
