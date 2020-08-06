@@ -39,11 +39,11 @@ class QrCodeController extends Base
             ]);
         }
         $full_path='';
-        if ($hasDevice->qrCodePath) {
+       /* if ($hasDevice->qrCodePath) {
             if(Storage::exists($hasDevice->qrCodePath)){
                 $full_path = Storage::url($hasDevice->qrCodePath);
             }
-        }
+        }*/
         if(!$full_path) {
             $data['type']=1;//表示登录游戏
             $imageRes = $api->getQrCode($data);

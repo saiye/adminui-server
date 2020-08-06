@@ -17,7 +17,7 @@ class SceneFactory
 
     //Scene
     public $data = [];
-    public $request =null;
+    public $request = null;
     const  type = [1, 2];
 
     public $action = null;
@@ -28,16 +28,14 @@ class SceneFactory
      */
     public static function make($scene)
     {
-        $data=scene_decode($scene);
+        $data = scene_decode($scene);
         $type = isset($data['t']) ? $data['t'] : 1;
         if (in_array($type, static::type)) {
             $class = '\\App\\Service\\SceneAction\\Action' . $type;
-            $obj = new $class($data);
-            return $obj;
+        } else {
+            $class = '\\App\\Service\\SceneAction\\ActionDefault';
         }
-        return response()->json([
-            'errorMessage' => '该扫码功能未开放!',
-            'code' => ErrorCode::VALID_FAILURE,
-        ], 200);
+        $obj = new $class($data);
+        return $obj;
     }
 }

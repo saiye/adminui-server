@@ -37,7 +37,7 @@ class Action1 extends SceneBase
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $user =Auth::guard('users')->user();
+        $user =Auth::guard('wx')->user();
         if(!$user){
             return $this->json([
                 'errorMessage' => '你未登录',
