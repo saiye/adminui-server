@@ -29,7 +29,6 @@ class Action1 extends SceneBase
         $validator2 = $this->validationFactory->make($this->data, [
             'd' => 'required|numeric|min:1',
             'c' => 'required|numeric|min:1',
-            't' => 'required|numeric',
         ]);
         if ($validator2->fails()) {
             return $this->json([

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Wx;
 
 use App\Models\Goods;
 use App\Models\GoodsCategory;
+use App\Models\GoodsSku;
 use App\Models\Store;
 use App\Constants\ErrorCode;
 use App\Models\StoreTag;
@@ -29,7 +30,7 @@ class StoreController extends Base
             ]);
         }
         $storeId = $this->request->input('store_id');
-        $store = Store::select(['store_id', 'store_name', 'open_at', 'close_at'])->whereStoreId($storeId)->whereCheck(1)->first();
+        $store = Store::select(['store_id', 'store_name', 'open_at', 'close_at','address'])->whereStoreId($storeId)->whereCheck(1)->first();
         if (!$store) {
             return $this->json(
                 [
@@ -96,7 +97,7 @@ class StoreController extends Base
                 )
             )
         ),2
-    ) AS distance")])->orderBy('distance', 'asc')->skip($skip)->take($limit)->get();
+    ) AS distance")])->whereCheck(1)->orderBy('distance', 'asc')->skip($skip)->take($limit)->get();
 
         if ($list) {
             return $this->json(
@@ -137,8 +138,9 @@ class StoreController extends Base
         $page = $this->request->input('page', 1);
         $category_id = $this->request->input('category_id', 1);
         $skip = ceil($page - 1) * $limit;
-        $list = Goods::select(['goods_name', 'goods_price', 'goods_id', 'image', 'info','tag'])->whereCategoryId($category_id)->whereStatus(1)->skip($skip)->take($limit)->get();
+        $list = Goods::select(['goods_name', 'goods_price', 'goods_id', 'image', 'info','tag','stock'])->whereCategoryId($category_id)->whereStatus(1)->skip($skip)->take($limit)->get();
         if ($list) {
+            $list=Goods::tagList($list);
             return $this->json(
                 [
                     'errorMessage' => '',

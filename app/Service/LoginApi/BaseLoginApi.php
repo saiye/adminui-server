@@ -37,6 +37,12 @@ abstract class BaseLoginApi implements LoginApi
 
     public function getUser()
     {
+        //已注册用户
+        $env=Config::get('app.env');
+        if($env=='local'){
+            $user = User::whereId(1)->first();
+            return [ErrorCode::SUCCESS, '老用户', $user];
+        }
         list($code, $info) = $this->code2Session();
         if ($code == 0) {
             //经度

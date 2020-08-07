@@ -6,9 +6,11 @@ use App\Constants\PaginateSet;
 use  App\Http\Controllers\Business\BaseController as Controller;
 use App\Models\Staff;
 use App\Models\Store;
+use App\Models\StoreTag;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Validator;
+use Illuminate\Support\Facades\Config;
 
 /**
  *
@@ -77,6 +79,7 @@ class IndexController extends Controller
             'password' => 'required|max:100',
             'real_name' => 'required|max:100',
             'sex' => 'required|in:1,2',
+            'tags' => 'array',
             'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/', 'unique:staff,phone'],
         ], [
             'store_name.required' => '门店名称，不能为空！',
@@ -97,12 +100,13 @@ class IndexController extends Controller
             'phone.required' => '手机号码，不能为空！',
             'phone.regex' => '你输入的不是手机号码',
             'phone.unique' => '你输入的手机号码已存在!',
+            'tags.array' => '标签格式错误!',
         ]);
         if ($validator->fails()) {
             //返回默认支付
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $company_id=$this->loginUser->company_id;
+        $company_id = $this->loginUser->company_id;
 
         $area = $this->req->area;
         $region_id = $city_id = $province_id = 0;
@@ -126,19 +130,32 @@ class IndexController extends Controller
         ];
         $staffObj = Staff::create($staff);
         $save_staff = $staffObj->save();
-
-
         //商家入库
         $data['store_name'] = $this->req->store_name;
         $data['region_id'] = $region_id;
         $data['province_id'] = $province_id;
         $data['city_id'] = $city_id;
         $data['address'] = $this->req->address;
-        $data['company_id'] =$company_id;
+        $data['company_id'] = $company_id;
         $data['describe'] = $this->req->describe;
         $data['staff_id'] = $staffObj->staff_id;
         $store = Store::create($data);
-        $store->save();
+        $tags = $this->req->input('tags', []);
+        if ($tags) {
+            $config = Config::get('deploy.store_tag');
+            $tagsArr = [];
+            foreach ($tags as $tg) {
+                if (isset($config[$tg])) {
+                    array_push($tagsArr, [
+                        'tag_id' => $tg,
+                        'tag_name' => $config[$tg],
+                    ]);
+                }
+            }
+            if ($tagsArr) {
+                StoreTag::insert($tagsArr);
+            }
+        }
         //联系人绑定到该店面
         $staffObj->store_id = $store->store_id;
         $save_store = $staffObj->save();
@@ -180,6 +197,20 @@ class IndexController extends Controller
         }
         return $this->errorJson('审核失败！');
     }
+
+    public function tagList()
+    {
+        $config = Config::get('deploy.store_tag');
+        $data = [];
+        foreach ($config as $k => $v) {
+            array_push($data, [
+                'k' => $k,
+                'v' => $v,
+            ]);
+        }
+        return $this->successJson($data);
+    }
+
 
 }
 

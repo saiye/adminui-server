@@ -60,4 +60,30 @@ class Goods extends Model
         return $this->hasManyThrough(GoodsTag::class, GoodsSku::class,'tag_id','tag_id');
     }
 
+
+    public static  function tagList($data){
+        $skuArr = [];
+        $goodsIdArr = $data->pluck('goods_id');
+        if ($goodsIdArr) {
+            $skus = GoodsSku::select('goods_sku.sku_id', 'goods_sku.active', 'goods_sku.stock', 'goods_sku.sku_name', 'goods_sku.goods_price', 'goods_sku.goods_id', 'goods_sku.tag_id', 'goods_tag.tag_name')->whereIn('goods_id', $goodsIdArr)->leftJoin('goods_tag', 'goods_sku.tag_id', '=', 'goods_tag.tag_id')->where('goods_sku.is_del', 0)->get();
+            foreach ($skus as $sk) {
+                if (!isset($skuArr[$sk->goods_id])) {
+                    $skuArr[$sk->goods_id] = [];
+                }
+                if (!isset($skuArr[$sk->goods_id][$sk->tag_id])) {
+                    $skuArr[$sk->goods_id][$sk->tag_id] = [
+                        'tag_id' => $sk->tag_id,
+                        'tag_name' => $sk->tag_name,
+                        'tags' => [],
+                    ];
+                }
+                array_push($skuArr[$sk->goods_id][$sk->tag_id]['tags'], $sk);
+            }
+        }
+        foreach ($data as &$goods) {
+            $goods->goodsTags = isset($skuArr[$goods->goods_id]) ? array_values($skuArr[$goods->goods_id]) : [];
+        }
+        return $data;
+    }
+
 }

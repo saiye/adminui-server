@@ -87,17 +87,23 @@ class LrsApi extends BaseGameApi
                     $selfJob = $res['selfJob'];
                     $userIdArr = [];
                     $seatArr = [];
+                    $seats_num=0;
                     foreach ($res['users'] as $item) {
-                        array_push($userIdArr, $item['userId']);
-                        $seatArr[$item['userId']] = $item['seat'];
+                        if($item['userId']>0){
+                            array_push($userIdArr, $item['userId']);
+                            $seatArr[$item['userId']] = $item['seat'];
+                        }
+                        $seats_num+=1;
                     }
                     $status = $res['status'];//,状态 1-未登陆，2-未开始，3 游戏中
                     $room = Room::with('store')->whereRoomId($roomId)->first();
+                    //sets_num
+                    $seats_num=$room->seats_num;
                     $list = User::select(['nickname', 'icon', 'sex', 'id'])->whereIn('id', $userIdArr)->get();
                     $item = [];
                     if (!empty($list->toArray())) {
                         $data = [];
-                        $roomName = $room ? $room->store->store_name . '【房间' . $room->room_name . '】' : '【房间' . $roomId . '】';
+                        $roomName = $room ? $room->store->store_name . '【' . $room->room_name . '】' : '【'. $roomId . '】';
                         foreach ($list as $v) {
                             $tmp = [
                                 'nickname' => $v->nickname,//头像
@@ -111,13 +117,13 @@ class LrsApi extends BaseGameApi
                                 'dup_id' => $dupId,
                                 'mvp' => 0,// 0 - ⽆， 1 mvp
                                 'user_id' => $v->id,
-                                'self_job' =>0,
+                                'job' =>0,
                                 'room_name' => $roomName,
                                 'status' => $status,
                             ];
                             if ($v->id == $userId) {
                                 $item = $tmp;
-                                $item['self_job']=$selfJob;
+                                $item['job']=$selfJob;
                             }
                             array_push($data, $tmp);
                         }
@@ -127,6 +133,7 @@ class LrsApi extends BaseGameApi
                             'list' => [
                                 'item' => $item,
                                 'list' => $data,
+                                'seats_num'=>$seats_num
                             ],
                         ]);
                     }

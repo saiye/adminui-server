@@ -35,7 +35,6 @@ class SceneFactory
         } else {
             $class = '\\App\\Service\\SceneAction\\ActionDefault';
         }
-        $obj = new $class($data);
-        return $obj;
+       return  new $class($data);
     }
 }

@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Wx;
 
 
 use App\Models\Channel;
-use App\Models\Device;
-use App\Models\User;
 use App\Service\GameApi\LrsApi;
 use App\Service\LoginApi\LoginApi;
 use App\Constants\ErrorCode;
 use App\Service\SceneAction\SceneFactory;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class UserController extends Base
@@ -35,10 +32,10 @@ class UserController extends Base
 
     public function logout()
     {
-        $token = $this->request->header('token');
         $user = $this->user();
         if ($user) {
-            Cache::forget($token);
+            $user->token=  hash('sha256', Str::random(60));;
+            $user->save();
             $channel = Channel::whereChannelId($user->channel_id)->first();
             $api = new LrsApi($channel);
             return $api->logicLogout($user->id);
@@ -146,16 +143,12 @@ class UserController extends Base
             'code' => ErrorCode::SUCCESS,
             'list' => [
                 [
-                    'month' => '5月',//月份
+                    'month' => '5月',
                     'list' => [
                         [
-                            'src' => 'http://lrs-tt.7955.com/storage/qrCode/1113.png',
-                            'title' => '1111',
+                            'src' => '',
+                            'title' => '',
                         ],
-                        [
-                            'src' => 'http://lrs-tt.7955.com/storage/qrCode/1113.png',
-                            'title' => '222',
-                        ]
                     ],
                 ]
             ],

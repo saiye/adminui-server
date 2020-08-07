@@ -6,7 +6,7 @@ Route::any('/user/login', 'Main\HomeController@postLogin')->name('bs-dologin');
 Route::any('/user/logout', 'Main\HomeController@getLogout')->name('bs-logout');
 Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('bs-cantAccess');
 Route::get('/', 'Main\HomeController@getHome')->name('bs-home')->middleware('auth:staff');
-Route::post('/user/info', 'Main\HomeController@getUserInfo')->name('bs-getUserInfo')->middleware('auth:staff');
+Route::any('/user/info', 'Main\HomeController@getUserInfo')->name('bs-getUserInfo')->middleware('auth:staff');
 Route::group([
     'middleware' => ['auth:staff']
 ], function () {
@@ -25,6 +25,7 @@ Route::group([
     Route::post('store/index/storeList', 'Store\IndexController@storeList')->name('bs-storeList');
     Route::post('store/index/addStore', 'Store\IndexController@addStore')->name('bs-addStore');
     Route::post('store/index/checkStore', 'Store\IndexController@checkStore')->name('bs-checkStore');
+    Route::post('store/index/tagList', 'Store\IndexController@tagList')->name('bs-StoreTagList');
 
     Route::post('company/index/getState', 'Company\IndexController@getState')->name('bs-getState');
     Route::post('company/index/areaList', 'Company\IndexController@areaList')->name('bs-areaList');
