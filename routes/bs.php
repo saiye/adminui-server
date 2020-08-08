@@ -24,6 +24,7 @@ Route::group([
     //门店管理
     Route::post('store/index/storeList', 'Store\IndexController@storeList')->name('bs-storeList');
     Route::post('store/index/addStore', 'Store\IndexController@addStore')->name('bs-addStore');
+    Route::post('store/index/editStore', 'Store\IndexController@editStore')->name('bs-editStore');
     Route::post('store/index/checkStore', 'Store\IndexController@checkStore')->name('bs-checkStore');
     Route::post('store/index/tagList', 'Store\IndexController@tagList')->name('bs-StoreTagList');
 

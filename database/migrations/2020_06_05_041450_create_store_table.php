@@ -27,7 +27,7 @@ class CreateStoreTable extends Migration
             $table->tinyInteger('check')->default(0)->comment('审核状态0未审核，1审核通过，2审核不通过');
             $table->tinyInteger('open_at')->default(0)->comment('营业开始时间');
             $table->tinyInteger('close_at')->default(24)->comment('营业结束时间');
-            $table->decimal('lon',8,6)->default(0)->comment('经度');
+            $table->decimal('lon',10,6)->default(0)->comment('经度');
             $table->decimal('lat',8,6)->default(0)->comment('维度');
             $table->timestamps();
         });

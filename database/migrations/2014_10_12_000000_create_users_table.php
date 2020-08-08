@@ -34,7 +34,7 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('online')->default(0)->comment('是否在线0否1是');
             $table->tinyInteger('play')->default(0)->comment('是否在游戏0否1是');
             $table->tinyInteger('two_way')->default(0)->comment('是否仅双向好友发信息');
-            $table->decimal('lon',8,6)->default(0)->comment('经度');
+            $table->decimal('lon',10,6)->default(0)->comment('经度');
             $table->decimal('lat',8,6)->default(0)->comment('维度');
             $table->string('token',80)->unique()->nullable()->default(null)->comment('api token');
             $table->timestamps();
