@@ -37,5 +37,4 @@ class Order extends Model
     {
         return $this->attributes['pay_status_word'] =Config::get('pay.pay_state.'.$this->pay_status,$this->pay_status);
     }
-
 }
