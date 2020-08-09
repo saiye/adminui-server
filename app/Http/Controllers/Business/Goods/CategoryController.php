@@ -31,6 +31,9 @@ class CategoryController extends Controller
         }
 
         $data = $data->orderBy('category_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        foreach ($data as &$item){
+            $item->move_cat_id='';
+        }
         $assign = compact('data');
         return $this->successJson($assign);
     }

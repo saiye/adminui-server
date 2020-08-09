@@ -70,12 +70,14 @@ class RoomGameLogJob implements ShouldQueue
                 $countdata['police'] = $unit["police"] != 0 ? 1 : 0;
                 array_push($playercounts, $countdata);
             } else {
-                $record->total_game += 1;
-                $record->win_game += $unit["res"] == 2 ? 1 : 0;
-                $record->mvp += $unit["mvp"] != 0 ? 1 : 0;
-                $record->svp += $unit["svp"] != 0 ? 1 : 0;
-                $record->police += $unit["police"] != 0 ? 1 : 0;
-                $record->save();
+                if($unit['res']!==1){
+                    $record->total_game += 1;
+                    $record->win_game += $unit["res"] == 2 ? 1 : 0;
+                    $record->mvp += $unit["mvp"] != 0 ? 1 : 0;
+                    $record->svp += $unit["svp"] != 0 ? 1 : 0;
+                    $record->police += $unit["police"] != 0 ? 1 : 0;
+                    $record->save();
+                }
             }
             $playerdata['user_id'] = $unit["userId"];
             $playerdata['dup_id'] = $this->post['dupId'];
@@ -83,7 +85,7 @@ class RoomGameLogJob implements ShouldQueue
             $playerdata['job'] = $unit["job"];
             $playerdata['res'] = $unit["res"];
             $playerdata['begin_tick'] = $this->post['beginTick'];
-            $playerdata['score'] = $unit["score"];;
+            $playerdata['score'] = $unit["score"];
             $playerdata['mvp'] = ($unit["mvp"] != 0 || $unit["svp"] != 0) ? 1 : 0;
             $playerdata['status'] = $unit["status"];
             $playerdata['room_game_id'] = $gameLog->id;

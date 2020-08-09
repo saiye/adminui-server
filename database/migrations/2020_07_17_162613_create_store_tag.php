@@ -14,10 +14,10 @@ class CreateStoreTag extends Migration
     public function up()
     {
         Schema::create('store_tag', function (Blueprint $table) {
-            $table->increments('tag_id')->comment('tag_id');
+            $table->id();
+            $table->unsignedInteger('tag_id')->default(0)->comment('tag_id');
             $table->string('tag_name', 30)->comment('商店标签');
             $table->unsignedInteger('store_id')->default(0)->comment('店铺id');
-            $table->timestamps();
         });
     }
 

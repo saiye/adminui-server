@@ -46,4 +46,12 @@ class Store extends Model
     public function category(){
          return   $this->hasMany('App\Models\GoodsCategory','store_id','store_id');
     }
+
+    public function tags(){
+        return $this->hasMany(StoreTag::class,'store_id','store_id');
+    }
+
+    public function image(){
+        return $this->hasMany(Image::class,'foreign_id','store_id');
+    }
 }

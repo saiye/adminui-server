@@ -40,28 +40,7 @@ class IndexController extends Controller
             $data = $data->where('goods_info', 'like', '%' . $this->req->goods_info . '%');
         }
         $data = $data->orderBy('goods.goods_id', 'desc')->paginate($this->req->input('limit', $limit = $this->req->input('limit', PaginateSet::LIMIT)))->appends($this->req->except('page'));
-
-        $skuArr = [];
-        $goodsIdArr = $data->pluck('goods_id');
-        if ($goodsIdArr) {
-            $skus = GoodsSku::select('goods_sku.sku_id', 'goods_sku.active', 'goods_sku.stock', 'goods_sku.sku_name', 'goods_sku.goods_price', 'goods_sku.goods_id', 'goods_sku.tag_id', 'goods_tag.tag_name')->whereIn('goods_id', $goodsIdArr)->leftJoin('goods_tag', 'goods_sku.tag_id', '=', 'goods_tag.tag_id')->where('goods_sku.is_del', 0)->get();
-            foreach ($skus as $sk) {
-                if (!isset($skuArr[$sk->goods_id])) {
-                    $skuArr[$sk->goods_id] = [];
-                }
-                if (!isset($skuArr[$sk->goods_id][$sk->tag_id])) {
-                    $skuArr[$sk->goods_id][$sk->tag_id] = [
-                        'tag_id' => $sk->tag_id,
-                        'tag_name' => $sk->tag_name,
-                        'tags' => [],
-                    ];
-                }
-                array_push($skuArr[$sk->goods_id][$sk->tag_id]['tags'], $sk);
-            }
-        }
-        foreach ($data as &$goods) {
-            $goods->goodsTags = isset($skuArr[$goods->goods_id]) ? array_values($skuArr[$goods->goods_id]) : [];
-        }
+        $data=Goods::tagList($data);
         $assign = compact('data');
         return $this->successJson($assign);
     }

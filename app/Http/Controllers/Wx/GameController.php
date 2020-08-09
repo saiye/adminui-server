@@ -86,10 +86,14 @@ class GameController extends Base
             $list = $list->whereJob($job);
         }
         if ($fightType) {
-            $list = $list->whereRes($fightType);
+            if($fightType==4){
+                $list = $list->whereMvp(1);
+            }else{
+                $list = $list->whereRes($fightType);
+            }
         }
         $skip = ceil($page - 1) * $limit;
-        $list = $list->skip($skip)->take($limit)->get();
+        $list = $list->orderBy('begin_tick','desc')->skip($skip)->take($limit)->get();
         if (!empty($list->toArray())) {
             $data = [];
             foreach ($list as $v) {
@@ -99,9 +103,10 @@ class GameController extends Base
                     'res' => $v->res,// 1- 中断， 2- 胜利 ，3- 失败
                     'dup_name' => $v->board ? $v->board->board_name : '板子' . $v->dup_id,//板子名称
                     'date' => $v->begin_tick->format('m-d H:i'),//时间
-                    'score' => $v->score,//评分
+                    'score' => $v->score/10,//评分
                     'seat' => $v->seat,//位置
                     'room_game_id' => $v->room_game_id,
+                    'job'=>$v->job,
                     'dup_id' => $v->dup_id,//评分
                     'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
                     'sex' => $v->user->sex,//0男,1女
@@ -146,7 +151,7 @@ class GameController extends Base
                     'res' => $v->res,// 1- 中断， 2- 胜利 ，3- 失败
                     'dup_name' => $v->board ? $v->board->board_name : '板子' . $v->dup_id,//板子名称
                     'date' => $v->begin_tick->format('m-d H:i'),//时间
-                    'score' => $v->score,//评分
+                    'score' => $v->score/10,//评分
                     'seat' => $v->seat,//位置
                     'room_game_id' => $v->room_game_id,
                     'dup_id' => $v->dup_id,//评分

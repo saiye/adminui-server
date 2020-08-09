@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class StoreTag extends Model
 {
     protected $table = 'store_tag';
+    public   $timestamps=false;
     protected $guarded = [
-        'tag_id'
+        'id'
     ];
 }

@@ -13,13 +13,28 @@ class OrderController extends Base
     public function preview()
     {
         $validator = $this->validationFactory->make($this->request->all(), [
-            'store_id' => 'required',
+            'buys' => 'required|json',
         ]);
         if ($validator->fails()) {
             return $this->json([
                 'errorMessage' => $validator->errors()->first(),
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
+        }
+        $buys=json_decode($this->request->input('buys'),true);
+        foreach ($buys as $buy){
+            $validator2 = $this->validationFactory->make($buy, [
+                'goodsId' => 'required|numeric',
+                'skuIds' => 'required|array',
+                'type' => 'required|numeric|in:1',
+                'count' => 'required|numeric|min:1',
+            ]);
+            if ($validator2->fails()) {
+                return $this->json([
+                    'errorMessage' => $validator2->errors()->first(),
+                    'code' => ErrorCode::VALID_FAILURE,
+                ]);
+            }
         }
     }
 
@@ -40,6 +55,8 @@ class OrderController extends Base
         }
     }
 
+
+
     /**
      * 发起支付
      */
@@ -47,8 +64,4 @@ class OrderController extends Base
     {
 
     }
-
-
-
-
 }
