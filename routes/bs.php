@@ -30,6 +30,7 @@ Route::group([
 
     Route::post('company/index/getState', 'Company\IndexController@getState')->name('bs-getState');
     Route::post('company/index/areaList', 'Company\IndexController@areaList')->name('bs-areaList');
+    Route::post('company/index/companyDetail', 'Company\IndexController@companyDetail')->name('bs-companyDetail');
 
     //新增会员
     Route::post('game/index/userList', 'Game\IndexController@userList')->name('bs-GameUserList');

@@ -48,9 +48,6 @@ class IndexController extends Controller
             $data = $data->where('staff.real_name', 'like', '%' . $this->req->real_name . '%')->leftJoin('staff', 'company.staff_id', '=', 'staff.staff_id');
         }
         $data = $data->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
-        foreach ($data as &$v) {
-            $v->state = $v->state();
-        }
         $assign = compact('data');
         return $this->successJson($assign);
     }

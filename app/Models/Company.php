@@ -12,12 +12,15 @@ class Company extends Model
 
     public $primaryKey = 'company_id';
     protected $table = 'company';
+
+    protected $appends = ['state'];
+
     protected $guarded = [
         'company_id'
     ];
 
     protected $casts = [
-      //  'company_id' => 'string',
+
     ];
 
     public function staffs()
@@ -29,7 +32,17 @@ class Company extends Model
     {
         return $this->hasOne('App\Models\Staff', 'staff_id', 'staff_id');
     }
-    public function state(){
-        return  Config::get('deploy.state.'.$this->state_id);
+
+    public function getStateAttribute()
+    {
+        return $this->attributes['state'] = Config::get('deploy.state.' . $this->state_id);
     }
+
+    /**
+     * 营业执照
+     */
+    public function  license(){
+        return $this->hasMany(Image::class,'foreign_id','company_id');
+    }
+
 }
