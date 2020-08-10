@@ -206,8 +206,8 @@ class GameController extends Base
             ]);
         }
         return $this->json([
-            'errorMessage' => '你未登录',
-            'code' => ErrorCode::DATA_NULL,
+            'errorMessage' => '你未登录!ss',
+            'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
         ]);
     }
 

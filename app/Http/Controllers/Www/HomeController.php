@@ -10,13 +10,15 @@ namespace App\Http\Controllers\Www;
 
 
 use App\Constants\ErrorCode;
+use App\TraitInterface\ApiTrait;
+use App\TraitInterface\BaseTrait;
 
 class HomeController extends BaseController
 {
+    use ApiTrait, BaseTrait;
 
     public function home()
     {
-        return response()->json(['message' =>'你未登录', 'code' =>ErrorCode::ACCOUNT_NOT_LOGIN], 200);
+        return 'hello boy';
     }
-
 }

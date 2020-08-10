@@ -7,6 +7,7 @@
  */
 
 namespace App\Http\Controllers\Client;
+use App\TraitInterface\ApiTrait;
 use \Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
@@ -14,6 +15,8 @@ use Illuminate\Http\Request;
 
 class Base extends Controller
 {
+    use ApiTrait;
+
     public $validationFactory;
     protected $request;
     protected $app;
@@ -27,10 +30,5 @@ class Base extends Controller
         $this->app = $app;
         $this->request = $request;
         $this->validationFactory =$app->make('validator');
-    }
-
-    public function json($data, $status = 200)
-    {
-        return response()->json($data, $status);
     }
 }

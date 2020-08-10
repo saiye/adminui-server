@@ -4,7 +4,6 @@ namespace App\Exceptions;
 
 use App\TraitInterface\BaseTrait;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -52,7 +51,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-
         return parent::render($request, $exception);
     }
 

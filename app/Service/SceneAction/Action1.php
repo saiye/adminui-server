@@ -39,8 +39,8 @@ class Action1 extends SceneBase
         $user =Auth::guard('wx')->user();
         if(!$user){
             return $this->json([
-                'errorMessage' => '你未登录',
-                'code' => ErrorCode::VALID_FAILURE,
+                'errorMessage' => '你未登录!',
+                'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
             ]);
         }
         $deviceShortId = $this->data['d'];

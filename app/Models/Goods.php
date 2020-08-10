@@ -16,7 +16,7 @@ class Goods extends Model
     protected $guarded = [
         'goods_id'
     ];
-    protected $appends = ['img100', 'img50'];
+    protected $appends = ['img100', 'img50', 'type'];
 
     public function images()
     {
@@ -28,7 +28,7 @@ class Goods extends Model
         if ($value) {
             return Storage::url($value);
         }
-        return WebConfig::getKeyByFile('goods.image','');
+        return WebConfig::getKeyByFile('goods.image', '');
     }
 
     public function getImg100Attribute()
@@ -47,21 +47,33 @@ class Goods extends Model
         return '';
     }
 
-    public function cat(){
-        return $this->hasOne(GoodsCategory::class,'category_id','category_id');
+    /**
+     * @return int
+     */
+    public function getTypeAttribute()
+    {
+        return 1;
+    }
+
+    public function cat()
+    {
+        return $this->hasOne(GoodsCategory::class, 'category_id', 'category_id');
     }
 
 
-    public function sku(){
-        return $this->hasMany(GoodsSku::class,'goods_id','goods_id');
+    public function sku()
+    {
+        return $this->hasMany(GoodsSku::class, 'goods_id', 'goods_id');
     }
 
-    public function tag(){
-        return $this->hasManyThrough(GoodsTag::class, GoodsSku::class,'tag_id','tag_id');
+    public function tag()
+    {
+        return $this->hasManyThrough(GoodsTag::class, GoodsSku::class, 'tag_id', 'tag_id');
     }
 
 
-    public static  function tagList($data){
+    public static function tagList($data)
+    {
         $skuArr = [];
         $goodsIdArr = $data->pluck('goods_id');
         if ($goodsIdArr) {
@@ -77,7 +89,14 @@ class Goods extends Model
                         'tags' => [],
                     ];
                 }
-                array_push($skuArr[$sk->goods_id][$sk->tag_id]['tags'], $sk);
+                array_push($skuArr[$sk->goods_id][$sk->tag_id]['tags'], [
+                    "sku_id" => $sk['sku_id'],
+                    "active" => $sk['active'],
+                    "stock" => $sk['stock'],
+                    "sku_name" => $sk['sku_name'],
+                    "goods_price" => $sk['goods_price'],
+                    "goods_id" => $sk['goods_id'],
+                ]);
             }
         }
         foreach ($data as &$goods) {

@@ -8,8 +8,11 @@
 
 namespace App\Service\SceneAction;
 
+use App\TraitInterface\ApiTrait;
+
 abstract  class SceneBase implements Scene
 {
+    use ApiTrait;
     protected $data = null;
     protected $validationFactory = null;
 
@@ -18,10 +21,4 @@ abstract  class SceneBase implements Scene
         $this->data = $data;
         $this->validationFactory =app('validator');
     }
-
-    public function json($data, $status = 200)
-    {
-        return response()->json($data, $status);
-    }
-
 }

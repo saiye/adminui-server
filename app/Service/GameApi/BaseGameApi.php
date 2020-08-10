@@ -9,8 +9,12 @@
 namespace App\Service\GameApi;
 
 
+use App\TraitInterface\ApiTrait;
+
 abstract class BaseGameApi implements GameApi
 {
+    use ApiTrait;
+
     public $channel = null;
 
     public function __construct($channel)
@@ -18,8 +22,4 @@ abstract class BaseGameApi implements GameApi
         $this->channel = $channel;
     }
 
-    public function json($data, $status = 200)
-    {
-        return response()->json($data, $status);
-    }
 }

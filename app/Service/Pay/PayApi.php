@@ -3,6 +3,7 @@
 namespace App\Service\Pay;
 
 use App\Constants\ErrorCode;
+use App\TraitInterface\ApiTrait;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use Log;
@@ -10,6 +11,7 @@ use Log;
 abstract class PayApi
 {
 
+    use ApiTrait;
     protected $order;
 
     protected $req;
@@ -37,13 +39,6 @@ abstract class PayApi
         return $obj;
     }
 
-    /**
-     * 给前端返回对应的数据格式
-     */
-    public function json($data, $status = 200)
-    {
-        return response()->json($data, $status);
-    }
 
     /**
      * 统一下单接口,对前端调用者返回对应的数据格式

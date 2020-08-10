@@ -84,7 +84,7 @@ class HomeController extends BaseController
                 'company_id' => $user->company_id,
             ]);
         }
-        return $this->errorJson('抱歉!你没有登录，或登录过期！', 2, []);
+        return $this->errorJson('抱歉,你未登录！', 2, []);
     }
 
     public function getRoleMenu()

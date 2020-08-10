@@ -22,5 +22,10 @@ class ErrorCode
     const  CREATE_ACCOUNT_ERROR = -13; //创建用户失败
     const  CREATE_ERCODE_ERROR = -14; //二维码生成失败
     const  DATA_NULL = -16; //数据不存在
+    const  CREATE_ORDER_FAILURE = -17; //订单创建失败
+    const  STORE_ORDER_FAILURE = -18; //存在跨店铺商品
+    const  ORDER_PARAM_FAILURE = -19; //订单参数错误
+    const  ORDER_GOODS_FAILURE = -20; //订单商品入库失败!
+    const  ORDER_NOT_FIND = -21; //订单商品入库失败!
     const  SUCCESS = 0; // 成功
 }
