@@ -19,17 +19,15 @@ final class WeiXinPayApi extends PayApi
   //  const postOrderUrl = 'https://api.mch.weixin.qq.com';
     const postOrderUrl = 'https://api.mch.weixin.qq.com/sandboxnew';
 
-    private static $config;
-
-    public function __construct()
+    public function init()
     {
-        self::$config = Config::get('pay.key.wx');
+        $this->config = Config::get('pay.key.wx');
     }
 
     /*
      * 微信支付回调
      */
-    function callBack()
+    function callBack($call)
     {
         $xml = file_get_contents('php://input');
         $http_params = $this->fromXml($xml);
@@ -39,7 +37,7 @@ final class WeiXinPayApi extends PayApi
             //是否支付ok?
             if (isset($http_params['return_code']) and $http_params['return_code'] == 'SUCCESS') {
                 if (isset($http_params['result_code']) and $http_params['result_code'] == 'SUCCESS') {
-                    $this->success([
+                    $call([
                         'payOrder' => $http_params['transaction_id'],
                         'callPrice' => $http_params['total_fee'] / 100,
                     ]);
@@ -60,30 +58,27 @@ final class WeiXinPayApi extends PayApi
     /*
      * 微信统一下单
      */
-    function createOrder()
+    function createOrder($order)
     {
-        $price = $this->order->total_price * 100;
-        $appid = self::$config['appId'];
-        $mch_id = self::$config['mchId'];
+        $price = $order['total_price']* 100;
+        $appid = $this->config['appId'];
+        $mch_id =  $this->config['mchId'];
         $time = date('YmdHis');
         $http_query = array(
             'appid' => $appid,
             'mch_id' => $mch_id,
             'nonce_str' => Str::random(32),
             'sign_type' => 'MD5',
-            'body' => $this->order->store->store_name. '消费',
-            'out_trade_no' => $this->order->order_sn,
+            'body' => $order['body'],
+            'out_trade_no' => $order['order_sn'],
             'fee_type' => 'CNY',
             'total_fee' => $price,
-            'spbill_create_ip' => Request::ip(),
+            'spbill_create_ip' => $this->req->ip(),
             'time_start' => $time,
             'time_expire' => date('YmdHis', strtotime('+3hour')),
             'notify_url' => route('wx-callWx'),
             'trade_type' => $this->req->input('trade_type', 'JSAPI'),
-            'scene_info' => json_encode(['store_info' => [
-                'name' => $this->order->store->store_name,
-                'address' => $this->order->store->address,
-            ]]),
+            'scene_info' => json_encode($order['scene_info']),
         );
         $http_query['sign'] = $this->MakeSign($http_query);
         $xml = self::createXml($http_query);
@@ -94,8 +89,7 @@ final class WeiXinPayApi extends PayApi
             //业务成功
             if (isset($repose_arr['result_code']) and $repose_arr['result_code'] == 'SUCCESS') {
                 //预充值订单
-                $this->order->prepay_id = $repose_arr['prepay_id'];
-                $this->order->save();
+               // $repose_arr['prepay_id']
                 return $this->json([
                     'errorMessage' => '微信下单成功',
                     'code' => ErrorCode::SUCCESS,
@@ -230,7 +224,7 @@ final class WeiXinPayApi extends PayApi
         ksort($data);
         $string = $this->ToUrlParams($data);
         //签名步骤二：在string后加入KEY
-        $string = $string . "&key=" . self::$config['key'];
+        $string = $string . "&key=" . $this->config['key'];
         //签名步骤三：MD5加密
         $string = md5($string);
         //签名步骤四：所有字符转为大写
