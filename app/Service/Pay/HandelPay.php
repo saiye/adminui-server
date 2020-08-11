@@ -23,38 +23,37 @@ class HandelPay
     private $handel = null;
 
 
-
-
     public function __construct(Application $app)
     {
         $this->app = $app;
     }
 
-    public function make($pay_type)
+    /**
+     * 微信 'WeiXinPayApi';
+     * 余额支付'DefaultPayApi';
+     * @param $aliases
+     * @return $this
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function make($aliases)
     {
-        switch ($pay_type) {
-            case 1:
-                //微信
-                $aliases = 'WeiXinPayApi';
-                break;
-            case 2:
-                //余额支付
-                $aliases = 'DefaultPayApi';
-                break;
+        if (in_array($aliases, [
+            'WeiXinPayApi', 'DefaultPayApi'
+        ])) {
+            $this->handel = $this->app->make($aliases);
+            return $this;
         }
-        $this->handel = $this->app->make($aliases);
-
-        return $this;
+        throw new \Exception('暂不支持该支付渠道!');
     }
 
     public function createOrder($data)
     {
-        list($status,$message,$info)= $this->handel->createOrder($data);
-        if ($status){
+        list($status, $message, $info) = $this->handel->createOrder($data);
+        if ($status) {
             return $this->json([
                 'errorMessage' => '下单成功！',
                 'code' => ErrorCode::SUCCESS,
-                'info'=>$info,
+                'info' => $info,
             ]);
         }
         return $this->json([
@@ -65,14 +64,13 @@ class HandelPay
 
     public function callBack()
     {
-        return $this->handel->callBack(function ($data){
+        return $this->handel->callBack(function ($data) {
             //回调成功相关逻辑
-            $savePayStatus= Order::whereOrderSn($data['order_sn'])->update([
-                'pay_status'=>1,
+            $savePayStatus = Order::whereOrderSn($data['order_sn'])->update([
+                'pay_status' => 1,
             ]);
         });
     }
-
 
 
 }
