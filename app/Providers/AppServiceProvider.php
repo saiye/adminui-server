@@ -6,6 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
+use App\Service\Order\CheckGoodsOrder;
+use App\Service\Order\CheckRoomOrder;
+use App\Service\Order\DefaultCheckOrder;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +27,17 @@ class AppServiceProvider extends ServiceProvider
             'App\Service\GameApi\GameApi',
             'App\Service\GameApi\LrsApi'
         );
+        $this->app->bind('CheckGoodsOrder', function ($app) {
+            return new CheckGoodsOrder($app);
+        });
+        $this->app->bind('CheckRoomOrder', function ($app) {
+            return new CheckRoomOrder($app);
+        });
+        $this->app->bind('DefaultCheckOrder', function ($app) {
+            return new DefaultCheckOrder($app);
+        });
+
+
     }
 
     /**

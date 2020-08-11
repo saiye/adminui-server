@@ -5,6 +5,7 @@ namespace App\Models;
 use App\TraitInterface\ModelDataFormat;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use App\Constants\Logic;
 
 class Goods extends Model
 {
@@ -52,7 +53,7 @@ class Goods extends Model
      */
     public function getTypeAttribute()
     {
-        return 1;
+        return Logic::BOOK_GOODS_TYPE;
     }
 
     public function cat()

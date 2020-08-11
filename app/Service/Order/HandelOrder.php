@@ -15,35 +15,40 @@ use App\Models\OrderGoods;
 use App\TraitInterface\ApiTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Constants\Logic;
+use \Illuminate\Contracts\Foundation\Application;
 
 class HandelOrder
 {
     use ApiTrait;
 
-    const BOOK_GOODS = 1;
-    const BOOK_ROOM = 2;
+    public $app=null;
 
+    public function __construct(Application $app)
+    {
+        $this->app=$app;
+    }
     public function createOrder($data, $user)
     {
         $goodsArr = [];
         foreach ($data as $type => $buys) {
             switch ($type) {
-                case self::BOOK_GOODS:
-                    $class = '\\App\\Service\\Order\\CheckGoodsOrder';
+                case Logic::BOOK_GOODS_TYPE:
+                    $class = 'CheckGoodsOrder';
                     break;
-                case self::BOOK_ROOM:
-                    $class = '\\App\\Service\\Order\\CheckRoomOrder';
+                case Logic::BOOK_ROOM_TYPE:
+                    $class = 'CheckRoomOrder';
                     break;
                 default:
-                    $class = '\\App\\Service\\Order\\DefaultCheckOrder';
+                    $class = 'DefaultCheckOrder';
                     break;
             }
-            $obj = new $class();
+            $obj=$this->app->make($class);
             list($status, $message, $list) = $obj->checkBuys($buys);
-            if (!$status) {
+            if ($status!==0) {
                 return $this->json([
                     'errorMessage' => $message,
-                    'code' => ErrorCode::VALID_FAILURE,
+                    'code' =>$status,
                 ]);
             } else {
                 //
@@ -65,8 +70,11 @@ class HandelOrder
         $order_id = 0;
         DB::beginTransaction();
         foreach ($ordersArr as $item) {
-            $order = Order::created($item['order']);
+            $order = Order::create($item['order']);
             if ($order) {
+                foreach ($item['order_goods'] as &$goods){
+                    $goods['order_id']=$order->order_id;
+                }
                 $saveOrderGoods = OrderGoods::insert($item['order_goods']);
                 if (!$saveOrderGoods) {
                     DB::rollBack();
@@ -98,16 +106,17 @@ class HandelOrder
                 $totalPrice += $goods['order_goods']['goods_price']*$goods['order_goods']['goods_num'];
             }
             $order = [
-                'info' => $item['info'],
+                'info' => $item[0]['info'],
                 'order_sn' => date('YmdHis') . mt_rand(999, 99999),
                 'total_price' => $totalPrice,
-                'user_id' => $user->user_id,
+                'actual_payment' => $totalPrice,
+                'user_id' => $user->id,
                 'nickname' => $user->nickname,
-                'phone' => $user->phone,
+                'phone' => $user->phone??'',
                 'room_id' => 0,
-                'store_id' => $item['store_id'],
-                'company_id' => $item['company_id'],
-                'staff_id' => $item['staff_id'],
+                'store_id' => $store_id,
+                'company_id' => $item[0]['company_id'],
+                'staff_id' => $item[0]['staff_id'],
                 'pay_time' => 0,
                 'coupon_id' => 0,
                 'coupon_price' => 0,

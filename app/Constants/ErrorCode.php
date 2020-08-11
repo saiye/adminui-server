@@ -27,5 +27,9 @@ class ErrorCode
     const  ORDER_PARAM_FAILURE = -19; //订单参数错误
     const  ORDER_GOODS_FAILURE = -20; //订单商品入库失败!
     const  ORDER_NOT_FIND = -21; //订单商品入库失败!
+    const  GOODS_CLOSE= -22; //商品已下架
+    const  GOODS_SELL_OUT= -23; //商品已售罄
+    const  GOODS_SKU_EDIT= -24; //商品规格已修改
+    const  GOODS_NOT_FIND= -25; //商品不存在
     const  SUCCESS = 0; // 成功
 }

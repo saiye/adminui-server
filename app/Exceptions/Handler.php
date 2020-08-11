@@ -6,6 +6,7 @@ use App\TraitInterface\BaseTrait;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
+
 class Handler extends ExceptionHandler
 {
     use BaseTrait;
@@ -15,7 +16,7 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        //
+        \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException::class,
     ];
 
     /**

@@ -108,3 +108,10 @@ ALTER TABLE `lrs_manage`.`order`     ADD COLUMN `info` VARCHAR(100) NOT NULL COM
 
  ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `token` VARCHAR(80) NULL COMMENT 'token' AFTER `lat`;
  ALTER TABLE `lrs_manage`.`users` ADD INDEX `api_token` (`token`);
+
+ ALTER TABLE `lrs_manage`.`store`     ADD COLUMN `logo` VARCHAR(100) NOT NULL COMMENT 'logo' AFTER `store_name`;
+
+ ALTER TABLE `lrs_manage`.`order`     ADD COLUMN `actual_payment` DECIMAL(10,2) NOT NULL COMMENT '真实支付' AFTER `total_price`;
+
+ ALTER TABLE `lrs_manage`.`order`     ADD COLUMN `integral_price` DECIMAL(10,2) NOT NULL COMMENT '积分减额' AFTER `coupon_price`,
+CHANGE `coupon_price` `coupon_price` DECIMAL(10,2) DEFAULT '0.00' NOT NULL COMMENT '券减金额';

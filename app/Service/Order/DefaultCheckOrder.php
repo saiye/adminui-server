@@ -9,7 +9,7 @@
 namespace App\Service\Order;
 
 
-class DefaultCheckOrder implements CheckOrder
+class DefaultCheckOrder extends CheckBase
 {
     public function checkBuys($buys)
     {

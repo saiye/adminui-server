@@ -20,6 +20,7 @@ Route::group([
     Route::post('store/goodsList', 'StoreController@goodsList');
     Route::post('order/createOrder', 'OrderController@createOrder');
     Route::post('order/detail', 'OrderController@detail');
+    Route::post('order/preview', 'OrderController@preview');
     Route::post('order/doPay', 'OrderController@doPay');
 });
 Route::post('user/login', 'UserController@login')->middleware('ApiLogRecord');

@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Wx;
 
 use App\Constants\ErrorCode;
 use App\Models\Order;
+use App\Models\UserCoupon;
 use App\Service\Order\HandelOrder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Base
 {
+
 
     /**
      * 下单接口
@@ -17,7 +20,6 @@ class OrderController extends Base
     {
         $validator = $this->validationFactory->make($this->request->all(), [
             'buys' => 'required|json',
-            'user_coupon_id' => 'nullable|numeric',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -40,7 +42,7 @@ class OrderController extends Base
                     'code' => ErrorCode::VALID_FAILURE,
                 ]);
             }
-            if (isset($data[$buy['type']])) {
+            if (!isset($data[$buy['type']])) {
                 $data[$buy['type']] = [];
             }
             //根据商品类型分组
@@ -70,7 +72,13 @@ class OrderController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $order = Order::with('orderGoods')->whereOrderId($this->req->order_id)->first();
+        $order = Order::select(['order_id', 'store_id', 'actual_payment', 'total_price', 'coupon_id', 'integral_price'])->with(['orderGoods' => function ($r) {
+            $r->select('order_id', 'goods_num', 'goods_name', 'image', 'tag', 'goods_price');
+        }, 'store' => function ($q) {
+            $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
+        },'userCoupon'=>function($q){
+            $q->select('coupon_name','condition_price','price');
+        }])->whereOrderId($this->request->input('order_id'))->first();
         if (!$order) {
             return $this->json([
                 'errorMessage' => '订单不存在！',
@@ -81,7 +89,58 @@ class OrderController extends Base
             [
                 'errorMessage' => '',
                 'code' => ErrorCode::SUCCESS,
-                'order' => $order
+                'order' => [
+                    'order_id' => $order->order_id,
+                    'total_price' => $order->total_price,
+                    'actual_payment' => $order->actual_payment,
+                    'integral_price' => $order->integral_price,
+                    'integral' => $order->integral_price*100,
+                ],
+                'user_coupon'=>$order->userCoupon,
+                'order_goods' => $order->orderGoods,
+                'store' => $order->store,
+            ]
+        );
+    }
+
+    /**
+     * 订单预览,发起支付前一步，用于选择优惠券之类的。
+     */
+    public function preview()
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'order_id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $user = $this->user();
+        $order = Order::select(['order_id', 'store_id', 'total_price'])->with(['orderGoods' => function ($r) {
+            $r->select('order_id', 'goods_num', 'goods_name', 'image', 'tag', 'goods_price');
+        }, 'store' => function ($q) {
+            $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
+        }])->whereOrderId($this->request->input('order_id'))->first();
+        if (!$order) {
+            return $this->json([
+                'errorMessage' => '订单不存在！',
+                'code' => ErrorCode::ORDER_NOT_FIND,
+            ]);
+        }
+        $user_coupon_list = UserCoupon::select(['coupon_name', 'user_coupon_id', 'condition_price', 'price'])->whereStoreId($order->store_id)->whereUserId($user->id)->whereIsUse(0)->get();
+        return $this->json(
+            [
+                'errorMessage' => '',
+                'code' => ErrorCode::SUCCESS,
+                'order' => [
+                    'order_id' => $order->order_id,
+                    'total_price' => $order->total_price,
+                ],
+                'order_goods' => $order->orderGoods,
+                'store' => $order->store,
+                'user_coupon_list' => $user_coupon_list
             ]
         );
     }
@@ -93,7 +152,8 @@ class OrderController extends Base
     {
         $validator = $this->validationFactory->make($this->request->all(), [
             'order_id' => 'required|numeric',
-            'pay_type' => 'required|numeric|in,1,2',
+            'user_coupon_id' => 'nullable|numeric',
+            'pay_type' => 'required|numeric|in:1,5',
         ], [
             'pay_type.in' => '该支付方式不支持！',
         ]);
@@ -103,8 +163,7 @@ class OrderController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        //
-        $orderId = $this->req->input('order_id');
+        $orderId = $this->request->input('order_id');
         $order = Order::whereOrderId($orderId)->first();
         if (!$order) {
             return $this->json([

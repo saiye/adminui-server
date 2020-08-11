@@ -19,22 +19,34 @@ class IndexController extends Controller
     public function orderList()
     {
         $data = new Order();
-        if ($this->req->order_sn) {
-            $data = $data->where('order_sn', $this->req->order_sn);
+        $data=$data->where('order.company_id',$this->loginUser->company_id);
+        if($this->loginUser->store_id){
+           $data= $data->where('order.store_id',$this->loginUser->store_id);
         }
-        if ($this->req->room_id) {
-            $data = $data->where('room_id', $this->req->room_id);
+        $searchName=$this->req->input('searchName');
+        if($searchName){
+            switch ($this->req->cat_id) {
+                case 1:
+                    //商品名称
+                   $data= $data->whereIn('order_id',function ($query) use($searchName){
+                       $query->select('order_id')->from('order_goods')->where('order_goods.goods_name','like',$searchName);
+                   });
+                    break;
+                case 2:
+                    //订单号
+                    $data= $data->where('order.order_sn',$searchName);
+                    break;
+                case 3:
+                    //用户名
+                    $data= $data->where('order.nickname','like','%'.$searchName.'%');
+                    break;
+                case 4:
+                    //用户ID
+                    $data= $data->where('order.user_id',$searchName);
+                    break;
+            }
         }
-        if ($this->req->store_id) {
-            $data = $data->where('store_id', $this->req->store_id);
-        }
-        if ($this->req->company_id) {
-            $data = $data->where('company_id', $this->req->company_id);
-        }
-        if ($this->req->staff_id) {
-            $data = $data->where('staff_id', $this->req->staff_id);
-        }
-        $data = $data->orderBy('order_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->select('order.company_id','order.created_at','order.info','order.order_id','order.store_id','order.total_price','order.pay_time','order.coupon_price','order.status','order.pay_type','order.pay_status','order.nickname','order.order_sn','order.user_id')->with('orderGoods')->orderBy('order.order_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }
@@ -96,6 +108,9 @@ class IndexController extends Controller
         $data = Order::whereCompanyId($this->loginUser->company_id)->whereOrderId($this->req->order_id)->first();
         if (!$data) {
             return $this->errorJson('订单不存在');
+        }
+        if ($data->pay_status !== 1) {
+            return $this->errorJson('订单未完成支付');
         }
         $data->status = 3;
         $data->save();

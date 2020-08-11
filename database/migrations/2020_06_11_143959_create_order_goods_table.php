@@ -14,12 +14,12 @@ class CreateOrderGoodsTable extends Migration
     public function up()
     {
         Schema::create('order_goods', function (Blueprint $table) {
-            $table->increments('order_goods_id')->comment('订单商品id');
+            $table->increments('id')->comment('id');
             $table->unsignedInteger('order_id')->comment('订单id');
             $table->string('goods_name')->comment('商品名称');
             $table->unsignedInteger('goods_id')->comment('商品id');
             $table->unsignedInteger('goods_num')->comment('购买数量');
-            $table->decimal('goods_price', 8, 3)->comment('商品单价');
+            $table->decimal('goods_price', 10, 2)->comment('商品单价');
             //type:1普通商品,2房费
             $table->tinyInteger('type')->default(1)->comment('商品类型');
             $table->string('tag',100)->nullable()->comment('默认规格字符');

@@ -310,5 +310,34 @@ if (!function_exists("index_by")) {
         return $post;
     }
 }
+if (!function_exists("get_distance")) {
+    /**
+     * 根据经纬度算距离，返回结果单位是公里，先纬度，后经度
+     * @param $lat1
+     * @param $lng1
+     * @param $lat2
+     * @param $lng2
+     * @return float|int
+     */
+    function get_distance($lat1, $lng1, $lat2, $lng2)
+    {
+        $EARTH_RADIUS = 6378.137;
+
+        $radLat1 =my_rad($lat1);
+        $radLat2 = my_rad($lat2);
+        $a = $radLat1 - $radLat2;
+        $b = my_rad($lng1) - my_rad($lng2);
+        $s = 2 * asin(sqrt(pow(sin($a / 2), 2) + cos($radLat1) * cos($radLat2) * pow(sin($b / 2), 2)));
+        $s = $s * $EARTH_RADIUS;
+        $s = round($s * 10000) / 10000;
+        return $s;
+    }
+}
+if (!function_exists("my_rad")) {
+    function my_rad($d)
+    {
+        return $d * M_PI / 180.0;
+    }
+}
 
 

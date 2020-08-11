@@ -9,7 +9,7 @@
 namespace App\Service\Order;
 
 
-class CheckRoomOrder implements CheckOrder
+class CheckRoomOrder  extends CheckBase
 {
     public function checkBuys($buys)
     {
