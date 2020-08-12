@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Service\Pay\WeiXinPayApi;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Config;
 use App\Service\Order\CheckGoodsOrder;
 use App\Service\Order\CheckRoomOrder;
 use App\Service\Order\DefaultCheckOrder;
+use App\Service\Pay\DefaultPayApi;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,6 +38,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('DefaultCheckOrder', function ($app) {
             return new DefaultCheckOrder($app);
         });
+        $this->app->bind('WeiXinPayApi', function ($app) {
+            return new WeiXinPayApi();
+        });
+        $this->app->bind('DefaultPayApi', function ($app) {
+            return new DefaultPayApi();
+        });
+
 
 
     }

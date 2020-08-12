@@ -209,6 +209,7 @@ class OrderController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
+        $user=$this->user();
         $orderId = $this->request->input('order_id');
         $order = Order::whereOrderId($orderId)->first();
         if (!$order) {
@@ -223,6 +224,7 @@ class OrderController extends Base
                 'code' => ErrorCode::DATA_NULL,
             ]);
         }
+        $order['openid']=$user->account;
         return $api->make($this->request->input('pay_type'))->createOrder($order);
     }
 

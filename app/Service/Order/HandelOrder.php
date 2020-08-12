@@ -123,7 +123,7 @@ class HandelOrder
                 'room_id' => 0,
                 'store_id' => $store_id,
                 'company_id' => $item[0]['company_id'],
-                'staff_id' => $item[0]['staff_id'],
+                'staff_id' => 0,
                 'pay_time' => 0,
                 'coupon_id' => 0,
                 'coupon_price' => 0,

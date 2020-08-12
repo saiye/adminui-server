@@ -28,38 +28,24 @@ class HandelPay
         $this->app = $app;
     }
 
-    /**
-     * 微信 'WeiXinPayApi';
-     * 余额支付'DefaultPayApi';
-     * @param $aliases
-     * @return $this
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public function make($aliases)
+    public function make($pay_type)
     {
-        if (in_array($aliases, [
-            'WeiXinPayApi', 'DefaultPayApi'
-        ])) {
-            $this->handel = $this->app->make($aliases);
-            return $this;
+        switch ($pay_type) {
+            case 1:
+                $aliases = 'WeiXinPayApi';
+                break;
+            case 5:
+                $aliases = 'DefaultPayApi';
+                break;
         }
-        throw new \Exception('暂不支持该支付渠道!');
+        $this->handel = $this->app->make($aliases);
+        return $this;
     }
 
     public function createOrder($data)
     {
-        list($status, $message, $info) = $this->handel->createOrder($data);
-        if ($status) {
-            return $this->json([
-                'errorMessage' => '下单成功！',
-                'code' => ErrorCode::SUCCESS,
-                'info' => $info,
-            ]);
-        }
-        return $this->json([
-            'errorMessage' => $message,
-            'code' => ErrorCode::THREE_FAIL,
-        ]);
+        $data= $this->handel->createOrder($data);
+        return $this->json($data);
     }
 
     public function callBack()

@@ -5,7 +5,6 @@
  */
 
 namespace App\Service\Pay;
-use Illuminate\Http\Request;
 
 interface PayContracts
 {
