@@ -22,6 +22,8 @@ Route::group([
     Route::post('order/detail', 'OrderController@detail');
     Route::post('order/preview', 'OrderController@preview');
     Route::post('order/doPay', 'OrderController@doPay');
+    Route::post('order/list', 'OrderController@orderList');
+    Route::post('order/cancel', 'OrderController@cancel');
 });
 Route::post('user/login', 'UserController@login')->middleware('ApiLogRecord');
 Route::post('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');

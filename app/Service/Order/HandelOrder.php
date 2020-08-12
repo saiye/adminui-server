@@ -61,7 +61,14 @@ class HandelOrder
             }
         }
         $ordersArr = $this->orderCompute($goodsArr, $user);
-        if (count($ordersArr) !== 1) {
+        $orderCount=count($ordersArr);
+        if($orderCount==0){
+            return $this->json([
+                'errorMessage' => '商品不存在！',
+                'code' => ErrorCode::GOODS_NOT_FIND,
+            ]);
+        }
+        if ($orderCount>1) {
             return $this->json([
                 'errorMessage' => '暂不允许跨店铺购物！',
                 'code' => ErrorCode::STORE_ORDER_FAILURE,

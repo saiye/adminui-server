@@ -6,6 +6,7 @@ use App\Constants\ErrorCode;
 use App\Models\Order;
 use App\Models\UserCoupon;
 use App\Service\Order\HandelOrder;
+use App\Service\Pay\HandelPay;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -27,7 +28,7 @@ class OrderController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $buys = json_decode($this->request->input('buys'), true);
+        $buys = json_decode($this->request->input('buys','{}'), true);
         $data = [];
         foreach ($buys as $buy) {
             $validator2 = $this->validationFactory->make($buy, [
@@ -59,6 +60,48 @@ class OrderController extends Base
     }
 
     /**
+     * 订单列表
+     */
+    public function orderList(){
+
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'page' => 'required|numeric|min:1',
+            'limit' => 'required|numeric|min:1',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $limit = $this->request->input('limit', 10);
+        $page = $this->request->input('page', 1);
+        $skip = ceil($page - 1) * $limit;
+        $user=$this->user();
+        $list=Order::select(['order_id', 'store_id', 'actual_payment', 'total_price', 'integral_price','pay_status','pay_type','coupon_price','created_at','status'])->with(['store' => function ($q) {
+            $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
+        },'orderGoods' => function ($r) {
+            $r->select('order_id', 'goods_num', 'goods_name', 'image', 'tag', 'goods_price');
+        },])->where('status','!=',2)->whereUserId($user->id)->orderBy('status','asc')->orderBy('order_id','desc')->skip($skip)->take($limit)->get();
+        if ($list) {
+            return $this->json(
+                [
+                    'errorMessage' => '',
+                    'code' => ErrorCode::SUCCESS,
+                    'list' => $list,
+                ]
+            );
+        }
+        return $this->json(
+            [
+                'errorMessage' => '没有更多数据了!',
+                'code' => ErrorCode::DATA_NULL,
+                'list' => [],
+            ]
+        );
+    }
+
+    /**
      * 订单详情
      */
     public function detail()
@@ -72,7 +115,7 @@ class OrderController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $order = Order::select(['order_id', 'store_id', 'actual_payment', 'total_price', 'coupon_id', 'integral_price'])->with(['orderGoods' => function ($r) {
+        $order = Order::select(['order_id', 'store_id', 'actual_payment', 'total_price', 'coupon_id','coupon_price','integral_price','created_at'])->with(['orderGoods' => function ($r) {
             $r->select('order_id', 'goods_num', 'goods_name', 'image', 'tag', 'goods_price');
         }, 'store' => function ($q) {
             $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
@@ -94,7 +137,9 @@ class OrderController extends Base
                     'total_price' => $order->total_price,
                     'actual_payment' => $order->actual_payment,
                     'integral_price' => $order->integral_price,
+                    'coupon_price' => $order->coupon_price,
                     'integral' => $order->integral_price*100,
+                    'created_at' => $order->created_at->format('Y-m-d H:i:s'),
                 ],
                 'user_coupon'=>$order->userCoupon,
                 'order_goods' => $order->orderGoods,
@@ -118,7 +163,7 @@ class OrderController extends Base
             ]);
         }
         $user = $this->user();
-        $order = Order::select(['order_id', 'store_id', 'total_price'])->with(['orderGoods' => function ($r) {
+        $order = Order::select(['order_id', 'store_id', 'total_price','created_at'])->with(['orderGoods' => function ($r) {
             $r->select('order_id', 'goods_num', 'goods_name', 'image', 'tag', 'goods_price');
         }, 'store' => function ($q) {
             $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
@@ -137,6 +182,7 @@ class OrderController extends Base
                 'order' => [
                     'order_id' => $order->order_id,
                     'total_price' => $order->total_price,
+                    'created_at' => $order->created_at->format('Y-m-d H:i:s'),
                 ],
                 'order_goods' => $order->orderGoods,
                 'store' => $order->store,
@@ -148,7 +194,7 @@ class OrderController extends Base
     /**
      * 发起支付
      */
-    public function doPay()
+    public function doPay(HandelPay $api)
     {
         $validator = $this->validationFactory->make($this->request->all(), [
             'order_id' => 'required|numeric',
@@ -177,11 +223,47 @@ class OrderController extends Base
                 'code' => ErrorCode::DATA_NULL,
             ]);
         }
+        return $api->make($this->request->input('pay_type'))->createOrder($order);
+    }
 
+    /**
+     * 取消订单
+     */
+    public function cancel(){
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'order_id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $orderId = $this->request->input('order_id');
+        $order = Order::whereOrderId($orderId)->first();
+        if (!$order) {
+            return $this->json([
+                'errorMessage' => '订单不存在！',
+                'code' => ErrorCode::DATA_NULL,
+            ]);
+        }
+        if($order->status==2){
+            return $this->json([
+                'errorMessage' => '请勿重复操作！',
+                'code' => ErrorCode::ORDER_IS_CANCEL,
+            ]);
+        }
+        if($order->pay_status==1){
+            return $this->json([
+                'errorMessage' => '订单已支付无法取消！',
+                'code' => ErrorCode::ORDER_IS_PAY,
+            ]);
+        }
+        $order->status=2;
+        $order->save();
         return $this->json([
-            'errorMessage' => 'success',
+            'errorMessage' => '订单取消成功',
             'code' => ErrorCode::SUCCESS,
-            'order_sn' => $order->order_sn,
         ]);
     }
 }
