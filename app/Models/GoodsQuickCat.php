@@ -46,7 +46,7 @@ class GoodsQuickCat extends Model
             foreach ($item['tags'] as $sub) {
                 $validator3 = Validator::make($sub, [
                     'sku_name' => 'required|max:50',
-                    'goods_price' => 'required|numeric|min:0|max:9999999',
+                    'goods_price' => 'required|numeric|min:0|max:900000',
                     'active' => 'required|numeric|in:0,1',
                     'stock' => 'required|numeric|min:0',
                 ], [
@@ -55,7 +55,7 @@ class GoodsQuickCat extends Model
                     'goods_price.required' => '规格id最小只能是0',
                     'goods_price.numeric' => '价格只能是数字',
                     'goods_price.min' => '价格最小只能是0',
-                    'goods_price.max' => '价格最大只能是9999999',
+                    'goods_price.max' => '价格不能大于90万',
                     'stock.required' => '库存不能为空',
                     'stock.numeric' => '库存是一个数字',
                     'stock.min' => '最小库存是0',

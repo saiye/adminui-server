@@ -39,10 +39,10 @@ class AppServiceProvider extends ServiceProvider
             return new DefaultCheckOrder($app);
         });
         $this->app->bind('WeiXinPayApi', function ($app) {
-            return new WeiXinPayApi();
+            return new WeiXinPayApi($app->make('request'));
         });
         $this->app->bind('DefaultPayApi', function ($app) {
-            return new DefaultPayApi();
+            return new DefaultPayApi($app->make('request'));
         });
 
 

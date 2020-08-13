@@ -115,7 +115,7 @@ class OrderController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $order = Order::select(['order_id', 'store_id', 'actual_payment', 'total_price', 'coupon_id','coupon_price','integral_price','created_at'])->with(['orderGoods' => function ($r) {
+        $order = Order::select(['order_id','order_sn', 'pay_type', 'store_id', 'actual_payment','pay_time', 'total_price', 'coupon_id','coupon_price','integral_price','created_at'])->with(['orderGoods' => function ($r) {
             $r->select('order_id', 'goods_num', 'goods_name', 'image', 'tag', 'goods_price');
         }, 'store' => function ($q) {
             $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
@@ -134,6 +134,10 @@ class OrderController extends Base
                 'code' => ErrorCode::SUCCESS,
                 'order' => [
                     'order_id' => $order->order_id,
+                    'order_sn' => $order->order_sn,
+                    'pay_type' => $order->pay_type,
+                    'pay_date' => $order->pay_date,
+                    'pay_type_word' => $order->pay_type_word,
                     'total_price' => $order->total_price,
                     'actual_payment' => $order->actual_payment,
                     'integral_price' => $order->integral_price,
@@ -211,7 +215,7 @@ class OrderController extends Base
         }
         $user=$this->user();
         $orderId = $this->request->input('order_id');
-        $order = Order::whereOrderId($orderId)->first();
+        $order = Order::whereUserId($user->id)->whereOrderId($orderId)->first();
         if (!$order) {
             return $this->json([
                 'errorMessage' => '订单不存在！',
@@ -242,7 +246,7 @@ class OrderController extends Base
             ]);
         }
         $orderId = $this->request->input('order_id');
-        $order = Order::whereOrderId($orderId)->first();
+        $order = Order::with('store')->whereOrderId($orderId)->first();
         if (!$order) {
             return $this->json([
                 'errorMessage' => '订单不存在！',

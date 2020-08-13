@@ -10,6 +10,7 @@ use App\Constants\ErrorCode;
 use App\Models\Order;
 use App\TraitInterface\ApiTrait;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Log;
 
 class HandelPay
 {
@@ -42,18 +43,19 @@ class HandelPay
         return $this;
     }
 
-    public function createOrder($data)
+    public function createOrder($order)
     {
-        $data= $this->handel->createOrder($data);
-        return $this->json($data);
+        return $this->json($this->handel->createOrder($order));
     }
 
     public function callBack()
     {
         return $this->handel->callBack(function ($data) {
-            //回调成功相关逻辑
+            //支付成功相关逻辑
             $savePayStatus = Order::whereOrderSn($data['order_sn'])->update([
                 'pay_status' => 1,
+                'prepay_id' => $data['prepay_id'],
+                'status' => 1,
             ]);
         });
     }

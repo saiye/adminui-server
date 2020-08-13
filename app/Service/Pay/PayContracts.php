@@ -10,10 +10,10 @@ interface PayContracts
 {
     /**
      * 统一下单
-     * @param $data
+     * @param $order
      * @return mixed
      */
-    public function createOrder($data);
+    public function createOrder($order);
 
     /**
      * 支付回调

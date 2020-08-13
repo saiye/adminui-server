@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Hash;
 
 abstract class BaseLoginApi implements LoginApi
 {
-    public $request = null;
+    protected $request = null;
 
     public function __construct(Request $request)
     {
@@ -37,6 +37,10 @@ abstract class BaseLoginApi implements LoginApi
 
     public function getUser()
     {
+        //经度
+        $longitude =$this->request->input('longitude',0);
+        //维度
+        $latitude =$this->request->input('latitude',0);
         //已注册用户
         $env=Config::get('app.env');
         if($env=='local'){
@@ -45,11 +49,6 @@ abstract class BaseLoginApi implements LoginApi
         }
         list($code, $info) = $this->code2Session();
         if ($code == 0) {
-            //经度
-            $longitude =$this->request->input('longitude',0);
-            //维度
-            $latitude =$this->request->input('latitude',0);
-
             $hasThreeUser = ThreeUser::whereOpenId($info['openid'])->first();
             if (!$hasThreeUser) {
                 DB::beginTransaction();
@@ -91,9 +90,12 @@ abstract class BaseLoginApi implements LoginApi
                 $user->lon =$longitude;
                 $user->lat =$latitude;
                 $user->save();
+                return [ErrorCode::SUCCESS, '老用户', $user];
             }
-            return [ErrorCode::SUCCESS, '老用户', $user];
+
         }
         return [$code, $info['message'], null];
     }
+
+
 }

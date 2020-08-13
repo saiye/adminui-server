@@ -25,7 +25,7 @@ return [
         'wx' => [
             'appId' => env('WX_APP_ID',''),
             'mchId' =>env('WX_MCH_ID',''),
-            'appSecret' => env('WX_APP_SECRET',''),
+            'appSecret' => env('WX_PAY_KEY',''),
         ],
     ],
     'selectConf' => [

@@ -9,7 +9,7 @@ use Log;
 use Illuminate\Support\Str;
 
 /**
- * 微信支付
+ * 钱包支付
  * @author chenyuansai
  *
  */
@@ -19,7 +19,7 @@ final class DefaultPayApi extends PayApi
 
     public function init()
     {
-
+        return [];
     }
 
     /*
@@ -31,11 +31,10 @@ final class DefaultPayApi extends PayApi
     }
 
     /*
-     * 微信统一下单
+     * 统一下单
      */
     function createOrder($order)
     {
 
     }
-
 }
