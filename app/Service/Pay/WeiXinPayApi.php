@@ -93,7 +93,7 @@ final class WeiXinPayApi extends PayApi
         );
         $http_query['sign'] = $this->MakeSign($http_query);
         $xml = self::createXml($http_query);
-        $repose_xml = self::postXmlCurl($xml, self::postOrderUrl . '/pay/unifiedorder');
+        $repose_xml = $this->postXmlCurl($xml, self::postOrderUrl . '/pay/unifiedorder');
         $repose_arr = $this->fromXml($repose_xml);
         //通讯成功
         if (isset($repose_arr['return_code']) and $repose_arr['return_code'] == 'SUCCESS') {
@@ -150,7 +150,7 @@ final class WeiXinPayApi extends PayApi
         ];
         $data['sign']=$this->MakeSign($data);
         $xml = self::createXml($data);
-        $repose_xml = self::postXmlCurl($xml, self::postOrderUrl . '/pay/unifiedorder');
+        $repose_xml = $this->postXmlCurl($xml, self::postOrderUrl . '/pay/unifiedorder');
         $repose_arr = $this->fromXml($repose_xml);
         //通讯成功
         if (isset($repose_arr['return_code']) and $repose_arr['return_code'] == 'SUCCESS') {
@@ -189,7 +189,7 @@ final class WeiXinPayApi extends PayApi
         ];
         $post['sign'] = $this->MakeSign($post);
         $xml = self::createXml($post);
-        $repose_xml = self::postXmlCurl($xml, $url);
+        $repose_xml =$this->postXmlCurl($xml, $url);
         $repose_arr = $this->fromXml($repose_xml);
         //通讯成功
         if (isset($repose_arr['return_code']) and $repose_arr['return_code'] == 'SUCCESS') {
@@ -231,7 +231,7 @@ final class WeiXinPayApi extends PayApi
     }
 
 
-    public static function postXmlCurl($xml, $url, $useCert = false, $second = 30)
+    public  function postXmlCurl($xml, $url, $useCert = false, $second = 30)
     {
         $ch = curl_init();
         //设置超时
@@ -247,6 +247,20 @@ final class WeiXinPayApi extends PayApi
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);//严格校验
         }
+
+        if($useCert == true){
+            //设置证书
+            //使用证书：cert 与 key 分别属于两个.pem文件
+            //证书文件请放入服务器的非web目录下
+            $sslCertPath = $this->config['sslCertPath'];
+            $sslKeyPath =  $this->config['sslKeyPath'];
+          //  $config->GetSSLCertPath($sslCertPath, $sslKeyPath);
+            curl_setopt($ch,CURLOPT_SSLCERTTYPE,'PEM');
+            curl_setopt($ch,CURLOPT_SSLCERT, $sslCertPath);
+            curl_setopt($ch,CURLOPT_SSLKEYTYPE,'PEM');
+            curl_setopt($ch,CURLOPT_SSLKEY, $sslKeyPath);
+        }
+
         //设置header
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
         //要求结果为字符串且输出到屏幕上

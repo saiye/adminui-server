@@ -81,7 +81,7 @@ class OrderController extends Base
         $list=Order::select(['order_id', 'store_id', 'actual_payment', 'total_price', 'integral_price','pay_status','pay_type','coupon_price','created_at','status'])->with(['store' => function ($q) {
             $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
         },'orderGoods' => function ($r) {
-            $r->select('order_id', 'goods_num', 'goods_name', 'image', 'tag', 'goods_price');
+            $r->select('order_id', 'goods_num', 'goods_name','goods_id','type' ,'image', 'tag', 'goods_price');
         },])->where('status','!=',2)->whereUserId($user->id)->orderBy('order_id','desc')->orderBy('status','asc')->skip($skip)->take($limit)->get();
         if ($list) {
             return $this->json(
@@ -116,7 +116,7 @@ class OrderController extends Base
             ]);
         }
         $order = Order::select(['order_id','order_sn', 'pay_type', 'store_id', 'actual_payment','pay_time', 'total_price', 'coupon_id','coupon_price','integral_price','created_at','pay_status'])->with(['orderGoods' => function ($r) {
-            $r->select('order_id', 'goods_num', 'goods_name', 'image', 'tag', 'goods_price');
+            $r->select('order_id', 'goods_num', 'goods_name', 'image','goods_id','type','tag', 'goods_price');
         }, 'store' => function ($q) {
             $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
         },'userCoupon'=>function($q){
