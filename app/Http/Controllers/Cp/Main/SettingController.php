@@ -101,6 +101,9 @@ class SettingController extends BaseController
         $content = "<?php\n return\t" . var_export($data, true) . ';';
         $isOK = Storage::disk('local')->put($webConfig, $content);
         if ($isOK) {
+            if (function_exists('opcache_reset')) {
+                opcache_reset();
+            }
             return $this->successJson([], '刷新成功！');
         }
         return $this->errorJson('刷新失败');
