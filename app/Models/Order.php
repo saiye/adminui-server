@@ -21,7 +21,7 @@ class Order extends Model
 
     public function getPayDateAttribute()
     {
-        return $this->attributes['pay_date'] = $this->pay_time ? date('Y-m-d', $this->pay_time) : '-';
+        return $this->attributes['pay_date'] = $this->pay_time ? date('Y-m-d H:i:s', $this->pay_time) : '-';
     }
 
     public function getPayTypeWordAttribute()

@@ -3,6 +3,7 @@
 namespace App\Service\Pay;
 
 use App\Constants\ErrorCode;
+use App\Models\User;
 use Config;
 use Request;
 use Log;
@@ -25,16 +26,39 @@ final class DefaultPayApi extends PayApi
     /*
      * 微信支付回调
      */
-    function callBack($call)
+   public  function callBack($call)
     {
-
+        return [
+            'code' => ErrorCode::SUCCESS,
+            'errorMessage' => '验证成功',
+        ];
     }
 
     /*
      * 统一下单
      */
-    function createOrder($order)
+    public function createOrder($order)
     {
+        //此处只管下单，不做余额是否充足的验证,另开发接口给前端发起余额支付，
+        return [
+            'code' => ErrorCode::SUCCESS,
+            'errorMessage' => '下单',
+        ];
+    }
+
+    /**
+     * 退款
+     * @param \Closure $call
+     */
+    public function  refundApply($refund_order,$call){
+
+    }
+
+    /**
+     * 退款结果通知
+     * @param \Closure $call
+     */
+    public function refundNotice($call){
 
     }
 }

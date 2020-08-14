@@ -82,7 +82,7 @@ class OrderController extends Base
             $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
         },'orderGoods' => function ($r) {
             $r->select('order_id', 'goods_num', 'goods_name', 'image', 'tag', 'goods_price');
-        },])->where('status','!=',2)->whereUserId($user->id)->orderBy('status','asc')->orderBy('order_id','desc')->skip($skip)->take($limit)->get();
+        },])->where('status','!=',2)->whereUserId($user->id)->orderBy('order_id','desc')->orderBy('status','asc')->skip($skip)->take($limit)->get();
         if ($list) {
             return $this->json(
                 [
@@ -115,7 +115,7 @@ class OrderController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $order = Order::select(['order_id','order_sn', 'pay_type', 'store_id', 'actual_payment','pay_time', 'total_price', 'coupon_id','coupon_price','integral_price','created_at'])->with(['orderGoods' => function ($r) {
+        $order = Order::select(['order_id','order_sn', 'pay_type', 'store_id', 'actual_payment','pay_time', 'total_price', 'coupon_id','coupon_price','integral_price','created_at','pay_status'])->with(['orderGoods' => function ($r) {
             $r->select('order_id', 'goods_num', 'goods_name', 'image', 'tag', 'goods_price');
         }, 'store' => function ($q) {
             $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
@@ -137,6 +137,7 @@ class OrderController extends Base
                     'order_sn' => $order->order_sn,
                     'pay_type' => $order->pay_type,
                     'pay_date' => $order->pay_date,
+                    'pay_status' => $order->pay_status,
                     'pay_type_word' => $order->pay_type_word,
                     'total_price' => $order->total_price,
                     'actual_payment' => $order->actual_payment,
@@ -224,10 +225,13 @@ class OrderController extends Base
         }
         if ($order->play_status == 1) {
             return $this->json([
-                'errorMessage' => '订单已经支付成功，请勿重复操作！',
+                'errorMessage' => '订单已支付成功，请勿重复操作！',
                 'code' => ErrorCode::DATA_NULL,
             ]);
         }
+        //记录当前支付方式！
+        $order->pay_type=$this->request->input('pay_type');
+        $order->save();
         $order['openid']=$user->account;
         return $api->make($this->request->input('pay_type'))->createOrder($order);
     }

@@ -21,4 +21,21 @@ interface PayContracts
      */
     public function callBack(\Closure $closure);
 
+
+    /**
+     * 退款申请
+     * @param $refund_order
+     * @param \Closure $closure
+     * @return mixed
+     */
+    public function  refundApply($refund_order,\Closure $closure);
+
+
+    /**
+     * 退款结果通知
+     */
+    public function  refundNotice(\Closure $closure);
+
+
+
 }

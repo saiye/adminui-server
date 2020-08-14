@@ -46,6 +46,7 @@ final class WeiXinPayApi extends PayApi
                         'prepay_id' => $http_params['transaction_id'],
                         'callPrice' => $http_params['total_fee'] / 100,
                         'order_sn' => $http_params['out_trade_no'],
+                        'pay_type' => 1,
                     ]);
                     //验证ok
                     return self::createXml([
@@ -99,10 +100,19 @@ final class WeiXinPayApi extends PayApi
             //业务成功
             if (isset($repose_arr['result_code']) and $repose_arr['result_code'] == 'SUCCESS') {
                 //预充值订单
+                $sendData=[
+                        'appId'=>$appid,
+                        'timeStamp'=>time(),
+                        'nonceStr'=>Str::random(32),
+                        'package'=>'prepay_id='.$repose_arr['prepay_id'],
+                        'signType'=>'MD5',
+                ];
+                $sendData['paySign']=$this->MakeSign($sendData);
                 return [
                     'code' => ErrorCode::SUCCESS,
                     'errorMessage' => '微信下单成功',
-                    'prepay_id' => $repose_arr['prepay_id']
+                    'data'=>$sendData,
+
                 ];
             }
             Log::info('原生微信下单失败-业务失败' . $order->order_sn);
@@ -118,6 +128,50 @@ final class WeiXinPayApi extends PayApi
             'code' => ErrorCode::THREE_FAIL,
             'errorMessage' => '微信下单失败',
         ];
+    }
+
+    /**
+     * 退款
+     * @param \Closure $call
+     */
+    public function  refundApply($refund_order,$call){
+        $data=[
+            'appid'=>'',
+            'mch_id'=>'',
+            'nonce_str'=>'',
+            'sign_type'=>'MD5',
+            'transaction_id'=>'',
+            'out_refund_no'=>'',
+            'total_fee'=>'',
+            'refund_fee'=>'',
+            'refund_fee_type'=>'CNY',
+            'refund_desc'=>'',
+            'notify_url'=>'',
+        ];
+        $data['sign']=$this->MakeSign($data);
+        $xml = self::createXml($data);
+        $repose_xml = self::postXmlCurl($xml, self::postOrderUrl . '/pay/unifiedorder');
+        $repose_arr = $this->fromXml($repose_xml);
+        //通讯成功
+        if (isset($repose_arr['return_code']) and $repose_arr['return_code'] == 'SUCCESS') {
+            //业务成功
+            if (isset($repose_arr['result_code']) and $repose_arr['result_code'] == 'SUCCESS') {
+                //退款申请成功
+                $call([
+                    'out_refund_no'=>'',
+                    'refund_id'=>'',
+                    'refund_fee'=>'',
+                ]);
+            }
+        }
+    }
+
+    /**
+     * 退款结果通知
+     * @param \Closure $call
+     */
+    public function refundNotice($call){
+
     }
 
     /**

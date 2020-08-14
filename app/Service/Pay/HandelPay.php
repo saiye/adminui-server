@@ -51,14 +51,25 @@ class HandelPay
     public function callBack()
     {
         return $this->handel->callBack(function ($data) {
-            //支付成功相关逻辑
-            $savePayStatus = Order::whereOrderSn($data['order_sn'])->update([
+            Order::whereOrderSn($data['order_sn'])->update([
+                'pay_time' => time(),
                 'pay_status' => 1,
+                'pay_type' => $data['pay_type'],
                 'prepay_id' => $data['prepay_id'],
                 'status' => 1,
             ]);
         });
     }
 
+    /**
+     * 退款申请
+     * @param $refund_order
+     * @return mixed
+     */
+    public function  refundApply($refund_order){
+        return $this->handel->refundApply($refund_order,function ($data) {
+
+        });
+    }
 
 }
