@@ -33,5 +33,6 @@ class ErrorCode
     const  GOODS_NOT_FIND= -25; //商品不存在
     const  ORDER_IS_PAY= -26; //订单已支付
     const  ORDER_IS_CANCEL= -27; //订单已取消
+    const  BALANCE_CANT= -28; //余额不足
     const  SUCCESS = 0; // 成功
 }

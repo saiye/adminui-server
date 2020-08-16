@@ -11,7 +11,7 @@ class DefaultPayCall extends Command
      *
      * @var string
      */
-    protected $signature = 'command:defaultPayCall';
+    protected $signature = 'defaultPayCall';
 
     /**
      * The console command description.
