@@ -61,6 +61,15 @@ Route::group([
     Route::post('order/index/conf', 'Order\IndexController@selectConfig')->name('bs-OrderSelectConfig');
     Route::post('order/index/detail', 'Order\IndexController@orderDetail')->name('bs-orderDetail');
     Route::post('order/index/set', 'Order\IndexController@setOrder')->name('bs-setOrder');
+
+    //提现订单
+    Route::post('order/withdraw/orderList', 'Order\WithdrawController@orderList')->name('bs-WithdrawOrderList');
+    Route::post('order/withdraw/setStatus', 'Order\WithdrawController@setStatus')->name('bs-WithdrawSetStatus');
+    Route::post('order/withdraw/addReceiptAccount', 'Order\WithdrawController@addReceiptAccount')->name('bs-addReceiptAccount');
+    Route::post('order/withdraw/editReceiptAccount', 'Order\WithdrawController@addReceiptAccount')->name('bs-editReceiptAccount');
+    Route::post('order/withdraw/receiptAccountList', 'Order\WithdrawController@receiptAccountList')->name('bs-receiptAccountList');
+    Route::post('order/withdraw/conf', 'Order\WithdrawController@conf')->name('bs-receiptConf');
+
     //房间管理
     Route::post('room/index/roomList', 'Room\IndexController@roomList')->name('bs-RoomList');
     Route::post('room/index/addRoom', 'Room\IndexController@addRoom')->name('bs-addRoom');
