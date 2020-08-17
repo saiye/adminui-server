@@ -55,6 +55,9 @@ return array(
                     'storeList' => array('name' => '门店列表', 'checked' => false, 'display' => true, 'url' => 'store/index/storeList', 'act' => 'default'),
                     'addStore' => array('name' => '添加门店', 'checked' => false, 'display' => true, 'url' => 'store/index/addStore', 'act' => 'default'),
                     'checkStore' => array('name' => '审核门店', 'checked' => false, 'display' => true, 'url' => 'store/index/checkStore', 'act' => 'default'),
+                    'tagList' => array('name' => '门店标签列表', 'checked' => false, 'display' => true, 'url' => 'store/index/tagList', 'act' => 'default'),
+                    'editStore' => array('name' => '编辑门店', 'checked' => false, 'display' => true, 'url' => 'store/index/editStore', 'act' => 'default'),
+                    'closeStore' => array('name' => '门店关闭或开启', 'checked' => false, 'display' => true, 'url' => 'store/index/closeStore', 'act' => 'default'),
                 )
             )
         ),

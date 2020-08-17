@@ -16,13 +16,13 @@ use Illuminate\Support\Str;
 final class WeiXinPayApi extends PayApi
 {
 
-    const postOrderUrl = 'https://api.mch.weixin.qq.com';
+   // const postOrderUrl = 'https://api.mch.weixin.qq.com';
 
-    // const postOrderUrl = 'https://api.mch.weixin.qq.com/sandboxnew';
+    const postOrderUrl = 'https://api.mch.weixin.qq.com/sandboxnew';
     public function init()
     {
         $this->config = Config::get('pay.key.wx');
-        // $this->config['appSecret']=$this->getkey();
+         $this->config['appSecret']=$this->getkey();
     }
 
     /*
@@ -36,15 +36,31 @@ final class WeiXinPayApi extends PayApi
             Log::info('wxPayCallL:');
             Log::info($xml);
         }
+        $appid = $this->config['appId'];
+        $mch_id = $this->config['mchId'];
         //验证回调参数
         $tmp_sign = $this->MakeSign($http_params);
         if (isset($http_params['sign']) and $http_params['sign'] == $tmp_sign) {
             //是否支付ok?
             if (isset($http_params['return_code']) and $http_params['return_code'] == 'SUCCESS') {
                 if (isset($http_params['result_code']) and $http_params['result_code'] == 'SUCCESS') {
+                    if($http_params['appid']!==$appid){
+                        return self::createXml([
+                            'return_code' => 'FAIL',
+                            'return_msg' => 'appid不正确'
+                        ]);
+                    }
+                    if($http_params['mch_id']!==$mch_id){
+                        return self::createXml([
+                            'return_code' => 'FAIL',
+                            'return_msg' => 'mch_id不正确'
+                        ]);
+                    }
+                    //有用代金券的情况下，应结订单金额作为回调金额
+                    $calPrice=$http_params['settlement_total_fee']??$http_params['total_fee'];
                     $call([
                         'prepay_id' => $http_params['transaction_id'],
-                        'callPrice' => $http_params['total_fee'] / 100,
+                        'callPrice' => $calPrice / 100,
                         'order_sn' => $http_params['out_trade_no'],
                         'pay_type' => 1,
                     ]);
@@ -119,14 +135,14 @@ final class WeiXinPayApi extends PayApi
             Log::info($repose_arr);
             return [
                 'code' => ErrorCode::THREE_FAIL,
-                'errorMessage' => '微信下单失败-业务失败',
+                'errorMessage' => '微信下单失败-业务失败,err_code:'.$repose_arr['err_code']??($repose_arr['err_code_des']??''),
             ];
         }
         Log::info('原生微信下单失败' . $order->order_sn);
         Log::info($repose_arr);
         return [
             'code' => ErrorCode::THREE_FAIL,
-            'errorMessage' => '微信下单失败',
+            'errorMessage' => '微信下单失败:'.$repose_arr['return_msg']??'',
         ];
     }
 
@@ -172,6 +188,49 @@ final class WeiXinPayApi extends PayApi
      */
     public function refundNotice($call){
 
+    }
+
+    /**
+     * 主动查询订单
+     * @param $order
+     * @param \Closure $closure
+     * @return mixed|void
+     */
+    public function findOrder($order,\Closure $closure){
+
+        $appid = $this->config['appId'];
+        $mch_id = $this->config['mchId'];
+        $url=self::postOrderUrl.'/pay/orderquery';
+        $post=[
+            'appid'=>$appid,
+            'mch_id'=>$mch_id,
+            'out_trade_no'=>$order->order_sn,
+            'nonce_str'=>Str::random(32),
+            'sign_type'=>'MD5',
+        ];
+        $post['sign'] = $this->MakeSign($post);
+        $xml = self::createXml($post);
+        $repose_xml =$this->postXmlCurl($xml, $url);
+        $repose_arr = $this->fromXml($repose_xml);
+        //通讯成功
+        if (isset($repose_arr['return_code']) and $repose_arr['return_code'] == 'SUCCESS') {
+            //业务成功
+            if(isset($repose_arr['result_code']) and $repose_arr['result_code']=='SUCCESS'){
+                if($repose_arr['trade_state']=='SUCCESS'){
+                    //有用代金券的情况下，应结订单金额作为回调金额
+                    $calPrice=$repose_arr['settlement_total_fee']??$repose_arr['total_fee'];
+                    $closure([
+                        'prepay_id' => $repose_arr['transaction_id'],
+                        'callPrice' => $calPrice / 100,
+                        'order_sn' => $repose_arr['out_trade_no'],
+                        'pay_type' => 1,
+                    ]);
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
     }
 
     /**

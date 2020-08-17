@@ -66,10 +66,30 @@ class HandelPay
      * @param $refund_order
      * @return mixed
      */
-    public function  refundApply($refund_order){
-        return $this->handel->refundApply($refund_order,function ($data) {
+    public function refundApply($refund_order)
+    {
+        return $this->handel->refundApply($refund_order, function ($data) {
 
         });
     }
 
+    /**
+     * 主动查询订单
+     * @param $data
+     * @param \Closure $closure
+     * @return mixed|void
+     */
+    public function findOrder($order)
+    {
+        return $this->handel->findOrder($order, function ($data) use ($order) {
+            $status = $order->status == 3 ? 3 : 1;
+            Order::whereOrderSn($data['order_sn'])->update([
+                'pay_time' => time(),
+                'pay_status' => 1,
+                'pay_type' => $data['pay_type'],
+                'prepay_id' => $data['prepay_id'],
+                'status' => $status,
+            ]);
+        });
+    }
 }

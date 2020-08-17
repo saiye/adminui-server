@@ -38,10 +38,10 @@ class CheckGoodsOrder extends CheckBase
         $data = [];
         foreach ($goodsList as $goods) {
             if($goods['status']==2){
-                return [ErrorCode::GOODS_CLOSE, '商品【'.$goods->goods_name.'】已下架,请刷新商品列表，再下单！', []];
+                return [ErrorCode::GOODS_CLOSE, '商品【'.$goods->goods_name.'】已下架,请刷新商品列表，再下单！', [$goods->goods_id]];
             }
             if($goods['stock']<1){
-                return [ErrorCode::GOODS_SELL_OUT, '商品【'.$goods->goods_name.'】已售罄！', []];
+                return [ErrorCode::GOODS_SELL_OUT, '商品【'.$goods->goods_name.'】已售罄！', [$goods->goods_id]];
             }
             foreach ($buys as $buy) {
                 if ($buy['goodsId'] == $goods['goods_id']) {
@@ -60,13 +60,13 @@ class CheckGoodsOrder extends CheckBase
                                     }
                                 }
                                 if(!$hasTag){
-                                    return [ErrorCode::GOODS_SKU_EDIT, '商品['.$goods->goods_name.']规格不存在，或者已被修改，请刷新页面，重新下单！', []];
+                                    return [ErrorCode::GOODS_SKU_EDIT, '商品['.$goods->goods_name.']规格不存在，或者已被修改，请刷新页面，重新下单！', [$goods->goods_id]];
                                 }
                             }
                         }
                     }
                     if(empty($tmpTag)){
-                        return [ErrorCode::GOODS_SKU_EDIT, '商品['.$goods->goods_name.']存在规格已下架,请刷新商品列表，再下单！', []];
+                        return [ErrorCode::GOODS_SKU_EDIT, '商品['.$goods->goods_name.']存在规格已下架,请刷新商品列表，再下单！', [$goods->goods_id]];
                     }
                     array_push($data, [
                         'info' => $goods->goods_name,
@@ -91,6 +91,6 @@ class CheckGoodsOrder extends CheckBase
         if ($data) {
             return [ErrorCode::SUCCESS, 'success', $data];
         }
-        return [ErrorCode::GOODS_NOT_FIND, '商品不存在！', []];
+        return [ErrorCode::GOODS_NOT_FIND, '商品不存在！', $goodsIds];
     }
 }

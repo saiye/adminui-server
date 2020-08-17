@@ -115,3 +115,6 @@ ALTER TABLE `lrs_manage`.`order`     ADD COLUMN `info` VARCHAR(100) NOT NULL COM
 
  ALTER TABLE `lrs_manage`.`order`     ADD COLUMN `integral_price` DECIMAL(10,2) NOT NULL COMMENT '积分减额' AFTER `coupon_price`,
 CHANGE `coupon_price` `coupon_price` DECIMAL(10,2) DEFAULT '0.00' NOT NULL COMMENT '券减金额';
+
+
+ ALTER TABLE `lrs_manage`.`store`     ADD COLUMN `is_close` TINYINT(4) DEFAULT '0' NULL COMMENT '是否关闭' AFTER `lat`;

@@ -30,7 +30,7 @@ class StoreController extends Base
             ]);
         }
         $storeId = $this->request->input('store_id');
-        $store = Store::select(['store_id', 'store_name', 'open_at', 'close_at','address'])->whereStoreId($storeId)->whereCheck(1)->first();
+        $store = Store::select(['store_id', 'store_name', 'open_at', 'close_at','address','logo'])->whereStoreId($storeId)->whereCheck(1)->first();
         if (!$store) {
             return $this->json(
                 [
@@ -39,7 +39,7 @@ class StoreController extends Base
                 ]
             );
         }
-        $store->category = GoodsCategory::whereStoreId($storeId)->select(['category_id', 'category_name'])->get();
+        $store->category = GoodsCategory::whereStoreId($storeId)->select(['category_id', 'category_name'])->whereIsDel(0)->get();
         $store->tags = StoreTag::whereStoreId($storeId)->select(['tag_id', 'tag_name'])->get();
         return $this->json(
             [
@@ -57,6 +57,7 @@ class StoreController extends Base
     public function storeList()
     {
         $validator = $this->validationFactory->make($this->request->all(), [
+            'searchName' => 'nullable',
             'page' => 'required|numeric|min:1',
             'limit' => 'required|numeric|min:1',
         ]);
@@ -73,6 +74,7 @@ class StoreController extends Base
          */
         $limit = $this->request->input('limit', 10);
         $page = $this->request->input('page', 1);
+        $searchName = $this->request->input('searchName');
         $skip = ceil($page - 1) * $limit;
         $user = $this->user();
         $lon = $user->lon;
@@ -97,7 +99,13 @@ class StoreController extends Base
                 )
             )
         ),2
-    ) AS distance")])->whereCheck(1)->orderBy('distance', 'asc')->skip($skip)->take($limit)->get();
+    ) AS distance")])->whereCheck(1)->whereIsClose(0);
+
+        if($searchName){
+            $list=$list->where('store_name','like','%'.$searchName.'%');
+        }
+
+        $list=$list->orderBy('distance', 'asc')->skip($skip)->take($limit)->get();
 
         if ($list) {
             return $this->json(

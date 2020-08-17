@@ -61,4 +61,14 @@ final class DefaultPayApi extends PayApi
     public function refundNotice($call){
 
     }
+
+    /**
+     * 主动查询订单
+     * @param $order
+     * @param \Closure $closure
+     * @return bool|mixed|void
+     */
+    public function findOrder($order,\Closure $closure){
+        return false;
+    }
 }

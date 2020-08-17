@@ -6,6 +6,8 @@
 
 namespace App\Service\Pay;
 
+use phpDocumentor\Reflection\Types\Boolean;
+
 interface PayContracts
 {
     /**
@@ -35,6 +37,13 @@ interface PayContracts
      * 退款结果通知
      */
     public function  refundNotice(\Closure $closure);
+
+    /**
+     * @param $order
+     * @param \Closure $closure
+     * @return mixed
+     */
+    public function findOrder($order,\Closure $closure);
 
 
 

@@ -55,6 +55,9 @@ Route::group([
     Route::post('store/index/storeList', 'Store\IndexController@storeList')->name('cp-storeList');
     Route::post('store/index/addStore', 'Store\IndexController@addStore')->name('cp-addStore');
     Route::post('store/index/checkStore', 'Store\IndexController@checkStore')->name('cp-checkStore');
+    Route::post('store/index/tagList', 'Store\IndexController@tagList')->name('cp-StoreTagList');
+    Route::post('store/index/editStore', 'Store\IndexController@editStore')->name('cp-editStore');
+    Route::post('store/index/closeStore', 'Store\IndexController@closeStore')->name('cp-closeStore');
 
     //新增会员
     Route::post('game/index/userList', 'Game\IndexController@userList')->name('cp-GameUserList');

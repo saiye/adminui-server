@@ -50,4 +50,80 @@ class UserController extends Base
             'code' => ErrorCode::ACCOUNT_NOT_EXIST,
         ]);
     }
+
+    /**
+     * 手机注册
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function phoneReg()
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'area_code' => 'required|numeric',
+            'phone_code' => 'required|numeric',
+            'phone' => 'required|numeric',
+            'password' => 'required|min:6',
+            'affirm_password' => 'required|min:6',
+            'sex' => 'required|in:0,1',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+
+    }
+
+    /**
+     * 手机登录
+     */
+    public function phoneLogin()
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'phone' => 'required|numeric',
+            'password' => 'required|min:6',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+    }
+
+    /**
+     * 忘记密码
+     */
+    public function forgetPassword()
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'phone' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+    }
+
+    /**
+     * 修改密码
+     */
+    public function editPassword()
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'phone' => 'required|numeric',
+            'phone_code' => 'required',
+            'password' => 'required',
+            'affirm_password' => 'required',//确认密码
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+    }
+
 }

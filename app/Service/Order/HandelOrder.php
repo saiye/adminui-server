@@ -49,6 +49,7 @@ class HandelOrder
                 return $this->json([
                     'errorMessage' => $message,
                     'code' =>$status,
+                    'removeGoodsIds' =>$list,
                 ]);
             } else {
                 //
