@@ -58,17 +58,20 @@ final class WeiXinPayApi extends PayApi
                     }
                     //有用代金券的情况下，应结订单金额作为回调金额
                     $calPrice=$http_params['settlement_total_fee']??$http_params['total_fee'];
-                    $call([
+                   $flag= $call([
                         'prepay_id' => $http_params['transaction_id'],
-                        'callPrice' => $calPrice / 100,
+                        'total_price' => $http_params['total_fee'] / 100,
+                        'actual_payment' => $calPrice / 100,
                         'order_sn' => $http_params['out_trade_no'],
                         'pay_type' => 1,
                     ]);
-                    //验证ok
-                    return self::createXml([
-                        'return_code' => 'SUCCESS',
-                        'return_msg' => 'OK'
-                    ]);
+                   if($flag){
+                       //验证ok
+                       return self::createXml([
+                           'return_code' => 'SUCCESS',
+                           'return_msg' => 'OK'
+                       ]);
+                   }
                 }
             }
         }
@@ -151,17 +154,19 @@ final class WeiXinPayApi extends PayApi
      * @param \Closure $call
      */
     public function  refundApply($refund_order,$call){
+        $appid = $this->config['appId'];
+        $mch_id = $this->config['mchId'];
         $data=[
-            'appid'=>'',
-            'mch_id'=>'',
-            'nonce_str'=>'',
+            'appid'=>$appid,
+            'mch_id'=>$mch_id,
+            'nonce_str'=>Str::random(32),
             'sign_type'=>'MD5',
-            'transaction_id'=>'',
-            'out_refund_no'=>'',
-            'total_fee'=>'',
-            'refund_fee'=>'',
+            'transaction_id'=>$refund_order->order->transaction_id,
+            'out_refund_no'=>$refund_order->out_refund_no,
+            'total_fee'=>$refund_order->order->total_fee,
+            'refund_fee'=>$refund_order->refund_fee,
             'refund_fee_type'=>'CNY',
-            'refund_desc'=>'',
+            'refund_desc'=>$refund_order->refund_desc,
             'notify_url'=>'',
         ];
         $data['sign']=$this->MakeSign($data);
@@ -218,10 +223,12 @@ final class WeiXinPayApi extends PayApi
             if(isset($repose_arr['result_code']) and $repose_arr['result_code']=='SUCCESS'){
                 if($repose_arr['trade_state']=='SUCCESS'){
                     //有用代金券的情况下，应结订单金额作为回调金额
+                    //有用代金券的情况下，应结订单金额作为回调金额
                     $calPrice=$repose_arr['settlement_total_fee']??$repose_arr['total_fee'];
                     $closure([
                         'prepay_id' => $repose_arr['transaction_id'],
-                        'callPrice' => $calPrice / 100,
+                        'callPrice' => $repose_arr['total_fee'] / 100,
+                        'actual_payment' => $calPrice / 100,
                         'order_sn' => $repose_arr['out_trade_no'],
                         'pay_type' => 1,
                     ]);

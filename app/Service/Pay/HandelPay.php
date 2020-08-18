@@ -51,14 +51,29 @@ class HandelPay
     public function callBack()
     {
         return $this->handel->callBack(function ($data) {
-            Order::whereOrderSn($data['order_sn'])->update([
-                'pay_time' => time(),
-                'pay_status' => 1,
-                'pay_type' => $data['pay_type'],
-                'prepay_id' => $data['prepay_id'],
-                'status' => 1,
-            ]);
+            $order = Order::whereOrderSn($data['order_sn'])->first();
+            if ($order) {
+                $delta = 0.01;
+                if (abs($data['actual_payment'] - $order->actual_payment) < $delta) {
+                    $status = $order->status == 3 ? 3 : 1;
+                    Order::whereOrderSn($data['order_sn'])->update([
+                        'pay_time' => time(),
+                        'pay_status' => 1,
+                        'pay_type' => $data['pay_type'],
+                        'prepay_id' => $data['prepay_id'],
+                        'status' => $status,
+                    ]);
+                    return true;
+                } else {
+                    //订单异常：
+                    Log::info('CallBackAbnormalOrders:');
+                    Log::info($data);
+                    return false;
+                }
+            }
+            return false;
         });
+
     }
 
     /**
@@ -81,15 +96,28 @@ class HandelPay
      */
     public function findOrder($order)
     {
-        return $this->handel->findOrder($order, function ($data) use ($order) {
-            $status = $order->status == 3 ? 3 : 1;
-            Order::whereOrderSn($data['order_sn'])->update([
-                'pay_time' => time(),
-                'pay_status' => 1,
-                'pay_type' => $data['pay_type'],
-                'prepay_id' => $data['prepay_id'],
-                'status' => $status,
-            ]);
+        return $this->handel->findOrder($order, function ($data) {
+            $order = Order::whereOrderSn($data['order_sn'])->first();
+            if ($order) {
+                $delta = 0.01;
+                if (abs($data['actual_payment'] - $order->actual_payment) < $delta) {
+                    if ($order->pay_status == 0) {
+                        $status = $order->status == 3 ? 3 : 1;
+                        Order::whereOrderSn($data['order_sn'])->update([
+                            'pay_time' => time(),
+                            'pay_status' => 1,
+                            'pay_type' => $data['pay_type'],
+                            'prepay_id' => $data['prepay_id'],
+                            'status' => $status,
+                        ]);
+                    }
+                } else {
+                    //订单异常：
+                    Log::info('findOrderAbnormalOrders:');
+                    Log::info($data);
+                }
+            }
         });
     }
+
 }
