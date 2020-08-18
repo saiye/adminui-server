@@ -16,13 +16,14 @@ use Illuminate\Support\Str;
 final class WeiXinPayApi extends PayApi
 {
 
-   // const postOrderUrl = 'https://api.mch.weixin.qq.com';
+    //是否打印log
+    const DEBUG = true;
+    //是否为沙盒测试,上线为否
+    const IS_SAND_BOX = true;
 
-    const postOrderUrl = 'https://api.mch.weixin.qq.com/sandboxnew';
     public function init()
     {
         $this->config = Config::get('pay.key.wx');
-         $this->config['appSecret']=$this->getkey();
     }
 
     /*
@@ -31,11 +32,14 @@ final class WeiXinPayApi extends PayApi
     function callBack($call)
     {
         $xml = file_get_contents('php://input');
-        $http_params = $this->fromXml($xml);
-        if ($xml) {
-            Log::info('wxPayCallL:');
-            Log::info($xml);
+
+        if (!$xml) {
+            return self::createXml([
+                'return_code' => 'FAIL',
+                'return_msg' => '验证失败'
+            ]);
         }
+        $http_params = $this->fromXml($xml);
         $appid = $this->config['appId'];
         $mch_id = $this->config['mchId'];
         //验证回调参数
@@ -44,37 +48,46 @@ final class WeiXinPayApi extends PayApi
             //是否支付ok?
             if (isset($http_params['return_code']) and $http_params['return_code'] == 'SUCCESS') {
                 if (isset($http_params['result_code']) and $http_params['result_code'] == 'SUCCESS') {
-                    if($http_params['appid']!==$appid){
+                    if ($http_params['appid'] !== $appid) {
                         return self::createXml([
                             'return_code' => 'FAIL',
                             'return_msg' => 'appid不正确'
                         ]);
                     }
-                    if($http_params['mch_id']!==$mch_id){
+                    if ($http_params['mch_id'] !== $mch_id) {
                         return self::createXml([
                             'return_code' => 'FAIL',
                             'return_msg' => 'mch_id不正确'
                         ]);
                     }
                     //有用代金券的情况下，应结订单金额作为回调金额
-                    $calPrice=$http_params['settlement_total_fee']??$http_params['total_fee'];
-                   $flag= $call([
+                    $calPrice = $http_params['settlement_total_fee'] ?? $http_params['total_fee'];
+                    $flag = $call([
                         'prepay_id' => $http_params['transaction_id'],
                         'total_price' => $http_params['total_fee'] / 100,
                         'actual_payment' => $calPrice / 100,
                         'order_sn' => $http_params['out_trade_no'],
+                        'time_end' => $http_params['time_end'],
                         'pay_type' => 1,
                     ]);
-                   if($flag){
-                       //验证ok
-                       return self::createXml([
-                           'return_code' => 'SUCCESS',
-                           'return_msg' => 'OK'
-                       ]);
-                   }
+                    if ($flag) {
+                        return self::createXml([
+                            'return_code' => 'SUCCESS',
+                            'return_msg' => 'OK'
+                        ]);
+                    } else {
+                        Log::info('wxPayCallL:异常订单');
+                        Log::info($xml);
+                        return self::createXml([
+                            'return_code' => 'SUCCESS',
+                            'return_msg' => '验证ok,金额不正确,归类异常订单!'
+                        ]);
+                    }
                 }
             }
         }
+        Log::info('wxPayCallL:失败订单');
+        Log::info($xml);
         return self::createXml([
             'return_code' => 'FAIL',
             'return_msg' => '验证失败'
@@ -86,7 +99,7 @@ final class WeiXinPayApi extends PayApi
      */
     function createOrder($order)
     {
-        $price = $order['actual_payment'] * 100;
+        $price = $order['due_price'] * 100;
         $appid = $this->config['appId'];
         $mch_id = $this->config['mchId'];
         $time = date('YmdHis');
@@ -112,25 +125,30 @@ final class WeiXinPayApi extends PayApi
         );
         $http_query['sign'] = $this->MakeSign($http_query);
         $xml = self::createXml($http_query);
-        $repose_xml = $this->postXmlCurl($xml, self::postOrderUrl . '/pay/unifiedorder');
+        if (self::DEBUG) {
+            Log::info('createOrderXML:');
+            Log::info($xml);
+        }
+        $repose_xml = $this->postXmlCurl($xml, self::getBaseUrl('/pay/unifiedorder'));
         $repose_arr = $this->fromXml($repose_xml);
+
         //通讯成功
         if (isset($repose_arr['return_code']) and $repose_arr['return_code'] == 'SUCCESS') {
             //业务成功
             if (isset($repose_arr['result_code']) and $repose_arr['result_code'] == 'SUCCESS') {
                 //预充值订单
-                $sendData=[
-                        'appId'=>$appid,
-                        'timeStamp'=>time(),
-                        'nonceStr'=>Str::random(32),
-                        'package'=>'prepay_id='.$repose_arr['prepay_id'],
-                        'signType'=>'MD5',
+                $sendData = [
+                    'appId' => $appid,
+                    'timeStamp' => time(),
+                    'nonceStr' => Str::random(32),
+                    'package' => 'prepay_id=' . $repose_arr['prepay_id'],
+                    'signType' => 'MD5',
                 ];
-                $sendData['paySign']=$this->MakeSign($sendData);
+                $sendData['paySign'] = $this->MakeSign($sendData);
                 return [
                     'code' => ErrorCode::SUCCESS,
                     'errorMessage' => '微信下单成功',
-                    'data'=>$sendData,
+                    'data' => $sendData,
 
                 ];
             }
@@ -138,14 +156,14 @@ final class WeiXinPayApi extends PayApi
             Log::info($repose_arr);
             return [
                 'code' => ErrorCode::THREE_FAIL,
-                'errorMessage' => '微信下单失败-业务失败,err_code:'.$repose_arr['err_code']??($repose_arr['err_code_des']??''),
+                'errorMessage' => '微信下单失败-业务失败,err_code:' . $repose_arr['err_code'] ?? ($repose_arr['err_code_des'] ?? ''),
             ];
         }
         Log::info('原生微信下单失败' . $order->order_sn);
         Log::info($repose_arr);
         return [
             'code' => ErrorCode::THREE_FAIL,
-            'errorMessage' => '微信下单失败:'.$repose_arr['return_msg']??'',
+            'errorMessage' => '微信下单失败:' . $repose_arr['return_msg'] ?? '',
         ];
     }
 
@@ -153,25 +171,26 @@ final class WeiXinPayApi extends PayApi
      * 退款
      * @param \Closure $call
      */
-    public function  refundApply($refund_order,$call){
+    public function refundApply($refund_order, $call)
+    {
         $appid = $this->config['appId'];
         $mch_id = $this->config['mchId'];
-        $data=[
-            'appid'=>$appid,
-            'mch_id'=>$mch_id,
-            'nonce_str'=>Str::random(32),
-            'sign_type'=>'MD5',
-            'transaction_id'=>$refund_order->order->transaction_id,
-            'out_refund_no'=>$refund_order->out_refund_no,
-            'total_fee'=>$refund_order->order->total_fee,
-            'refund_fee'=>$refund_order->refund_fee,
-            'refund_fee_type'=>'CNY',
-            'refund_desc'=>$refund_order->refund_desc,
-            'notify_url'=>'',
+        $data = [
+            'appid' => $appid,
+            'mch_id' => $mch_id,
+            'nonce_str' => Str::random(32),
+            'sign_type' => 'MD5',
+            'transaction_id' => $refund_order->order->transaction_id,
+            'out_refund_no' => $refund_order->out_refund_no,
+            'total_fee' => $refund_order->order->total_fee,
+            'refund_fee' => $refund_order->refund_fee,
+            'refund_fee_type' => 'CNY',
+            'refund_desc' => $refund_order->refund_desc,
+            'notify_url' => '',
         ];
-        $data['sign']=$this->MakeSign($data);
+        $data['sign'] = $this->MakeSign($data);
         $xml = self::createXml($data);
-        $repose_xml = $this->postXmlCurl($xml, self::postOrderUrl . '/pay/unifiedorder');
+        $repose_xml = $this->postXmlCurl($xml, self::getBaseUrl('/pay/unifiedorder'));
         $repose_arr = $this->fromXml($repose_xml);
         //通讯成功
         if (isset($repose_arr['return_code']) and $repose_arr['return_code'] == 'SUCCESS') {
@@ -179,9 +198,9 @@ final class WeiXinPayApi extends PayApi
             if (isset($repose_arr['result_code']) and $repose_arr['result_code'] == 'SUCCESS') {
                 //退款申请成功
                 $call([
-                    'out_refund_no'=>'',
-                    'refund_id'=>'',
-                    'refund_fee'=>'',
+                    'out_refund_no' => '',
+                    'refund_id' => '',
+                    'refund_fee' => '',
                 ]);
             }
         }
@@ -191,7 +210,8 @@ final class WeiXinPayApi extends PayApi
      * 退款结果通知
      * @param \Closure $call
      */
-    public function refundNotice($call){
+    public function refundNotice($call)
+    {
 
     }
 
@@ -201,36 +221,42 @@ final class WeiXinPayApi extends PayApi
      * @param \Closure $closure
      * @return mixed|void
      */
-    public function findOrder($order,\Closure $closure){
+    public function findOrder($order, \Closure $call)
+    {
 
         $appid = $this->config['appId'];
         $mch_id = $this->config['mchId'];
-        $url=self::postOrderUrl.'/pay/orderquery';
-        $post=[
-            'appid'=>$appid,
-            'mch_id'=>$mch_id,
-            'out_trade_no'=>$order->order_sn,
-            'nonce_str'=>Str::random(32),
-            'sign_type'=>'MD5',
+        $url = self::getBaseUrl('/pay/orderquery');
+        $post = [
+            'appid' => $appid,
+            'mch_id' => $mch_id,
+            'out_trade_no' => $order->order_sn,
+            'nonce_str' => Str::random(32),
+            'sign_type' => 'MD5',
         ];
         $post['sign'] = $this->MakeSign($post);
         $xml = self::createXml($post);
-        $repose_xml =$this->postXmlCurl($xml, $url);
+        $repose_xml = $this->postXmlCurl($xml, $url);
         $repose_arr = $this->fromXml($repose_xml);
+        if (self::DEBUG) {
+            Log::info('searchOrderXML:');
+            Log::info($repose_xml);
+        }
         //通讯成功
         if (isset($repose_arr['return_code']) and $repose_arr['return_code'] == 'SUCCESS') {
             //业务成功
-            if(isset($repose_arr['result_code']) and $repose_arr['result_code']=='SUCCESS'){
-                if($repose_arr['trade_state']=='SUCCESS'){
+            if (isset($repose_arr['result_code']) and $repose_arr['result_code'] == 'SUCCESS') {
+                if ($repose_arr['trade_state'] == 'SUCCESS') {
+
                     //有用代金券的情况下，应结订单金额作为回调金额
-                    //有用代金券的情况下，应结订单金额作为回调金额
-                    $calPrice=$repose_arr['settlement_total_fee']??$repose_arr['total_fee'];
-                    $closure([
+                    $calPrice = $repose_arr['settlement_total_fee'] ?? $repose_arr['total_fee'];
+                    $call([
                         'prepay_id' => $repose_arr['transaction_id'],
-                        'callPrice' => $repose_arr['total_fee'] / 100,
+                        'total_price' => $repose_arr['total_fee'] / 100,
                         'actual_payment' => $calPrice / 100,
                         'order_sn' => $repose_arr['out_trade_no'],
                         'pay_type' => 1,
+                        'time_end' => $repose_arr['time_end'],
                     ]);
                     return true;
                 }
@@ -248,18 +274,19 @@ final class WeiXinPayApi extends PayApi
     public function getkey()
     {
         //https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=23_1
-        $url = self::postOrderUrl . '/pay/getsignkey';
+        $url = self::getBaseUrl('/pay/getsignkey');
         $post = [
             'mch_id' => $this->config['mchId'],
             'nonce_str' => Str::random(32),
         ];
         $post['sign'] = $this->MakeSign($post);
         $xml = self::createXml($post);
-        $repose_xml =$this->postXmlCurl($xml, $url);
+        $repose_xml = $this->postXmlCurl($xml, $url);
         $repose_arr = $this->fromXml($repose_xml);
         //通讯成功
         if (isset($repose_arr['return_code']) and $repose_arr['return_code'] == 'SUCCESS') {
             //业务成功
+            Log::info('sandbox_signkey:' . $repose_arr['sandbox_signkey']);
             return $repose_arr['sandbox_signkey'];
         }
         Log::info($repose_arr);
@@ -297,7 +324,7 @@ final class WeiXinPayApi extends PayApi
     }
 
 
-    public  function postXmlCurl($xml, $url, $useCert = false, $second = 30)
+    public function postXmlCurl($xml, $url, $useCert = false, $second = 30)
     {
         $ch = curl_init();
         //设置超时
@@ -314,17 +341,17 @@ final class WeiXinPayApi extends PayApi
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);//严格校验
         }
 
-        if($useCert == true){
+        if ($useCert == true) {
             //设置证书
             //使用证书：cert 与 key 分别属于两个.pem文件
             //证书文件请放入服务器的非web目录下
             $sslCertPath = $this->config['sslCertPath'];
-            $sslKeyPath =  $this->config['sslKeyPath'];
-          //  $config->GetSSLCertPath($sslCertPath, $sslKeyPath);
-            curl_setopt($ch,CURLOPT_SSLCERTTYPE,'PEM');
-            curl_setopt($ch,CURLOPT_SSLCERT, $sslCertPath);
-            curl_setopt($ch,CURLOPT_SSLKEYTYPE,'PEM');
-            curl_setopt($ch,CURLOPT_SSLKEY, $sslKeyPath);
+            $sslKeyPath = $this->config['sslKeyPath'];
+            //  $config->GetSSLCertPath($sslCertPath, $sslKeyPath);
+            curl_setopt($ch, CURLOPT_SSLCERTTYPE, 'PEM');
+            curl_setopt($ch, CURLOPT_SSLCERT, $sslCertPath);
+            curl_setopt($ch, CURLOPT_SSLKEYTYPE, 'PEM');
+            curl_setopt($ch, CURLOPT_SSLKEY, $sslKeyPath);
         }
 
         //设置header
@@ -377,12 +404,25 @@ final class WeiXinPayApi extends PayApi
         ksort($data);
         $string = $this->ToUrlParams($data);
         //签名步骤二：在string后加入KEY
-        $string = $string . "&key=" . $this->config['appSecret'];
+        if (self::IS_SAND_BOX) {
+            $key = $this->config['sandKey'];
+        } else {
+            $key = $this->config['appSecret'];
+        }
+        $string = $string . "&key=" . $key;
         //签名步骤三：MD5加密
-        $string = md5($string);
+        $sig = md5($string);
         //签名步骤四：所有字符转为大写
-        $result = strtoupper($string);
+        $result = strtoupper($sig);
         return $result;
+    }
+
+    public static function getBaseUrl($uri)
+    {
+        if (self::IS_SAND_BOX) {
+            return 'https://api.mch.weixin.qq.com/sandboxnew' . $uri;
+        }
+        return 'https://api.mch.weixin.qq.com' . $uri;
     }
 
 }

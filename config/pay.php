@@ -33,6 +33,7 @@ return [
             'appId' => env('WX_APP_ID',''),
             'mchId' =>env('WX_MCH_ID',''),
             'appSecret' => env('WX_PAY_KEY',''),
+            'sandKey' => env('WX_SAND_KEY',''),
             'sslCertPath'=>env('WX_PAY_CERT_PATH',''),
             'sslKeyPath'=>env('WX_PAY_KEY_PATH',''),
         ],

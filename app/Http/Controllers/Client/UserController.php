@@ -6,6 +6,7 @@ use App\Constants\CacheKey;
 use App\Models\PlayerCountRecord;
 use App\Models\User;
 use App\Modesl\Device;
+use App\Service\SmsApi\HandelSms;
 use Hyperf\Guzzle\CoroutineHandler;
 use App\Constants\ErrorCode;
 use Illuminate\Support\Facades\Cache;
@@ -52,10 +53,30 @@ class UserController extends Base
     }
 
     /**
+     * 获取手机验证码
+     */
+    public function phoneCode(HandelSms $api)
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'area_code' => 'required|numeric',
+            'phone' => 'required|numeric',
+            'type' => 'required|in:1,2',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $message = mt_rand(11111, 99999);
+        return $api->send($this->request->type, $this->request->area_code, $this->request->phone, $message);
+    }
+
+    /**
      * 手机注册
      * @return \Illuminate\Http\JsonResponse
      */
-    public function phoneReg()
+    public function phoneReg(HandelSms $api)
     {
         $validator = $this->validationFactory->make($this->request->all(), [
             'area_code' => 'required|numeric',
@@ -71,7 +92,17 @@ class UserController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-
+        if ($api->checkCode(1, $this->request->area_code, $this->request->phone, $this->request->phone_code)) {
+            //验证码ok,开始注册逻辑
+            return $this->json([
+                'errorMessage' => '注册成功!',
+                'code' => ErrorCode::SUCCESS,
+            ]);
+        }
+        return $this->json([
+            'errorMessage' => '验证码不正确!',
+            'code' => ErrorCode::VALID_FAILURE,
+        ]);
     }
 
     /**
@@ -82,6 +113,8 @@ class UserController extends Base
         $validator = $this->validationFactory->make($this->request->all(), [
             'phone' => 'required|numeric',
             'password' => 'required|min:6',
+            'channelId' => 'required',
+            'deviceShortId' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -98,6 +131,7 @@ class UserController extends Base
     {
         $validator = $this->validationFactory->make($this->request->all(), [
             'phone' => 'required|numeric',
+            'area_code' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -113,6 +147,7 @@ class UserController extends Base
     public function editPassword()
     {
         $validator = $this->validationFactory->make($this->request->all(), [
+            'area_code' => 'required|numeric',
             'phone' => 'required|numeric',
             'phone_code' => 'required',
             'password' => 'required',

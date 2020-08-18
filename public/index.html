@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WX微信小程序接口.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p>###小程序登录接口[app -&gt; Manage Server]:</p>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/login
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>{
+	<span class="hljs-string">'js_code'</span>:<span class="hljs-built_in">string</span>,<span class="hljs-comment">//必须</span>
+	<span class="hljs-string">'nickName'</span>:<span class="hljs-string">''</span>,	<span class="hljs-comment">//userInfo.nickName</span>
+	<span class="hljs-string">'avatarUrl'</span>:<span class="hljs-string">''</span>,<span class="hljs-comment">//userInfo.avatarUrl</span>
+	<span class="hljs-string">'gender'</span>:<span class="hljs-string">''</span>,  <span class="hljs-comment">// userInfo.gender 性别 0：未知、1：男、2：女  ,可选</span>
+	<span class="hljs-string">'province'</span>:<span class="hljs-string">''</span>,	<span class="hljs-comment">//userInfo.province ,可选</span>
+	<span class="hljs-string">'city'</span>:<span class="hljs-string">''</span>,     <span class="hljs-comment">//userInfo.city,可选</span>
+    <span class="hljs-string">'country'</span>:<span class="hljs-string">''</span>,	  <span class="hljs-comment">//userInfo.country,可选</span>
+    <span class="hljs-string">'longitude'</span>:<span class="hljs-string">''</span>,<span class="hljs-comment">//numeric 经度</span>
+    <span class="hljs-string">'latitude'</span>:<span class="hljs-string">''</span><span class="hljs-comment">//numeric  维度</span>
+}
+</div></code></pre>
+<p>###扫码进游戏[app -&gt; Manage Server]:</p>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/scene
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+</div></code></pre>
+<pre class="hljs"><code><div>params{
+	<span class="hljs-string">'scene'</span>:<span class="hljs-built_in">string</span>,<span class="hljs-comment">//必须，扫码场景，带过来</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">"code"</span>: ERetCode, <span class="hljs-comment">// 返回码</span>
+    <span class="hljs-string">"errorMessage"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// [可选] 错误描述</span>
+}
+</div></code></pre>
+<h3 id="%E7%99%BB%E5%87%BA%E6%8E%A5%E5%8F%A3app---manage-server">登出接口app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/logout
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">"success"</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+}
+</div></code></pre>
+<h3 id="%E6%9F%A5%E8%AF%A2%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AFapp---manage-server">查询用户信息[app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/info
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">"errorMessage"</span>: <span class="hljs-string">"success"</span>,
+    <span class="hljs-string">"user_id"</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-string">"nickname"</span>: <span class="hljs-string">"zhansan"</span>,
+    <span class="hljs-string">"sex"</span>: <span class="hljs-number">1</span>,<span class="hljs-comment">//0男1女</span>
+    <span class="hljs-string">"icon"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-string">"popularity"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">"attention"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">"fans"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-string">"remaining"</span>: <span class="hljs-string">"0.00"</span>,
+    <span class="hljs-string">"income"</span>: <span class="hljs-string">"0.00"</span>,
+    <span class="hljs-string">"withdrawal"</span>: <span class="hljs-string">"0.00"</span>,
+    <span class="hljs-string">"code"</span>: <span class="hljs-number">0</span> ,<span class="hljs-comment">// ERetCode,  返回码</span>
+}
+</div></code></pre>
+<h3 id="%E6%88%98%E7%BB%A9%E6%90%9C%E7%B4%A2%E6%9D%A1%E4%BB%B6app---manage-server">战绩搜索条件[app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/game/conf
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+
+<span class="hljs-string">``</span><span class="hljs-string">`typescript
+
+</span></div></code></pre>
+<pre class="hljs"><code><div>Response
+
+```json
+{
+    &quot;errorMessage&quot;: &quot;&quot;,
+    &quot;code&quot;: 0,
+    &quot;list&quot;: {
+        &quot;dup_list&quot;: [
+            {
+                &quot;dup_id&quot;: 1,
+                &quot;dup_name&quot;: &quot;板子20&quot;
+            }
+        ],
+        &quot;job_list&quot;: [
+            {
+                &quot;v&quot;: 1,
+                &quot;name&quot;: &quot;平民&quot;
+            }
+        ],
+        &quot;fight_type&quot;: [
+            {
+                &quot;v&quot;: 1,
+                &quot;name&quot;: &quot;中断&quot;
+            }
+        ]
+    }
+}
+</div></code></pre>
+<h3 id="%E7%8E%A9%E5%AE%B6%E6%83%B3%E8%B5%B7%E5%A4%B4%E9%83%A8%E6%88%98%E7%BB%A9%E6%B1%87%E6%80%BBapp---manage-server">玩家想起头部战绩汇总[app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/game/record
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+     <span class="hljs-string">'userId'</span> =&gt; <span class="hljs-string">'required'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">"success"</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"list"</span>: {
+        <span class="hljs-attr">"total_game"</span>: <span class="hljs-number">10</span>,
+        <span class="hljs-attr">"win_game"</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-attr">"mvp"</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-attr">"svp"</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-attr">"police"</span>: <span class="hljs-number">1</span>
+    }
+}
+</div></code></pre>
+<h3 id="%E5%AF%B9%E6%88%98%E5%8E%86%E5%8F%B2app---manage-server">对战历史app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/game/fightHistorical
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'dupId'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'job'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'fightType'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'limit'</span> =&gt; <span class="hljs-string">'required|numeric|max:100'</span>,
+    <span class="hljs-string">'page'</span> =&gt; <span class="hljs-string">'required|numeric|min:1'</span>,
+    <span class="hljs-string">'userId'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"list"</span>: [
+        {
+            <span class="hljs-attr">"nickname"</span>: <span class="hljs-string">"夜星"</span>,
+            <span class="hljs-attr">"icon"</span>: <span class="hljs-string">""</span>,
+            <span class="hljs-attr">"res"</span>: <span class="hljs-number">3</span>,<span class="hljs-comment">// 1- 中断， 2- 胜利 ，3- 失败</span>
+            <span class="hljs-attr">"dup_name"</span>: <span class="hljs-string">"12人标准局"</span>,
+            <span class="hljs-attr">"date"</span>: <span class="hljs-string">"07-10 17:37"</span>,
+            <span class="hljs-attr">"score"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//评分</span>
+             <span class="hljs-attr">"seat"</span>: <span class="hljs-number">12</span>,<span class="hljs-comment">//位置</span>
+            <span class="hljs-attr">"room_game_id"</span>: <span class="hljs-number">2</span>,
+            <span class="hljs-attr">"dup_id"</span>: <span class="hljs-number">103</span>,
+            <span class="hljs-attr">"mvp"</span>: <span class="hljs-number">0</span>,
+            <span class="hljs-attr">"svp"</span>: <span class="hljs-number">0</span>,
+            <span class="hljs-attr">"sex"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//0男,1女</span>
+            <span class="hljs-attr">"user_id"</span>: <span class="hljs-number">67</span>,
+            <span class="hljs-attr">"job"</span>:<span class="hljs-number">0</span>,<span class="hljs-comment">//职业0表示没有职业,头像显示当前微信头像，其他值查询文档底部职业对照表。。前端根据self_job显示不同的职业头像</span>
+        }
+    ]
+}
+</div></code></pre>
+<h3 id="%E6%B8%B8%E6%88%8F%E4%B8%ADapp---manage-server">游戏中app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/game/nowGame
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"list"</span>: {
+        <span class="hljs-attr">"item"</span>: {
+            <span class="hljs-attr">"nickname"</span>: <span class="hljs-string">"nw3"</span>,
+            <span class="hljs-attr">"icon"</span>: <span class="hljs-string">""</span>,
+            <span class="hljs-attr">"dup_name"</span>: <span class="hljs-string">"12人标准局"</span>,
+            <span class="hljs-attr">"date"</span>: <span class="hljs-string">"07-10 17:37"</span>,
+            <span class="hljs-attr">"score"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//评分</span>
+            <span class="hljs-attr">"seat"</span>: <span class="hljs-number">1</span>,<span class="hljs-comment">//位置</span>
+            <span class="hljs-attr">"room_game_id"</span>: <span class="hljs-number">2</span>,
+            <span class="hljs-attr">"dup_id"</span>: <span class="hljs-number">103</span>,
+            <span class="hljs-attr">"mvp"</span>: <span class="hljs-number">0</span>,
+            <span class="hljs-attr">"svp"</span>: <span class="hljs-number">0</span>,
+            <span class="hljs-attr">"sex"</span>: <span class="hljs-number">0</span>,
+            <span class="hljs-attr">"user_id"</span>: <span class="hljs-number">24</span>,
+            <span class="hljs-attr">"job"</span>:<span class="hljs-number">0</span>,<span class="hljs-comment">//职业0表示没有职业,头像显示当前微信头像，其他值查询文档底部职业对照表。。前端根据self_job显示不同的职业头像</span>
+            <span class="hljs-attr">"room_name"</span>: <span class="hljs-string">"北京店-三一【房间1111】"</span>,
+            <span class="hljs-attr">"status"</span>: <span class="hljs-number">3</span> <span class="hljs-comment">//状态 1-未登陆，2-未开始，3 游戏中, 4 观战中</span>
+        },
+        <span class="hljs-attr">"list"</span>:[
+                {
+                <span class="hljs-attr">"nickname"</span>: <span class="hljs-string">"nw3"</span>,
+                <span class="hljs-attr">"icon"</span>: <span class="hljs-string">""</span>,
+                <span class="hljs-attr">"dup_name"</span>: <span class="hljs-string">"12人标准局"</span>,
+                <span class="hljs-attr">"date"</span>: <span class="hljs-string">"07-10 17:37"</span>,
+                <span class="hljs-attr">"score"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//评分</span>
+                <span class="hljs-attr">"seat"</span>: <span class="hljs-number">1</span>,<span class="hljs-comment">//位置</span>
+                <span class="hljs-attr">"room_game_id"</span>: <span class="hljs-number">2</span>,
+                <span class="hljs-attr">"dup_id"</span>: <span class="hljs-number">103</span>,
+                <span class="hljs-attr">"mvp"</span>: <span class="hljs-number">0</span>,
+                <span class="hljs-attr">"svp"</span>: <span class="hljs-number">0</span>,
+                <span class="hljs-attr">"sex"</span>: <span class="hljs-number">0</span>,
+                <span class="hljs-attr">"user_id"</span>: <span class="hljs-number">24</span>,
+                <span class="hljs-attr">"job"</span>:<span class="hljs-number">0</span>,<span class="hljs-comment">//职业0表示没有职业,头像显示当前微信头像，其他值查询文档底部职业对照表。。前端根据self_job显示不同的职业头像</span>
+                <span class="hljs-attr">"room_name"</span>: <span class="hljs-string">"北京店-三一【房间1111】"</span>,
+                <span class="hljs-attr">"status"</span>: <span class="hljs-number">3</span> <span class="hljs-comment">//状态 1-未登陆，2-未开始，3 游戏中, 4 观战中</span>
+            }
+        ],
+        <span class="hljs-attr">"seats_num"</span>:<span class="hljs-number">12</span>, <span class="hljs-comment">//座位号</span>
+    }
+}
+
+
+
+### 对局详情app -&gt; Manage Server]:
+
+&gt; 访问链接: https:<span class="hljs-comment">//lrs-tt.7955.com/wx/game/room</span>
+&gt; 协议发送类型: `POST` 
+Request
+```typescript
+header
+{
+    <span class="hljs-attr">"token"</span>: string, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    'roomId' =&gt; 'required|numeric'
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"list"</span>: [
+        {
+            <span class="hljs-attr">"nickname"</span>: <span class="hljs-string">"nw3"</span>,
+            <span class="hljs-attr">"icon"</span>: <span class="hljs-string">""</span>,
+            <span class="hljs-attr">"res"</span>: <span class="hljs-number">2</span>,<span class="hljs-comment">// 1- 中断， 2- 胜利 ，3- 失败</span>
+            <span class="hljs-attr">"dup_name"</span>: <span class="hljs-string">"12人标准局"</span>,
+            <span class="hljs-attr">"date"</span>: <span class="hljs-string">"07-10 17:37"</span>,
+             <span class="hljs-attr">"seat"</span>: <span class="hljs-number">12</span>,<span class="hljs-comment">//位置</span>
+            <span class="hljs-attr">"score"</span>: <span class="hljs-number">0</span>,
+            <span class="hljs-attr">"room_game_id"</span>: <span class="hljs-number">2</span>,
+            <span class="hljs-attr">"dup_id"</span>: <span class="hljs-number">103</span>,
+            <span class="hljs-attr">"mvp"</span>: <span class="hljs-number">0</span>,
+            <span class="hljs-attr">"svp"</span>: <span class="hljs-number">0</span>,
+            <span class="hljs-attr">"user_id"</span>: <span class="hljs-number">24</span>
+        }
+    ]
+}
+</div></code></pre>
+<h3 id="%E5%AF%B9%E5%B1%80%E5%A4%8D%E7%9B%98app---manage-server">对局复盘app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/game/roomReplay
+协议发送类型: <code>POST</code>
+Request</p>
+</blockquote>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'roomGameid'</span> =&gt; <span class="hljs-string">'required|numeric'</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"playerlist"</span>: [
+        {
+            <span class="hljs-attr">"seat"</span>: <span class="hljs-number">1</span>,<span class="hljs-comment">//位置</span>
+            <span class="hljs-attr">"nickname"</span>: <span class="hljs-string">"nw3"</span>,
+            <span class="hljs-attr">"icon"</span>: <span class="hljs-string">""</span>,
+        }
+    ],
+    <span class="hljs-attr">"replayData"</span>:[
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">0</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">0</span>, <span class="hljs-comment">// 行为类型</span>
+            <span class="hljs-attr">"datajson"</span>:<span class="hljs-string">""</span>,<span class="hljs-comment">// 根据不同的actionType 具体内容不同</span>
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">// 预言家查验</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">//预言家位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">// 查验位置</span>
+                <span class="hljs-attr">"resjob"</span>:<span class="hljs-number">99</span>, <span class="hljs-comment">// 99 - 好人</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">2</span>, <span class="hljs-comment">// 预言家查杀</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">//预言家位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">// 查杀位置</span>
+                <span class="hljs-attr">"resjob"</span>:<span class="hljs-number">2</span>, <span class="hljs-comment">// 2 - 狼人</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">3</span>, <span class="hljs-comment">// 预言家空过</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">//预言家位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">0</span>,<span class="hljs-comment">//</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">4</span>, <span class="hljs-comment">// 狼刀</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"killseat"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">//刀的位置</span>
+                <span class="hljs-attr">"choselist"</span>:[
+                    {
+                        <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼位置</span>
+                        <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">// 狼选择位置</span>
+                    }
+                ],
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">5</span>, <span class="hljs-comment">// 狼空刀</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"killseat"</span>:<span class="hljs-number">0</span>, <span class="hljs-comment">//刀的位置</span>
+                <span class="hljs-attr">"choselist"</span>:[
+                    {
+                        <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼位置</span>
+                        <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">// 狼选择位置</span>
+                    }
+                ],
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">6</span>, <span class="hljs-comment">// 狼自爆</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼人位置</span>
+            }
+        },
+
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">7</span>, <span class="hljs-comment">// 白狼王带走</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼人位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">8</span>, <span class="hljs-comment">// 白狼王不带走</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼人位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">9</span>, <span class="hljs-comment">// 黑狼带走</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼人位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">10</span>, <span class="hljs-comment">// 黑狼不带走</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼人位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">11</span>, <span class="hljs-comment">// 女巫救</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//女巫位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">12</span>, <span class="hljs-comment">// 女巫杀</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//女巫位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">13</span>, <span class="hljs-comment">// 女巫过</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//女巫位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">14</span>, <span class="hljs-comment">// 守卫守</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//守卫位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">15</span>, <span class="hljs-comment">// 守卫过</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//守卫位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">16</span>, <span class="hljs-comment">// 猎人杀</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//猎人位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">17</span>, <span class="hljs-comment">// 猎人过</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//猎人位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">18</span>, <span class="hljs-comment">// 白痴翻牌</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//白痴位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">101</span>, <span class="hljs-comment">// 选警长延期</span>
+            <span class="hljs-attr">"datajson"</span>: <span class="hljs-string">""</span>,
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">102</span>, <span class="hljs-comment">// 选警长pk</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seats"</span> :[
+                    {
+                        <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">// Pk位置</span>
+                    },
+                    {
+                        <span class="hljs-attr">"seat"</span>:<span class="hljs-number">2</span>, <span class="hljs-comment">// Pk位置</span>
+                    }
+                ]
+            },
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">103</span>, <span class="hljs-comment">// 当选警长</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 警长位置</span>
+            },
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">104</span>, <span class="hljs-comment">// 警徽流失</span>
+            <span class="hljs-attr">"datajson"</span>: <span class="hljs-string">""</span>,
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">105</span>, <span class="hljs-comment">// 转移警长</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//警长位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//转移位置</span>
+            },
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">106</span>, <span class="hljs-comment">// 撕毁警徽</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//警长位置</span>
+                <span class="hljs-attr">"chose"</span>:<span class="hljs-number">0</span>,
+            },
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">107</span>, <span class="hljs-comment">// 平安夜</span>
+            <span class="hljs-attr">"datajson"</span>: <span class="hljs-string">""</span>,
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">108</span>, <span class="hljs-comment">// 平安日</span>
+            <span class="hljs-attr">"datajson"</span>: <span class="hljs-string">""</span>,
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">109</span>, <span class="hljs-comment">// 公布死讯</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"deadInfos"</span>:[
+                    {
+                        <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//死亡位置</span>
+                        <span class="hljs-attr">"status"</span>:<span class="hljs-number">0</span>,<span class="hljs-comment">//状态EFightStatus 对应死因</span>
+                    },
+                    {
+                        <span class="hljs-attr">"seat"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//死亡位置</span>
+                        <span class="hljs-attr">"status"</span>:<span class="hljs-number">0</span>,<span class="hljs-comment">//状态EFightStatus 对应死因</span>
+                    },
+                ]
+            },
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">110</span>, <span class="hljs-comment">// 放逐公告</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"banishseat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//被放逐的位置</span>
+                <span class="hljs-attr">"choselist"</span>:[
+                    {
+                        <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">// 位置</span>
+                        <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>, <span class="hljs-comment">//投票的位置</span>
+                    },
+                ]
+            },
+        },
+    ]
+}
+
+
+</div></code></pre>
+<pre class="hljs"><code><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> EGameActionType
+	{
+		None = <span class="hljs-number">0</span>,
+		ProphotCheckGood = <span class="hljs-number">1</span>, <span class="hljs-comment">// 预言家查验</span>
+		ProphotCheckWolf = <span class="hljs-number">2</span>, <span class="hljs-comment">// 预言家查杀</span>
+		ProphotPass = <span class="hljs-number">3</span>, <span class="hljs-comment">// 预言家空过</span>
+		
+		WereWolfKill = <span class="hljs-number">4</span>, <span class="hljs-comment">// 狼刀</span>
+		WereWolfPass = <span class="hljs-number">5</span>, <span class="hljs-comment">// 空刀</span>
+		WereWolfSelfBurst = <span class="hljs-number">6</span>, <span class="hljs-comment">// 狼人自爆</span>
+		WhiteWolfKill = <span class="hljs-number">7</span>, <span class="hljs-comment">// 白狼王带走</span>
+		WhiteWolfPass = <span class="hljs-number">8</span>,<span class="hljs-comment">// 白狼王不带走</span>
+		BlackWoflKill = <span class="hljs-number">9</span>, <span class="hljs-comment">// 黑狼带走</span>
+		BlackWolfPass = <span class="hljs-number">10</span>, <span class="hljs-comment">// 黑狼不带走</span>
+		
+		WitchSave = <span class="hljs-number">11</span>, <span class="hljs-comment">// 女巫救</span>
+		WitchKill = <span class="hljs-number">12</span>,<span class="hljs-comment">// 女巫杀</span>
+		WitchPass = <span class="hljs-number">13</span>,<span class="hljs-comment">// 女巫过</span>
+		
+		GuardHelp = <span class="hljs-number">14</span>, <span class="hljs-comment">// 守卫守</span>
+		GuardPass = <span class="hljs-number">15</span>,<span class="hljs-comment">// 守卫过</span>
+		
+		HunterKill = <span class="hljs-number">16</span>,<span class="hljs-comment">//猎人杀</span>
+		HunterPass = <span class="hljs-number">17</span>,<span class="hljs-comment">// 猎人过</span>
+		
+		IdiotShowIdentify = <span class="hljs-number">18</span>,<span class="hljs-comment">// 白痴翻牌</span>
+		
+		DelaySelectPolice = <span class="hljs-number">101</span>, <span class="hljs-comment">// 选警长延期</span>
+		SelectPolicePK = <span class="hljs-number">102</span>,<span class="hljs-comment">// 选警长pk</span>
+		AsPolice = <span class="hljs-number">103</span>, <span class="hljs-comment">// 当选警长</span>
+		LossPolice = <span class="hljs-number">104</span>, <span class="hljs-comment">// 警徽流失</span>
+		TransPolice = <span class="hljs-number">105</span>,<span class="hljs-comment">// 转移警长</span>
+		DestroyPolice = <span class="hljs-number">106</span>,<span class="hljs-comment">// 撕毁警徽</span>
+		
+		SafeNight = <span class="hljs-number">107</span>,<span class="hljs-comment">// 平安夜</span>
+		SafeDay = <span class="hljs-number">108</span>,<span class="hljs-comment">// 平安日</span>
+		PublishNightDie = <span class="hljs-number">109</span>,<span class="hljs-comment">// 公布死讯</span>
+		BanishPlayer = <span class="hljs-number">110</span>,<span class="hljs-comment">// 放逐公告</span>
+	}
+
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> EFightStatus
+	{
+		None = <span class="hljs-number">0</span>,
+		Normal = <span class="hljs-number">1</span>, <span class="hljs-comment">//</span>
+		WereWolfKill = <span class="hljs-number">2</span>, <span class="hljs-comment">// 狼人杀死</span>
+		WereWolfSelfButst = <span class="hljs-number">3</span>, <span class="hljs-comment">// 狼人自爆</span>
+		WitchKill = <span class="hljs-number">4</span>, <span class="hljs-comment">// 女巫毒杀</span>
+		VoteKill = <span class="hljs-number">5</span>, <span class="hljs-comment">// 投票放逐</span>
+		IdiotAlive = <span class="hljs-number">6</span>, <span class="hljs-comment">// 白痴状态</span>
+		HunterKill = <span class="hljs-number">7</span>, <span class="hljs-comment">// 枪杀</span>
+		WolfHunterKill = <span class="hljs-number">8</span>, <span class="hljs-comment">// 枪杀</span>
+	}
+
+</div></code></pre>
+<h3 id="%E7%9B%B8%E5%86%8Capp---manage-server">相册app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/images
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'limit'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'page'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'userId'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">"success"</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"list"</span>: [
+        {
+            <span class="hljs-attr">"month"</span>: <span class="hljs-string">"5月"</span>,
+            <span class="hljs-attr">"list"</span>: [
+                {
+                    <span class="hljs-attr">"src"</span>: <span class="hljs-string">"https://lrs-tt.7955.com/storage/qrCode/1113.png"</span>,
+                    <span class="hljs-attr">"title"</span>: <span class="hljs-string">"1111"</span>
+                },
+                {
+                    <span class="hljs-attr">"src"</span>: <span class="hljs-string">"https://lrs-tt.7955.com/storage/qrCode/1113.png"</span>,
+                    <span class="hljs-attr">"title"</span>: <span class="hljs-string">"222"</span>
+                }
+            ]
+        }
+    ]
+}
+</div></code></pre>
+<h3 id="%E5%95%86%E5%93%81%E5%88%86%E7%B1%BBapp---manage-server">商品分类app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/store/detail
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+ <span class="hljs-string">'store_id'</span> =&gt; <span class="hljs-string">'required'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"list"</span>: {
+        <span class="hljs-attr">"store_id"</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-attr">"store_name"</span>: <span class="hljs-string">"北京店-三一"</span>,
+        <span class="hljs-attr">"open_at"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//营业开始</span>
+        <span class="hljs-attr">"close_at"</span>: <span class="hljs-number">24</span>,<span class="hljs-comment">//营业结束时间</span>
+        <span class="hljs-attr">"address"</span>:<span class="hljs-string">""</span>,
+        <span class="hljs-attr">"logo"</span>: <span class="hljs-string">""</span>,
+        <span class="hljs-attr">"category"</span>: [
+            {
+                <span class="hljs-attr">"category_id"</span>: <span class="hljs-number">1</span>,
+                <span class="hljs-attr">"category_name"</span>: <span class="hljs-string">"蛋糕"</span>
+            },
+            {
+                <span class="hljs-attr">"category_id"</span>: <span class="hljs-number">2</span>,
+                <span class="hljs-attr">"category_name"</span>: <span class="hljs-string">"甜点"</span>
+            },
+            {
+                <span class="hljs-attr">"category_id"</span>: <span class="hljs-number">3</span>,
+                <span class="hljs-attr">"category_name"</span>: <span class="hljs-string">"奶茶"</span>
+            }
+        ],
+        <span class="hljs-attr">"tags"</span>: [
+            {
+                <span class="hljs-attr">"tag_id"</span>: <span class="hljs-number">1</span>,
+                <span class="hljs-attr">"tag_name"</span>: <span class="hljs-string">"大包间"</span>
+            },
+            {
+                <span class="hljs-attr">"tag_id"</span>: <span class="hljs-number">2</span>,
+                <span class="hljs-attr">"tag_name"</span>: <span class="hljs-string">"可停车"</span>
+            }
+        ]
+    }
+}
+</div></code></pre>
+<h3 id="%E5%95%86%E5%93%81%E5%88%97%E8%A1%A8app---manage-server">商品列表app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/store/goodsList
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+        <span class="hljs-string">'page'</span> =&gt; <span class="hljs-string">'required|numeric|min:1'</span>,
+        <span class="hljs-string">'limit'</span> =&gt; <span class="hljs-string">'required|numeric|min:1'</span>,
+        <span class="hljs-string">'category_id'</span> =&gt; <span class="hljs-string">'required|numeric|min:1'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"list"</span>: [
+        {
+            <span class="hljs-attr">"goods_name"</span>: <span class="hljs-string">"奶茶111"</span>,
+            <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"15.00"</span>,
+            <span class="hljs-attr">"goods_id"</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-attr">"image"</span>: <span class="hljs-string">"https://langrens.oss-cn-shenzhen.aliyuncs.com/app/default/goods.jpeg"</span>,
+            <span class="hljs-attr">"img100"</span>: <span class="hljs-string">"https://langrens.oss-cn-shenzhen.aliyuncs.com/app/default/goods.jpeg?x-oss-process=image/resize,m_lfit,h_100,w_100/format,png"</span>,
+            <span class="hljs-attr">"img50"</span>: <span class="hljs-string">"https://langrens.oss-cn-shenzhen.aliyuncs.com/app/default/goods.jpeg?x-oss-process=image/resize,m_pad,h_50,w_50"</span>,
+            <span class="hljs-attr">"info"</span>: <span class="hljs-string">"奶茶1撒大大啊是的大奥大撒大大"</span>,
+            <span class="hljs-attr">"tag"</span>: <span class="hljs-string">"大/5%"</span>,
+            <span class="hljs-attr">"stock"</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-attr">"type"</span>: <span class="hljs-number">1</span>
+            <span class="hljs-string">"goodsTags"</span>: [
+                {
+                    <span class="hljs-attr">"tag_id"</span>: <span class="hljs-number">11</span>,
+                    <span class="hljs-attr">"tag_name"</span>: <span class="hljs-string">"杯型"</span>,
+                    <span class="hljs-attr">"tags"</span>: [
+                        {
+                            <span class="hljs-attr">"sku_id"</span>: <span class="hljs-number">1</span>,
+                            <span class="hljs-attr">"active"</span>: <span class="hljs-number">1</span>,
+                            <span class="hljs-attr">"stock"</span>: <span class="hljs-number">1</span>,
+                            <span class="hljs-attr">"sku_name"</span>: <span class="hljs-string">"大"</span>,
+                            <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"15.00"</span>,
+                            <span class="hljs-attr">"goods_id"</span>: <span class="hljs-number">1</span>
+                        },
+                        {
+                            <span class="hljs-attr">"sku_id"</span>: <span class="hljs-number">2</span>,
+                            <span class="hljs-attr">"active"</span>: <span class="hljs-number">0</span>,
+                            <span class="hljs-attr">"stock"</span>: <span class="hljs-number">1</span>,
+                            <span class="hljs-attr">"sku_name"</span>: <span class="hljs-string">"中"</span>,
+                            <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"12.00"</span>,
+                            <span class="hljs-attr">"goods_id"</span>: <span class="hljs-number">1</span>
+                        },
+                        {
+                            <span class="hljs-attr">"sku_id"</span>: <span class="hljs-number">3</span>,
+                            <span class="hljs-attr">"active"</span>: <span class="hljs-number">0</span>,
+                            <span class="hljs-attr">"stock"</span>: <span class="hljs-number">1</span>,
+                            <span class="hljs-attr">"sku_name"</span>: <span class="hljs-string">"小"</span>,
+                            <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"10.00"</span>,
+                            <span class="hljs-attr">"goods_id"</span>: <span class="hljs-number">1</span>
+                        }
+                    ]
+                },
+                {
+                    <span class="hljs-attr">"tag_id"</span>: <span class="hljs-number">12</span>,
+                    <span class="hljs-attr">"tag_name"</span>: <span class="hljs-string">"糖度"</span>,
+                    <span class="hljs-attr">"tags"</span>: [
+                        {
+                            <span class="hljs-attr">"sku_id"</span>: <span class="hljs-number">4</span>,
+                            <span class="hljs-attr">"active"</span>: <span class="hljs-number">1</span>,
+                            <span class="hljs-attr">"stock"</span>: <span class="hljs-number">1</span>,
+                            <span class="hljs-attr">"sku_name"</span>: <span class="hljs-string">"5%"</span>,
+                            <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"0.00"</span>,
+                            <span class="hljs-attr">"goods_id"</span>: <span class="hljs-number">1</span>
+                        },
+                        {
+                            <span class="hljs-attr">"sku_id"</span>: <span class="hljs-number">5</span>,
+                            <span class="hljs-attr">"active"</span>: <span class="hljs-number">0</span>,
+                            <span class="hljs-attr">"stock"</span>: <span class="hljs-number">1</span>,
+                            <span class="hljs-attr">"sku_name"</span>: <span class="hljs-string">"10%"</span>,
+                            <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"0.00"</span>,
+                            <span class="hljs-attr">"goods_id"</span>: <span class="hljs-number">1</span>
+                        }
+                    ]
+                }
+            ],
+        }
+    ]
+}
+image:<span class="hljs-comment">//源图</span>
+img100:<span class="hljs-number">100</span>*<span class="hljs-number">100</span>图
+img50:<span class="hljs-number">50</span>*<span class="hljs-number">50</span>图
+</div></code></pre>
+<h3 id="%E5%95%86%E9%93%BA%E5%88%97%E8%A1%A8app---manage-server">商铺列表app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/store/storeList
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'searchName'</span> =&gt; <span class="hljs-string">'nullable'</span>,<span class="hljs-comment">//可以为空</span>
+    <span class="hljs-string">'page'</span> =&gt; <span class="hljs-string">'required|numeric|min:1'</span>,
+    <span class="hljs-string">'limit'</span> =&gt; <span class="hljs-string">'required|numeric|min:1'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"list"</span>: [
+        {
+            <span class="hljs-attr">"store_name"</span>: <span class="hljs-string">"北京店-三一"</span>,<span class="hljs-comment">//店铺名称</span>
+            <span class="hljs-attr">"store_id"</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-attr">"describe"</span>: <span class="hljs-string">"mktest"</span>,<span class="hljs-comment">//店面描述</span>
+            <span class="hljs-attr">"address"</span>: <span class="hljs-string">"aaaaa"</span>,<span class="hljs-comment">//地址</span>
+            <span class="hljs-attr">"close_at"</span>: <span class="hljs-number">24</span>,<span class="hljs-comment">//营业结束</span>
+            <span class="hljs-attr">"open_at"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//营业开始时间</span>
+            <span class="hljs-attr">"distance"</span>:<span class="hljs-number">1.2</span> <span class="hljs-comment">//距离单位千米</span>
+        }
+    ]
+}
+</div></code></pre>
+<h3 id="%E5%88%9B%E5%BB%BA%E8%AE%A2%E5%8D%95-app---manage-server">创建订单 app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/order/createOrder
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+  <span class="hljs-string">'buys'</span> =&gt; <span class="hljs-string">'required|json'</span>,<span class="hljs-comment">//购买的物品json</span>
+}
+
+buys 说明:
+[
+    {
+        <span class="hljs-string">'goodsId'</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//商品id</span>
+        <span class="hljs-string">'ext'</span>:[]  <span class="hljs-comment">//规格sku_id数组,具体查看ext说明</span>
+        <span class="hljs-string">'type'</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">//商品类型，取值商品列表,后期肯能有,虚拟商品</span>
+        <span class="hljs-string">'count'</span>:<span class="hljs-number">10</span> <span class="hljs-comment">//数量</span>
+    }
+]
+ext 说明:
+[
+    {
+        tag_id:<span class="hljs-number">1</span>,
+        sku_id:<span class="hljs-number">10</span>,
+    },
+    {
+        tag_id:<span class="hljs-number">2</span>,
+        sku_id:<span class="hljs-number">25</span>,
+    }
+]
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>成功
+{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"order_id"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">//订单id</span>
+}
+
+失败:
+{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">"商品[汽车]规格不存在，或者已被修改，请刷新页面，重新下单！"</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">-24</span>,
+    <span class="hljs-attr">"removeGoodsIds"</span>: [
+        <span class="hljs-number">2</span>
+    ]
+}
+</div></code></pre>
+<h3 id="%E8%AE%A2%E5%8D%95%E9%A2%84%E8%A7%88%E5%8F%91%E8%B5%B7%E6%94%AF%E4%BB%98%E5%89%8D%E4%B8%80%E6%AD%A5%E7%94%A8%E4%BA%8E%E9%80%89%E6%8B%A9%E4%BC%98%E6%83%A0%E5%88%B8%E4%B9%8B%E7%B1%BB%E7%9A%84-app---manage-server">订单预览,发起支付前一步，用于选择优惠券之类的。 app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/order/preview
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+   <span class="hljs-string">'order_id'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"order"</span>: {
+        <span class="hljs-attr">"order_id"</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-attr">"total_price"</span>: <span class="hljs-string">"10200169.90"</span>,<span class="hljs-comment">//商品总额</span>
+        <span class="hljs-attr">"created_at"</span>: <span class="hljs-string">"2020-08-11 18:58:59"</span>
+    },
+    <span class="hljs-attr">"order_goods"</span>: [
+        {
+            <span class="hljs-attr">"order_id"</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-attr">"goods_num"</span>: <span class="hljs-number">10</span>,<span class="hljs-comment">//商品数量</span>
+            <span class="hljs-attr">"goods_name"</span>: <span class="hljs-string">"汽车"</span>,
+            <span class="hljs-attr">"image"</span>: <span class="hljs-string">"http://langrens.oss-cn-shenzhen.aliyuncs.com/app/local/goods/fP8FnyWpgAfPGvUGtRJx8fRYtIapS2vMi5AQwpkQ.jpeg"</span>,
+            <span class="hljs-attr">"tag"</span>: <span class="hljs-string">"C/双杠"</span>,
+            <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"100000.00"</span>,<span class="hljs-comment">//单价</span>
+            <span class="hljs-attr">"img100"</span>: <span class="hljs-string">"http://langrens.oss-cn-shenzhen.aliyuncs.com/app/local/goods/fP8FnyWpgAfPGvUGtRJx8fRYtIapS2vMi5AQwpkQ.jpeg?x-oss-process=image/resize,m_lfit,h_100,w_100/format,png"</span>,
+            <span class="hljs-attr">"img50"</span>: <span class="hljs-string">"http://langrens.oss-cn-shenzhen.aliyuncs.com/app/local/goods/fP8FnyWpgAfPGvUGtRJx8fRYtIapS2vMi5AQwpkQ.jpeg?x-oss-process=image/resize,m_pad,h_50,w_50"</span>
+        },
+        {
+            <span class="hljs-attr">"order_id"</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-attr">"goods_num"</span>: <span class="hljs-number">10</span>,
+            <span class="hljs-attr">"goods_name"</span>: <span class="hljs-string">"沃尔沃"</span>,
+            <span class="hljs-attr">"image"</span>: <span class="hljs-string">"https://langrens.oss-cn-shenzhen.aliyuncs.com/app/default/goods.jpeg"</span>,
+            <span class="hljs-attr">"tag"</span>: <span class="hljs-string">"15两/油炸"</span>,
+            <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"17.00"</span>,
+            <span class="hljs-attr">"img100"</span>: <span class="hljs-string">"https://langrens.oss-cn-shenzhen.aliyuncs.com/app/default/goods.jpeg?x-oss-process=image/resize,m_lfit,h_100,w_100/format,png"</span>,
+            <span class="hljs-attr">"img50"</span>: <span class="hljs-string">"https://langrens.oss-cn-shenzhen.aliyuncs.com/app/default/goods.jpeg?x-oss-process=image/resize,m_pad,h_50,w_50"</span>
+        }
+    ],
+    <span class="hljs-attr">"store"</span>: {
+        <span class="hljs-attr">"store_id"</span>: <span class="hljs-number">11</span>,
+        <span class="hljs-attr">"store_name"</span>: <span class="hljs-string">"倾1门店1111"</span>,<span class="hljs-comment">//门店名称</span>
+        <span class="hljs-attr">"logo"</span>: <span class="hljs-string">""</span>,
+        <span class="hljs-attr">"address"</span>: <span class="hljs-string">"撒大大"</span>,<span class="hljs-comment">//门店名称</span>
+        <span class="hljs-attr">"company_name"</span>: <span class="hljs-string">"A1"</span><span class="hljs-comment">//商户名称</span>
+    },
+    <span class="hljs-attr">"user_coupon_list"</span>: [
+        {
+            <span class="hljs-attr">"coupon_name"</span>: <span class="hljs-string">"满10减5"</span>,<span class="hljs-comment">//券名称</span>
+            <span class="hljs-attr">"user_coupon_id"</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-attr">"condition_price"</span>: <span class="hljs-string">"10.000"</span>,<span class="hljs-comment">//满额</span>
+            <span class="hljs-attr">"price"</span>: <span class="hljs-string">"5.000"</span><span class="hljs-comment">//减额</span>
+        }
+    ]
+}
+</div></code></pre>
+<h3 id="%E5%8F%91%E8%B5%B7%E6%94%AF%E4%BB%98%E9%80%89%E6%8B%A9%E6%94%AF%E4%BB%98%E6%96%B9%E5%BC%8F%E8%BF%94%E5%9B%9E%E6%94%AF%E4%BB%98%E5%87%AD%E8%AF%81%E5%89%8D%E7%AB%AF%E8%B0%83%E8%B5%B7%E6%94%AF%E4%BB%98-app---manage-server">发起支付，选择支付方式，返回支付凭证，前端调起支付 app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/order/doPay
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'order_id'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'user_coupon_id'</span> =&gt; <span class="hljs-string">'nullable|numeric'</span>,<span class="hljs-comment">//券id</span>
+    <span class="hljs-string">'data'</span>=&gt;{
+        <span class="hljs-string">"appId"</span>: <span class="hljs-string">"wxa710f094a5283328"</span>,
+        <span class="hljs-string">"timeStamp"</span>: <span class="hljs-number">1597316754</span>,
+        <span class="hljs-string">"nonceStr"</span>: <span class="hljs-string">"gszKPE5ja1rfpGHdfPHmjD43RLKrkFlu"</span>,
+        <span class="hljs-string">"package"</span>: <span class="hljs-string">"prepay_id=wx13190559380970bc0a388987a194370000"</span>,
+        <span class="hljs-string">"signType"</span>: <span class="hljs-string">"MD5"</span>,
+        <span class="hljs-string">"paySign"</span>: <span class="hljs-string">"219365FF170F4B6B6FB363B93A34762B"</span>
+    },
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">"ok"</span>,
+    <span class="hljs-attr">"prepay_id"</span>:'预支付回话标识,吊起支付用!',
+}
+</div></code></pre>
+<h3 id="%E8%AE%A2%E5%8D%95%E8%AF%A6%E6%83%85%E8%AE%A2%E5%8D%95%E5%8E%86%E5%8F%B2%E6%9F%A5%E7%9C%8B%E4%B9%8B%E7%B1%BB-app---manage-server">订单详情,订单历史查看之类 app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/order/list
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'page'</span> =&gt; <span class="hljs-string">'required|numeric|min:1'</span>,
+    <span class="hljs-string">'limit'</span> =&gt; <span class="hljs-string">'required|numeric|min:1'</span>,
+}
+
+</div></code></pre>
+<p>Response
+&quot;actual_payment&quot;: &quot;10200169.90&quot;,//应付款
+&quot;total_price&quot;: &quot;10200169.90&quot;,//商品原价总额</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"list"</span>: [
+        {
+            <span class="hljs-attr">"order_id"</span>: <span class="hljs-number">3</span>,
+            <span class="hljs-attr">"store_id"</span>: <span class="hljs-number">11</span>,
+            <span class="hljs-attr">"actual_payment"</span>: <span class="hljs-string">"0"</span>,<span class="hljs-comment">//实际支付金额,</span>
+            <span class="hljs-attr">"total_price"</span>: <span class="hljs-string">"10200169.90"</span>,<span class="hljs-comment">//商品原价总额</span>
+            <span class="hljs-attr">"due_price"</span>:<span class="hljs-string">"10200169.90"</span>,<span class="hljs-comment">//应付款</span>
+            <span class="hljs-attr">"integral_price"</span>: <span class="hljs-string">"0.00"</span>,<span class="hljs-comment">//积分减额</span>
+            <span class="hljs-attr">"pay_status"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//支付状态 1支付，0位未支付</span>
+            <span class="hljs-attr">"pay_type"</span>: <span class="hljs-number">0</span>,   <span class="hljs-comment">//1 =&gt; '微信', 2 =&gt; '支付宝',3 =&gt; '银行卡',4 =&gt; '乐马支付',5 =&gt; '钱包',</span>
+            <span class="hljs-attr">"coupon_price"</span>: <span class="hljs-string">"0.00"</span>,<span class="hljs-comment">//券减金额</span>
+            <span class="hljs-attr">"created_at"</span>: <span class="hljs-string">"2020-08-12 10:05:43"</span>,<span class="hljs-comment">//下单时间</span>
+            <span class="hljs-attr">"status"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//  0=&gt;'未支付', 1=&gt;'已支付', 2=&gt;'用户取消',3=&gt;'订单完成',</span>
+            <span class="hljs-attr">"pay_date"</span>: <span class="hljs-string">"-"</span>, <span class="hljs-comment">//</span>
+            <span class="hljs-attr">"pay_type_word"</span>: <span class="hljs-string">"-"</span>,
+            <span class="hljs-attr">"status_word"</span>: <span class="hljs-string">"未支付"</span>,
+            <span class="hljs-attr">"pay_status_word"</span>: <span class="hljs-string">"未支付"</span>,
+             <span class="hljs-attr">"order_goods"</span>: [
+                {
+                    <span class="hljs-attr">"order_id"</span>: <span class="hljs-number">8</span>,
+                    <span class="hljs-attr">"goods_num"</span>: <span class="hljs-number">10</span>,
+                    <span class="hljs-attr">"goods_name"</span>: <span class="hljs-string">"汽车"</span>,
+                    <span class="hljs-attr">"image"</span>: <span class="hljs-string">"http://langrens.oss-cn-shenzhen.aliyuncs.com/app/local/goods/fP8FnyWpgAfPGvUGtRJx8fRYtIapS2vMi5AQwpkQ.jpeg"</span>,
+                    <span class="hljs-attr">"tag"</span>: <span class="hljs-string">"C/双杠"</span>,
+                    <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"999999.99"</span>,
+                    <span class="hljs-attr">"img100"</span>: <span class="hljs-string">"http://langrens.oss-cn-shenzhen.aliyuncs.com/app/local/goods/fP8FnyWpgAfPGvUGtRJx8fRYtIapS2vMi5AQwpkQ.jpeg?x-oss-process=image/resize,m_lfit,h_100,w_100/format,png"</span>,
+                    <span class="hljs-attr">"img50"</span>: <span class="hljs-string">"http://langrens.oss-cn-shenzhen.aliyuncs.com/app/local/goods/fP8FnyWpgAfPGvUGtRJx8fRYtIapS2vMi5AQwpkQ.jpeg?x-oss-process=image/resize,m_pad,h_50,w_50"</span>
+                },
+                {
+                    <span class="hljs-attr">"order_id"</span>: <span class="hljs-number">8</span>,
+                    <span class="hljs-attr">"goods_num"</span>: <span class="hljs-number">10</span>,
+                    <span class="hljs-attr">"goods_name"</span>: <span class="hljs-string">"沃尔沃"</span>,
+                    <span class="hljs-attr">"image"</span>: <span class="hljs-string">"https://langrens.oss-cn-shenzhen.aliyuncs.com/app/default/goods.jpeg"</span>,
+                    <span class="hljs-attr">"tag"</span>: <span class="hljs-string">"15两/油炸"</span>,
+                    <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"17.00"</span>,
+                    <span class="hljs-attr">"img100"</span>: <span class="hljs-string">"https://langrens.oss-cn-shenzhen.aliyuncs.com/app/default/goods.jpeg?x-oss-process=image/resize,m_lfit,h_100,w_100/format,png"</span>,
+                    <span class="hljs-attr">"img50"</span>: <span class="hljs-string">"https://langrens.oss-cn-shenzhen.aliyuncs.com/app/default/goods.jpeg?x-oss-process=image/resize,m_pad,h_50,w_50"</span>
+                }
+            ],
+            <span class="hljs-attr">"store"</span>: {
+                <span class="hljs-attr">"store_id"</span>: <span class="hljs-number">11</span>,
+                <span class="hljs-attr">"store_name"</span>: <span class="hljs-string">"倾1门店1111"</span>,
+                <span class="hljs-attr">"logo"</span>: <span class="hljs-string">""</span>,
+                <span class="hljs-attr">"address"</span>: <span class="hljs-string">"撒大大"</span>,
+                <span class="hljs-attr">"company_name"</span>: <span class="hljs-string">"A1"</span>
+            }
+        },
+    ]
+}
+</div></code></pre>
+<h3 id="%E8%AE%A2%E5%8D%95%E8%AF%A6%E6%83%85%E8%AE%A2%E5%8D%95%E5%8E%86%E5%8F%B2%E6%9F%A5%E7%9C%8B%E4%B9%8B%E7%B1%BB-app---manage-server">订单详情,订单历史查看之类 app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/order/detail
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+   <span class="hljs-string">'order_id'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"order"</span>: {
+        <span class="hljs-attr">"order_id"</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-attr">"order_sn"</span>: <span class="hljs-string">"2020081118585912543"</span>, <span class="hljs-comment">//订单号</span>
+        <span class="hljs-attr">"pay_type"</span>: <span class="hljs-number">1</span>,<span class="hljs-comment">//支付类型</span>
+        <span class="hljs-attr">"pay_date"</span>: <span class="hljs-string">"2020-08-13 15:21:21"</span>,
+        <span class="hljs-attr">"pay_status"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//1支付，0未支付</span>
+        <span class="hljs-attr">"pay_type_word"</span>: <span class="hljs-string">"微信"</span>,<span class="hljs-comment">//支付类型</span>
+        <span class="hljs-attr">"total_price"</span>: <span class="hljs-string">"10200169.90"</span>,<span class="hljs-comment">//商品原价总额</span>
+        <span class="hljs-attr">"due_price"</span>:<span class="hljs-string">"10200169.90"</span>,<span class="hljs-comment">//应付款</span>
+        <span class="hljs-attr">"actual_payment"</span>: <span class="hljs-string">"0"</span>,<span class="hljs-comment">//实际支付金额,</span>
+        <span class="hljs-attr">"integral_price"</span>: <span class="hljs-string">"0.00"</span>,<span class="hljs-comment">//积分减额</span>
+        <span class="hljs-attr">"coupon_price"</span>: <span class="hljs-string">"5.00"</span>,<span class="hljs-comment">//券减金额</span>
+        <span class="hljs-attr">"integral"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//消耗积分</span>
+        <span class="hljs-attr">"created_at"</span>: <span class="hljs-string">"2020-08-11 18:58:59"</span><span class="hljs-comment">//订单创建时间</span>
+    },
+    <span class="hljs-attr">"user_coupon"</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attr">"order_goods"</span>: [
+        {
+            <span class="hljs-attr">"order_id"</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-attr">"goods_num"</span>: <span class="hljs-number">10</span>,
+            <span class="hljs-attr">"goods_name"</span>: <span class="hljs-string">"汽车"</span>,
+            <span class="hljs-attr">"goods_id"</span>: <span class="hljs-number">2</span>,
+            <span class="hljs-attr">"type"</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-attr">"image"</span>: <span class="hljs-string">"http://langrens.oss-cn-shenzhen.aliyuncs.com/app/local/goods/fP8FnyWpgAfPGvUGtRJx8fRYtIapS2vMi5AQwpkQ.jpeg"</span>,
+            <span class="hljs-attr">"tag"</span>: <span class="hljs-string">"C/双杠"</span>,
+            <span class="hljs-attr">"goods_price"</span>: <span class="hljs-string">"999999.99"</span>,
+            <span class="hljs-attr">"img100"</span>: <span class="hljs-string">"http://langrens.oss-cn-shenzhen.aliyuncs.com/app/local/goods/fP8FnyWpgAfPGvUGtRJx8fRYtIapS2vMi5AQwpkQ.jpeg?x-oss-process=image/resize,m_lfit,h_100,w_100/format,png"</span>,
+            <span class="hljs-attr">"img50"</span>: <span class="hljs-string">"http://langrens.oss-cn-shenzhen.aliyuncs.com/app/local/goods/fP8FnyWpgAfPGvUGtRJx8fRYtIapS2vMi5AQwpkQ.jpeg?x-oss-process=image/resize,m_pad,h_50,w_50"</span>
+        }
+    ],
+    <span class="hljs-attr">"store"</span>: {
+        <span class="hljs-attr">"store_id"</span>: <span class="hljs-number">11</span>,
+        <span class="hljs-attr">"store_name"</span>: <span class="hljs-string">"倾1门店1111"</span>,
+        <span class="hljs-attr">"logo"</span>: <span class="hljs-string">""</span>,
+        <span class="hljs-attr">"address"</span>: <span class="hljs-string">"撒大大"</span>,
+        <span class="hljs-attr">"company_name"</span>: <span class="hljs-string">"A1"</span>
+    }
+}
+</div></code></pre>
+<h3 id="%E8%AE%A2%E5%8D%95%E5%8F%96%E6%B6%88-app---manage-server">订单取消 app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/order/cancel
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+   <span class="hljs-string">'order_id'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+}
+</div></code></pre>
+<ul>
+<li>
+<h2 id="span-id%22eretcode%22%E8%BF%94%E5%9B%9E%E7%A0%81span"><span id="ERetCode">返回码</span></h2>
+</li>
+</ul>
+<blockquote>
+<p><code>&quot;&gt;=0&quot;成功，&quot;&lt;0&quot;失败</code></p>
+</blockquote>
+<pre class="hljs"><code><div><span class="hljs-keyword">enum</span> ERetCode
+{
+    <span class="hljs-keyword">const</span> SERVER_ERROR = <span class="hljs-number">500</span>;
+    <span class="hljs-keyword">const</span> DEVICE_NOT_BINDING = <span class="hljs-number">-1</span>; <span class="hljs-comment">// 设备未绑定房间</span>
+    <span class="hljs-keyword">const</span> ACCOUNT_NOT_EXIST = <span class="hljs-number">-2</span>; <span class="hljs-comment">// 账号不存在</span>
+    <span class="hljs-keyword">const</span> ACCOUNT_VALID_FAILURE = <span class="hljs-number">-3</span>; <span class="hljs-comment">// 账号校验失败</span>
+    <span class="hljs-keyword">const</span>  ACCOUNT_NO_PREVILEGE = <span class="hljs-number">-4</span>; <span class="hljs-comment">// 该账号没有权限登录当前设备</span>
+    <span class="hljs-keyword">const</span>  ACCOUNT_LOCK = <span class="hljs-number">-5</span>; <span class="hljs-comment">// 该账号已经锁定</span>
+    <span class="hljs-keyword">const</span>  CONNECTION_TIMEOUT = <span class="hljs-number">-6</span>; <span class="hljs-comment">// 连接超时</span>
+    <span class="hljs-keyword">const</span>  VALID_FAILURE = <span class="hljs-number">-7</span>; <span class="hljs-comment">// 接口参数不全，或类型错误</span>
+    <span class="hljs-keyword">const</span>  FAIL_LOGIN_CURRENT_DEVICE = <span class="hljs-number">-8</span>; <span class="hljs-comment">// 不能登录当前设备</span>
+    <span class="hljs-keyword">const</span>  CHANNEL_NONENTITY = <span class="hljs-number">-9</span>; <span class="hljs-comment">// 渠道不存在</span>
+    <span class="hljs-keyword">const</span>  THREE_FAIL = <span class="hljs-number">-10</span>; <span class="hljs-comment">//第三方接口失败</span>
+    <span class="hljs-keyword">const</span>  ACCOUNT_NOT_LOGIN = <span class="hljs-number">-11</span>; <span class="hljs-comment">//用户未登录</span>
+    <span class="hljs-keyword">const</span>  THREE_ACCOUNT_NOT_LOGIN = <span class="hljs-number">-12</span>; <span class="hljs-comment">//第三方用户未登录，auth2 code验证失败</span>
+    <span class="hljs-keyword">const</span>  CREATE_ACCOUNT_ERROR = <span class="hljs-number">-13</span>; <span class="hljs-comment">//创建用户失败</span>
+    <span class="hljs-keyword">const</span>  CREATE_ERCODE_ERROR = <span class="hljs-number">-14</span>; <span class="hljs-comment">//二维码生成失败</span>
+    <span class="hljs-keyword">const</span>  DATA_NULL = <span class="hljs-number">-16</span>; <span class="hljs-comment">//数据不存在</span>
+    <span class="hljs-keyword">const</span>  CREATE_ORDER_FAILURE = <span class="hljs-number">-17</span>; <span class="hljs-comment">//订单创建失败</span>
+    <span class="hljs-keyword">const</span>  STORE_ORDER_FAILURE = <span class="hljs-number">-18</span>; <span class="hljs-comment">//存在跨店铺商品</span>
+    <span class="hljs-keyword">const</span>  ORDER_PARAM_FAILURE = <span class="hljs-number">-19</span>; <span class="hljs-comment">//订单参数错误</span>
+    <span class="hljs-keyword">const</span>  ORDER_GOODS_FAILURE = <span class="hljs-number">-20</span>; <span class="hljs-comment">//订单商品入库失败!</span>
+    <span class="hljs-keyword">const</span>  ORDER_NOT_FIND = <span class="hljs-number">-21</span>; <span class="hljs-comment">//订单商品入库失败!</span>
+    <span class="hljs-keyword">const</span>  GOODS_CLOSE= <span class="hljs-number">-22</span>; <span class="hljs-comment">//商品已下架</span>
+    <span class="hljs-keyword">const</span>  GOODS_SELL_OUT= <span class="hljs-number">-23</span>; <span class="hljs-comment">//商品已售罄</span>
+    <span class="hljs-keyword">const</span>  GOODS_SKU_EDIT= <span class="hljs-number">-24</span>; <span class="hljs-comment">//商品规格已修改</span>
+    <span class="hljs-keyword">const</span>  GOODS_NOT_FIND= <span class="hljs-number">-25</span>; <span class="hljs-comment">//商品不存在</span>
+    <span class="hljs-keyword">const</span>  ORDER_IS_PAY= <span class="hljs-number">-26</span>; <span class="hljs-comment">//订单已支付</span>
+    <span class="hljs-keyword">const</span>  ORDER_IS_CANCEL= <span class="hljs-number">-27</span>; <span class="hljs-comment">//订单已取消</span>
+    <span class="hljs-keyword">const</span>  SUCCESS = <span class="hljs-number">0</span>; <span class="hljs-comment">// 成功</span>
+}
+</div></code></pre>
+<ul>
+<li>
+<h2 id="%E7%8E%A9%E5%AE%B6%E8%81%8C%E4%B8%9A%E5%AF%B9%E7%85%A7%E8%A1%A8">玩家职业对照表</h2>
+</li>
+</ul>
+<pre class="hljs"><code><div>1 =&gt; [
+    'v' =&gt; 1,
+    'name' =&gt; '平民',
+],
+2 =&gt; [
+    'v' =&gt; 2,
+    'name' =&gt; '狼人',
+],
+3 =&gt; [
+    'v' =&gt; 3,
+    'name' =&gt; '预言家',
+],
+4 =&gt; [
+    'v' =&gt; 4,
+    'name' =&gt; '女巫',
+],
+5 =&gt; [
+    'v' =&gt; 5,
+    'name' =&gt; '猎人',
+],
+6 =&gt; [
+    'v' =&gt; 6,
+    'name' =&gt; '白痴',
+],
+7 =&gt; [
+    'v' =&gt; 7,
+    'name' =&gt; '守卫',
+],
+8 =&gt; [
+    'v' =&gt; 8,
+    'name' =&gt; '白狼王',
+],
+9 =&gt; [
+    'v' =&gt; 9,
+    'name' =&gt; '黑狼王',
+],
+</div></code></pre>
+
+</body>
+</html>

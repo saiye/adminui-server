@@ -116,6 +116,7 @@ class LrsApi extends BaseGameApi
                                 'room_game_id' => 0,
                                 'dup_id' => $dupId,
                                 'mvp' => 0,// 0 - ⽆， 1 mvp
+                                'svp' => 0,// 0 - ⽆， 1 svp
                                 'user_id' => $v->id,
                                 'job' =>0,
                                 'room_name' => $roomName,

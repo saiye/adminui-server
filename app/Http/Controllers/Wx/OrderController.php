@@ -79,7 +79,7 @@ class OrderController extends Base
         $page = $this->request->input('page', 1);
         $skip = ceil($page - 1) * $limit;
         $user = $this->user();
-        $list = Order::select(['order_id', 'store_id', 'actual_payment', 'total_price', 'integral_price', 'pay_status', 'pay_type', 'coupon_price', 'created_at', 'status'])->with(['store' => function ($q) {
+        $list = Order::select(['order_id', 'store_id', 'actual_payment','due_price' ,'total_price', 'integral_price', 'pay_status', 'pay_type', 'coupon_price', 'created_at', 'status'])->with(['store' => function ($q) {
             $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
         }, 'orderGoods' => function ($r) {
             $r->select('order_id', 'goods_num', 'goods_name', 'goods_id', 'type', 'image', 'tag', 'goods_price');
@@ -119,7 +119,7 @@ class OrderController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $order = Order::select(['order_id', 'order_sn', 'pay_type', 'store_id', 'actual_payment', 'pay_time', 'total_price', 'coupon_id', 'coupon_price', 'integral_price', 'created_at', 'pay_status'])->with(['orderGoods' => function ($r) {
+        $order = Order::select(['order_id', 'order_sn', 'pay_type', 'store_id', 'actual_payment', 'pay_time', 'total_price','due_price', 'coupon_id', 'coupon_price', 'integral_price', 'created_at', 'pay_status'])->with(['orderGoods' => function ($r) {
             $r->select('order_id', 'goods_num', 'goods_name', 'image', 'goods_id', 'type', 'tag', 'goods_price');
         }, 'store' => function ($q) {
             $q->select('store.store_id', 'store.store_name', 'store.logo', 'store.address', 'company.company_name')->leftJoin('company', 'store.company_id', 'company.company_id');
@@ -144,6 +144,7 @@ class OrderController extends Base
                     'pay_status' => $order->pay_status,
                     'pay_type_word' => $order->pay_type_word,
                     'total_price' => $order->total_price,
+                    'due_price' => $order->due_price,
                     'actual_payment' => $order->actual_payment,
                     'integral_price' => $order->integral_price,
                     'coupon_price' => $order->coupon_price,
@@ -279,35 +280,6 @@ class OrderController extends Base
         return $this->json([
             'errorMessage' => '订单取消成功',
             'code' => ErrorCode::SUCCESS,
-        ]);
-    }
-
-    /**
-     * 检查订单是否已支付成功
-     */
-    public function checkOrderIsPay(HandelPay $api)
-    {
-        $validator = $this->validationFactory->make($this->request->all(), [
-            'order_id' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            return $this->json([
-                'errorMessage' => $validator->errors()->first(),
-                'code' => ErrorCode::VALID_FAILURE,
-            ]);
-        }
-        $order = Order::whereOrderId($this->req->order_id)->find();
-        if ($order) {
-            if ($api->findOrder($order)) {
-                return $this->json([
-                    'errorMessage' => '已经支付成功!',
-                    'code' => ErrorCode::SUCCESS,
-                ]);
-            }
-        }
-        return $this->json([
-            'errorMessage' => '订单不存在',
-            'code' => ErrorCode::DATA_NULL,
         ]);
     }
 }

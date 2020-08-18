@@ -19,6 +19,7 @@ class CreateOrderTable extends Migration
             $table->string('prepay_id',80)->comment('第三方订单号');
             $table->string('info',100)->comment('订单简讯');
             $table->decimal('total_price',10,2)->comment('订单总价');
+            $table->decimal('due_price',10,2)->comment('应付金额');
             $table->decimal('actual_payment',10,2)->comment('真实支付');
             $table->unsignedInteger('user_id')->comment('用户id');
             $table->string('nickname',20)->comment('用户昵称');
@@ -34,6 +35,7 @@ class CreateOrderTable extends Migration
             $table->tinyInteger('pay_type')->default(0)->comment('支付方式');
             $table->tinyInteger('pay_status')->default(0)->comment('支付状态');
             $table->tinyInteger('status')->default(0)->comment('订单状态');
+            $table->tinyInteger('is_abnormal')->default(0)->comment('是否为异常订单');
             $table->timestamps();
         });
     }

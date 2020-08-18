@@ -10,8 +10,6 @@ namespace App\Service\Activity;
 
 interface  ActivityContract
 {
-    public function make();
-
     public function addActivity();
 
     public function editActivity();

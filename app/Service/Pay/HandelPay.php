@@ -38,6 +38,8 @@ class HandelPay
             case 5:
                 $aliases = 'DefaultPayApi';
                 break;
+            default:
+                $aliases = 'DefaultPayApi';
         }
         $this->handel = $this->app->make($aliases);
         return $this;
@@ -54,26 +56,36 @@ class HandelPay
             $order = Order::whereOrderSn($data['order_sn'])->first();
             if ($order) {
                 $delta = 0.01;
-                if (abs($data['actual_payment'] - $order->actual_payment) < $delta) {
-                    $status = $order->status == 3 ? 3 : 1;
-                    Order::whereOrderSn($data['order_sn'])->update([
-                        'pay_time' => time(),
+                $status = $order->status == 3 ? 3 : 1;
+                $is_abnormal=0;
+                if ((abs($data['actual_payment'] - $order->due_price) < $delta) and (abs($data['total_price']-$order->total_price)<$delta)) {
+                    $post=[
+                        'pay_time' => strtotime($data['time_end']),
                         'pay_status' => 1,
                         'pay_type' => $data['pay_type'],
                         'prepay_id' => $data['prepay_id'],
+                        'actual_payment' => $data['actual_payment'],
+                        'is_abnormal' => 0,
                         'status' => $status,
-                    ]);
-                    return true;
+                    ];
                 } else {
+                    $is_abnormal=1;
                     //订单异常：
-                    Log::info('CallBackAbnormalOrders:');
-                    Log::info($data);
-                    return false;
+                    $post=[
+                        'actual_payment' => $data['actual_payment'],
+                        'is_abnormal' => $is_abnormal,
+                    ];
                 }
+                Order::whereOrderSn($data['order_sn'])->update($post);
+                if($is_abnormal==0){
+                    return true;
+                }
+                return false;
             }
+            Log::info('wxCall验证ok,但订单不存在!');
+            Log::info($data);
             return false;
         });
-
     }
 
     /**
@@ -100,22 +112,31 @@ class HandelPay
             $order = Order::whereOrderSn($data['order_sn'])->first();
             if ($order) {
                 $delta = 0.01;
-                if (abs($data['actual_payment'] - $order->actual_payment) < $delta) {
-                    if ($order->pay_status == 0) {
-                        $status = $order->status == 3 ? 3 : 1;
-                        Order::whereOrderSn($data['order_sn'])->update([
-                            'pay_time' => time(),
+                $status = $order->status == 3 ? 3 : 1;
+                $is_abnormal=0;
+                if ((abs($data['actual_payment'] - $order->due_price) < $delta) and (abs($data['total_price']-$order->total_price)<$delta)) {
+                    $post=[
+                            'pay_time' => strtotime($data['time_end']),
                             'pay_status' => 1,
                             'pay_type' => $data['pay_type'],
                             'prepay_id' => $data['prepay_id'],
+                            'actual_payment' => $data['actual_payment'],
+                            'is_abnormal' => 0,
                             'status' => $status,
-                        ]);
-                    }
+                    ];
                 } else {
                     //订单异常：
-                    Log::info('findOrderAbnormalOrders:');
-                    Log::info($data);
+                    $is_abnormal=1;
+                    $post=[
+                        'actual_payment' => $data['actual_payment'],
+                        'is_abnormal' => $is_abnormal,
+                    ];
                 }
+                Order::whereOrderSn($data['order_sn'])->update($post);
+                if($is_abnormal==0){
+                    return true;
+                }
+                return false;
             }
         });
     }

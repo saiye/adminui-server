@@ -47,7 +47,7 @@ class IndexController extends Controller
                     break;
             }
         }
-        $data = $data->select('order.company_id', 'order.created_at', 'order.info', 'order.order_id', 'order.store_id', 'order.total_price', 'order.pay_time', 'order.coupon_price', 'order.status', 'order.pay_type', 'order.pay_status', 'order.nickname', 'order.order_sn', 'order.user_id')->with('orderGoods')->orderBy('order.order_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->select('order.company_id', 'order.created_at','order.due_price', 'order.actual_payment','order.is_abnormal','order.info', 'order.order_id', 'order.store_id', 'order.total_price', 'order.pay_time', 'order.coupon_price', 'order.status', 'order.pay_type', 'order.pay_status', 'order.nickname', 'order.order_sn', 'order.user_id')->with('orderGoods')->orderBy('order.order_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }
@@ -129,8 +129,9 @@ class IndexController extends Controller
         if($order){
            $flag= $api->make($order->pay_type)->findOrder($order);
            if($flag){
-               return $this->errorJson('订单已支付');
+               return $this->successJson([],'订单已支付!');
            }
+            return $this->errorJson('订单未支付!');
         }
         return $this->errorJson('订单不存在！');
     }

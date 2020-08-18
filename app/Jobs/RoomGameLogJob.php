@@ -86,7 +86,8 @@ class RoomGameLogJob implements ShouldQueue
             $playerdata['res'] = $unit["res"];
             $playerdata['begin_tick'] = $this->post['beginTick'];
             $playerdata['score'] = $unit["score"];
-            $playerdata['mvp'] = ($unit["mvp"] != 0 || $unit["svp"] != 0) ? 1 : 0;
+            $playerdata['mvp'] = $unit["mvp"];;
+            $playerdata['svp'] =$unit["svp"];
             $playerdata['status'] = $unit["status"];
             $playerdata['room_game_id'] = $gameLog->id;
             array_push($playerlogs, $playerdata);

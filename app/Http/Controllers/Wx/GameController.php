@@ -109,6 +109,7 @@ class GameController extends Base
                     'job'=>$v->job,
                     'dup_id' => $v->dup_id,//评分
                     'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
+                    'svp' => $v->svp,// 0 - ⽆， 1 svp
                     'sex' => $v->user->sex,//0男,1女
                     'user_id' => $v->user_id
                 ]);
@@ -156,6 +157,7 @@ class GameController extends Base
                     'room_game_id' => $v->room_game_id,
                     'dup_id' => $v->dup_id,//评分
                     'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
+                    'svp' => $v->svp,// 0 - ⽆， 1 svp
                     'user_id' => $v->user_id,
                 ]);
             }
