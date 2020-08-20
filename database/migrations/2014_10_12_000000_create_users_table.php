@@ -27,9 +27,9 @@ class CreateUsersTable extends Migration
             $table->unsignedInteger('popularity')->default(0)->comment('人气');
             $table->unsignedInteger('attention')->default(0)->comment('关注');
             $table->unsignedInteger('fans')->default(0)->comment('粉丝');
-            $table->decimal('remaining',2)->default(0)->comment('余额');
-            $table->decimal('income',2)->default(0)->comment('收入');
-            $table->decimal('withdrawal',2)->default(0)->comment('已提现');
+            $table->decimal('remaining',10,2)->default(0)->comment('余额');
+            $table->decimal('income',10,2)->default(0)->comment('收入');
+            $table->decimal('withdrawal',10,2)->default(0)->comment('已提现');
             $table->integer('channel_id')->default(0)->comment('最后登录渠道');
             $table->tinyInteger('online')->default(0)->comment('是否在线0否1是');
             $table->tinyInteger('play')->default(0)->comment('是否在游戏0否1是');
@@ -37,6 +37,8 @@ class CreateUsersTable extends Migration
             $table->decimal('lon',10,6)->default(0)->comment('经度');
             $table->decimal('lat',8,6)->default(0)->comment('维度');
             $table->string('token',80)->unique()->nullable()->default(null)->comment('api token');
+            $table->string('phone',20)->nullable()->comment('phone');
+            $table->string('area_code',5)->nullable()->comment('area_code');
             $table->timestamps();
         });
     }

@@ -10,7 +10,6 @@ Route::group([
     Route::post('user/logout', 'UserController@logout');
     Route::post('game/conf', 'GameController@conf');
     Route::post('game/record', 'GameController@record');
-    Route::post('game/fightHistorical', 'GameController@fightHistorical');
     Route::post('game/room', 'GameController@room');
     Route::post('game/nowGame', 'GameController@nowGame');
     Route::post('user/images', 'UserController@images');
@@ -25,6 +24,8 @@ Route::group([
     Route::post('order/list', 'OrderController@orderList');
     Route::post('order/cancel', 'OrderController@cancel');
 });
+Route::post('game/fightHistorical', 'GameController@fightHistorical');
+
 Route::post('user/login', 'UserController@login')->middleware('ApiLogRecord');
 Route::post('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
 Route::post('qrCode/test', 'QrCodeController@testQrCode')->name('wx-QrCodeTestQrCode');

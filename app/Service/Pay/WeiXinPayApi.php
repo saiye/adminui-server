@@ -19,7 +19,7 @@ final class WeiXinPayApi extends PayApi
     //是否打印log
     const DEBUG = true;
     //是否为沙盒测试,上线为否
-    const IS_SAND_BOX = true;
+    const IS_SAND_BOX = false;
 
     public function init()
     {

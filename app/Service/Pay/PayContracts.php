@@ -39,6 +39,7 @@ interface PayContracts
     public function  refundNotice(\Closure $closure);
 
     /**
+     * 主动查询订单
      * @param $order
      * @param \Closure $closure
      * @return mixed

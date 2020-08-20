@@ -120,3 +120,6 @@ CHANGE `coupon_price` `coupon_price` DECIMAL(10,2) DEFAULT '0.00' NOT NULL COMME
  ALTER TABLE `lrs_manage`.`store`     ADD COLUMN `is_close` TINYINT(4) DEFAULT '0' NULL COMMENT '是否关闭' AFTER `lat`;
 
   ALTER TABLE `lrs_manage`.`order`     ADD COLUMN `is_abnormal` TINYINT(4) DEFAULT '0' NULL COMMENT '是否异常' AFTER `status`;
+
+
+ ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `phone` VARCHAR(20) NULL AFTER `lat`,     ADD COLUMN `area_code` VARCHAR(5) NULL AFTER `phone`;

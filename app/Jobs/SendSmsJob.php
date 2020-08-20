@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Service\SmsApi\AliYunSms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -12,7 +13,7 @@ class SendSmsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $NoteSms = null;
+    public $noteSms = null;
 
     /**
      * Create a new job instance.
@@ -21,7 +22,7 @@ class SendSmsJob implements ShouldQueue
      */
     public function __construct($NoteSms)
     {
-        $this->NoteSms= $NoteSms;
+        $this->noteSms= $NoteSms;
     }
 
     /**
@@ -29,8 +30,8 @@ class SendSmsJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(AliYunSms $api)
     {
-        //
+        //$api->send($this->noteSms->type,$this->noteSms->area_code,$this->noteSms->phone,$this->noteSms->msg);
     }
 }

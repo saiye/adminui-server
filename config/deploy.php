@@ -64,4 +64,8 @@ return [
         1=>'注册',
         2=>'找回密码',
     ],
+    'aliSmsKey'=>[
+        'accessKeyId'=>env('AliSmsAccessKeyId', ''),
+        'accessSecret'=>env('AliSmsAccessSecret', ''),
+    ],
 ];

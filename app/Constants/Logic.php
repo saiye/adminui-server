@@ -11,7 +11,9 @@ namespace App\Constants;
 
 class Logic
 {
+    //普通商品
     const BOOK_GOODS_TYPE = 1;
-
+    //预定房间
     const BOOK_ROOM_TYPE = 2;
+
 }

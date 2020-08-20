@@ -8,6 +8,7 @@ use App\Models\PhysicsAddress;
 use App\Models\User;
 use App\Models\WebConfig;
 use App\Service\GameApi\LrsApi;
+use App\Service\SmsApi\AliYunSms;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use App\Constants\ErrorCode;
@@ -20,6 +21,11 @@ use App\Constants\ErrorCode;
 class ClientController extends Base
 {
 
+    public function test(AliYunSms $api){
+        $res=$api->send(1, 86, '15876537053', mt_rand(1111,9999));
+        dd($res);
+    }
+
     /**
      * 内部测试用
      */
@@ -30,6 +36,9 @@ class ClientController extends Base
             'password' => 'required',
             'channelId' => 'required',
             'deviceShortId' => 'required',
+        ],[
+            'account.required'=>'账号不能为空!',
+            'password.required'=>'密码不能为空!',
         ]);
         if ($validator->fails()) {
             return $this->json([
