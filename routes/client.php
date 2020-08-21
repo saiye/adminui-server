@@ -11,4 +11,3 @@ Route::any('/user/checkCode', 'UserController@checkCode');
 Route::any('/user/forgetPasswordSendCode', 'UserController@forgetPasswordSendCode');
 Route::any('/user/editPassword', 'UserController@editPassword');
 Route::any('/user/phoneLogin', 'UserController@phoneLogin');
-Route::any('/test', 'ClientController@test');

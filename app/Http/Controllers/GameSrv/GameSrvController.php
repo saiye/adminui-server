@@ -93,12 +93,7 @@ class GameSrvController extends Base
     public function gameResLog()
     {
          $json= file_get_contents('php://input');
-         Log::info($json);
          $data=[];
-         if($json){
-             $data=  json_decode($json,true);
-             Log::info($data);
-         }
          if(empty($data)){
              return $this->json([
                  'errorMessage' => 'null body',

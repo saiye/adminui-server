@@ -123,3 +123,8 @@ CHANGE `coupon_price` `coupon_price` DECIMAL(10,2) DEFAULT '0.00' NOT NULL COMME
 
 
  ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `phone` VARCHAR(20) NULL AFTER `lat`,     ADD COLUMN `area_code` VARCHAR(5) NULL AFTER `phone`;
+
+
+ ALTER TABLE `lrs_manage`.`balance_water` DROP COLUMN `order_id`,    ADD COLUMN `order_sn` VARCHAR(80) NULL COMMENT '订单号' AFTER `balance_sn`;
+
+

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Cp\Company;
 
 use App\Constants\CacheKey;
+use App\Constants\SmsAction;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Area;
 use App\Models\Company;
 use App\Models\Image;
 use App\Models\Staff;
+use App\Service\SmsApi\HandelSms;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -65,7 +67,7 @@ class IndexController extends Controller
             'password' => 'required|max:100',
             'real_name' => 'required|max:100',
             'sex' => 'required|in:1,2',
-            'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/', 'unique:staff,phone'],
+            'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/'],
             'proportion' => 'required|integer|min:1|max:100',
         ], [
             'imageData.required' => '商户营业执照不能为空！',
@@ -145,7 +147,7 @@ class IndexController extends Controller
     /**
      * 审核商家
      */
-    public function checkCompany()
+    public function checkCompany(HandelSms $api)
     {
         $validator = Validator::make($this->req->all(), [
             'company_id' => 'required|numeric',
@@ -161,15 +163,30 @@ class IndexController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
+        $company=Company::whereCompanyId($this->req->input('company_id'))->first();
+        $reason=$this->req->input('reason', '');
+        if(!$company){
+            return $this->errorJson('商户不存在！');
+        }
+        $check=$this->req->input('check');
         $success = Company::whereCompanyId($this->req->company_id)->update([
-            'check' => $this->req->check,
-            'status' => $this->req->check,
-            'reason' => $this->req->input('reason', '.'),
+            'check' => $check,
+            'status' => $check,
+            'reason' =>$reason,
         ]);
        $checkStaff= Staff::whereCompanyId($this->req->company_id)->update([
             'lock'=>1,
         ]);
         if ($success and $checkStaff) {
+            $staff=Staff::whereCompanyId($this->req->company_id)->whereStaffId($company->staff_id)->first();
+            if($check==1){
+                $action=SmsAction::COMPANY_CHECK_SUCCESS;
+                $tmpCode='company_check_success';
+            }else{
+                $action=SmsAction::COMPANY_CHECK_FAIL;
+                $tmpCode='company_check_fail';
+            }
+            $api->send($tmpCode, 86, $staff->phone, ['company_name'=>$company->company_name,'reason'=>$reason],$action);
             return $this->successJson([], '操作成功');
         }
         return $this->errorJson('审核失败！');

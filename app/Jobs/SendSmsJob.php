@@ -32,6 +32,6 @@ class SendSmsJob implements ShouldQueue
      */
     public function handle(AliYunSms $api)
     {
-        //$api->send($this->noteSms->type,$this->noteSms->area_code,$this->noteSms->phone,$this->noteSms->msg);
+        $api->send($this->noteSms->type,$this->noteSms->area_code,$this->noteSms->phone,$this->noteSms->msg,$this->noteSms->action);
     }
 }

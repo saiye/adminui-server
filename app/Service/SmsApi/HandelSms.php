@@ -24,14 +24,7 @@ class HandelSms
         $this->validationFactory =$app->make('validator');
     }
 
-    /**
-     * @param $type 查看配置文件,deploy.sms_type
-     * @param $area_code
-     * @param $phone
-     * @param $message
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function send($type, $area_code, $phone, $message)
+    public function send($type, $area_code, $phone, $array,$action)
     {
         $check=$this->phoneCheck($area_code,$phone);
         if($check['code']!==0){
@@ -39,21 +32,31 @@ class HandelSms
         }
         //1.频率处理
         $frequencyKey = $area_code . '_' . $phone;
-        $frequencyKeyCode = $area_code . '_code' . $phone . '_' . $type;
+        $frequencyKeyCode = $area_code . '_code' . $phone . '_' . $type.'_'.$action;
         $canSend = Cache::get($frequencyKey);
-        $count=100;
+        $count=300;
         if ($canSend<$count) {
+            if ($type=='code'){
+                if(!isset($array['code'])){
+                    return [
+                        'errorMessage' => '发送验证码，必须带参数code!',
+                        'code' => ErrorCode::SMS_OFTEN,
+                    ];
+                }
+                Cache::put($frequencyKeyCode,$array['code'], 900);
+            }
             //2.入库处理
             $NoteSms = NoteSms::create([
                 'area_code' => $area_code,
                 'phone' => $phone,
-                'msg' => $message,
+                'msg' =>json_encode($array),
                 'create_time' => time(),
                 'status' => 0,
                 'type' => $type,
+                'action' => $action,
             ]);
             $canSend+=1;
-            Cache::put($frequencyKeyCode,$message, 900);
+
             Cache::put($frequencyKey,$canSend, 86400);
             //3.触发队列执行发送
             dispatch(new SendSmsJob($NoteSms));
@@ -68,9 +71,9 @@ class HandelSms
         ];
     }
 
-    public function checkCode($type, $area_code, $phone, $code)
+    public function checkCode($type, $area_code, $phone, $code,$action)
     {
-        $frequencyKeyCode = $area_code . '_code' . $phone . '_' . $type;
+        $frequencyKeyCode = $area_code . '_code' . $phone . '_' . $type.'_'.$action;
         $cacheCode = Cache::get($frequencyKeyCode);
         return $code == $cacheCode;
     }

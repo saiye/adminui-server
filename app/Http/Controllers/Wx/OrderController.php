@@ -228,6 +228,12 @@ class OrderController extends Base
                 'code' => ErrorCode::DATA_NULL,
             ]);
         }
+        if($order->status==2){
+            return $this->json([
+                'errorMessage' => '订单已取消无法，不允许支付',
+                'code' => ErrorCode::DATA_NULL,
+            ]);
+        }
         if ($order->play_status == 1) {
             return $this->json([
                 'errorMessage' => '订单已支付成功，请勿重复操作！',

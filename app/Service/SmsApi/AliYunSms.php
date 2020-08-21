@@ -11,23 +11,29 @@ namespace App\Service\SmsApi;
 use AlibabaCloud\Client\AlibabaCloud;
 use AlibabaCloud\Client\Exception\ClientException;
 use AlibabaCloud\Client\Exception\ServerException;
+use App\Models\WebConfig;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
 class AliYunSms implements SmsInterface
 {
-    public function send($type, $area_code, $phone, $message)
+
+    public function send($tmpCode,$area_code, $phone, $TemplateParam,$action)
     {
         $conf=Config::get('deploy.aliSmsKey');
         $accessKeyId = $conf['accessKeyId'];
         $accessSecret = $conf['accessSecret'];
+        $signName =$conf['signName'];
         $regionId = 'cn-hangzhou';
         $host = 'dysmsapi.aliyuncs.com';
-        $templateCode = 'SMS_121160241';//模板
-        $signName = '开放测评网';
-        $OutId = 1;
-        $TemplateParam = json_encode(['code' => $message]);
-        $date = date('Y-m-d H:i:s');
+        switch ($area_code){
+            case 86:
+                $templateCode=WebConfig::getKeyByFile('sms86.'.$tmpCode);
+                break;
+            default:
+                $phone=$area_code.$phone;
+                $templateCode=WebConfig::getKeyByFile('sms852.'.$tmpCode);
+        }
         AlibabaCloud::accessKeyClient($accessKeyId, $accessSecret)
             ->regionId($regionId)
             ->asDefaultClient();
@@ -46,7 +52,6 @@ class AliYunSms implements SmsInterface
                         'SignName' => $signName,
                         'TemplateCode' => $templateCode,
                         'AccessKeyId' => $accessKeyId,
-                        'OutId' => $OutId,
                         'TemplateParam' => $TemplateParam
                     ],
                 ])->request();

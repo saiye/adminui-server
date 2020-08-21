@@ -31,6 +31,8 @@ Route::post('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
 Route::post('qrCode/test', 'QrCodeController@testQrCode')->name('wx-QrCodeTestQrCode');
 //微信支付回调
 Route::post('call/wx', 'PayController@callWx')->name('wx-callWx');
+//余额支付
+Route::post('balancePay', 'PayController@balancePay')->name('wx-balancePay');
 
 
 

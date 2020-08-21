@@ -8,8 +8,6 @@ use App\Models\PhysicsAddress;
 use App\Models\User;
 use App\Models\WebConfig;
 use App\Service\GameApi\LrsApi;
-use App\Service\SmsApi\AliYunSms;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use App\Constants\ErrorCode;
 
@@ -20,11 +18,6 @@ use App\Constants\ErrorCode;
  */
 class ClientController extends Base
 {
-
-    public function test(AliYunSms $api){
-        $res=$api->send(1, 86, '15876537053', mt_rand(1111,9999));
-        dd($res);
-    }
 
     /**
      * 内部测试用

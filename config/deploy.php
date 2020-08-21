@@ -65,7 +65,8 @@ return [
         2=>'找回密码',
     ],
     'aliSmsKey'=>[
-        'accessKeyId'=>env('AliSmsAccessKeyId', ''),
-        'accessSecret'=>env('AliSmsAccessSecret', ''),
+        'accessKeyId'=>env('AliSmsAccessKeyId',''),
+        'accessSecret'=>env('AliSmsAccessSecret',''),
+        'signName'=>env('AliSmsSignName',''),
     ],
 ];

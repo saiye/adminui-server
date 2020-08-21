@@ -37,6 +37,9 @@ return [
             'sslCertPath'=>env('WX_PAY_CERT_PATH',''),
             'sslKeyPath'=>env('WX_PAY_KEY_PATH',''),
         ],
+        'default'=>[
+            'appSecret' => env('WX_PAY_KEY',''),
+        ],
     ],
     'selectConf' => [
         [

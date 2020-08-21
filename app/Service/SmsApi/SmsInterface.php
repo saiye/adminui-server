@@ -12,5 +12,5 @@ namespace App\Service\SmsApi;
 
 interface SmsInterface
 {
-    public function send($type,$area_code,$phone,$message);
+    public function send($tmpCode,$area_code,$phone,$message,$action);
 }

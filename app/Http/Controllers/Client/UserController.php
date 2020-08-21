@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 
+use App\Constants\SmsAction;
 use App\Models\Certificate;
 use App\Models\Channel;
 use App\Models\PlayerCountRecord;
@@ -89,13 +90,14 @@ class UserController extends Base
         //1.验证用户信息,ok入库
         $certificate = Str::random(32);
 
-        $type=1;
+        $type='code';
         $this->cacheStep($certificate, [
             'type' =>$type,
+            'action' =>SmsAction::USER_REG,
             'ext' => $data,
         ]);
         //2.发送验证码，和凭证给客户端
-        $res = $api->send($type, $this->request->area_code, $this->request->phone, mt_rand(111111, 999999));
+        $res = $api->send($type, $this->request->area_code, $this->request->phone, ['code'=>mt_rand(11111, 99999)],SmsAction::USER_REG);
         if ($res['code'] == 0) {
             return $this->json([
                 'errorMessage' => '验证码已下发！',
@@ -155,7 +157,7 @@ class UserController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        if (!isset($post['type']) or !isset($post['ext'])) {
+        if (!isset($post['type']) or !isset($post['ext']) or !isset($post['action'])) {
             return $this->json([
                 'errorMessage' => '凭证错误！',
                 'code' => ErrorCode::VALID_FAILURE,
@@ -163,8 +165,8 @@ class UserController extends Base
         }
         $data = $post['ext'];
         $token = Str::random(32);
-        switch ($post['type']) {
-            case 1:
+        switch ($post['action']) {
+            case SmsAction::USER_REG:
                 $validator2 = $this->validationFactory->make($data, [
                     'area_code' => 'required|numeric',
                     'phone' => 'required|numeric',
@@ -178,7 +180,7 @@ class UserController extends Base
                     ]);
                 }
                 //验证码检查
-                if ($api->checkCode($post['type'], $data['area_code'], $data['phone'], $this->request->phone_code)) {
+                if ($api->checkCode($post['type'], $data['area_code'], $data['phone'], $this->request->phone_code,$post['action'])) {
                     $account = $data['area_code'] . $data['phone'];
                     $user=User::whereAccount($account)->first();
                     if($user){
@@ -214,7 +216,7 @@ class UserController extends Base
                     'code' => ErrorCode::VALID_FAILURE,
                 ]);
                 break;
-            case 2:
+            case SmsAction::USER_FORGET_PASSWORD:
             default:
                 $validator3 = $this->validationFactory->make($data, [
                     'area_code' => 'required|numeric',
@@ -226,7 +228,7 @@ class UserController extends Base
                         'code' => ErrorCode::VALID_FAILURE,
                     ]);
                 }
-                if ($api->checkCode($post['type'], $data['area_code'], $data['phone'], $this->request->phone_code)) {
+                if ($api->checkCode($post['type'], $data['area_code'], $data['phone'], $this->request->phone_code,$post['action'])) {
                     $account = $data['area_code'] . $data['phone'];
                     $save = User::whereAccount($account)->update([
                         'token' => $token,
@@ -274,12 +276,13 @@ class UserController extends Base
         }
         //1.验证用户信息,ok入库
         $certificate = Str::random(32);
-        $type=2;
+        $type='code';
         $this->cacheStep($certificate, [
             'type' =>$type,
+            'action' =>SmsAction::USER_FORGET_PASSWORD,
             'ext' => $data,
         ]);
-       $res= $api->send(2, $this->request->area_code, $this->request->phone, mt_rand(11111, 99999));
+       $res= $api->send($type, $this->request->area_code, $this->request->phone,['code'=>mt_rand(11111, 99999)],SmsAction::USER_FORGET_PASSWORD);
         if ($res['code'] == 0) {
             return $this->json([
                 'errorMessage' => "验证码下发成功",

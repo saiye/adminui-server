@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Cp\Store;
 
 use App\Constants\CacheKey;
 use App\Constants\PaginateSet;
+use App\Constants\SmsAction;
 use  App\Http\Controllers\Cp\BaseController as Controller;
+use App\Models\Company;
 use App\Models\Image;
 use App\Models\Staff;
 use App\Models\Store;
 use App\Models\StoreTag;
+use App\Service\SmsApi\HandelSms;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -343,7 +346,7 @@ class IndexController extends Controller
     /**
      * 审核门店
      */
-    public function checkStore()
+    public function checkStore(HandelSms $api)
     {
         $validator = Validator::make($this->req->all(), [
             'store_id' => 'required|numeric',
@@ -358,15 +361,28 @@ class IndexController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $item = Store::whereStoreId($this->req->store_id)->first();
+        $item = Store::with('company')->whereStoreId($this->req->store_id)->first();
+        $check=$this->req->input('check');
+        $reason=$this->req->input('reason');
+
         if ($item) {
-            $item->check = $this->req->check;
+            $item->check =$check;
             $item->reason = $this->req->reason ?? '';
             $success = $item->save();
-            $checkStaff = Staff::whereStaffId($item->staff_id)->update([
-                'lock' => 1,
-            ]);
+            $staff=Staff::whereStaffId($item->staff_id)->first();
+            $staff->lock=1;
+            $checkStaff=$staff->save();
             if ($success and $checkStaff) {
+                if($check==1){
+                    $action=SmsAction::STORE_CHECK_SUCCESS;
+                    $tmpCode='store_check_success';
+                    $arr=['company_name'=>$item->company->company_name,'store_name'=>$item->store_name];
+                }else{
+                    $action=SmsAction::STORE_CHECK_FAIL;
+                    $tmpCode='store_check_fail';
+                    $arr=['company_name'=>$item->company->company_name,'store_name'=>$item->store_name,'reason'=>$reason];
+                }
+                $api->send($tmpCode, 86, $staff->phone,$arr,$action);
                 return $this->successJson([], '操作成功');
             }
         }
