@@ -9,6 +9,7 @@
 namespace App\Service\LoginApi;
 
 use App\Constants\ErrorCode;
+use App\Constants\Logic;
 use App\Models\ThreeUser;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -61,6 +62,8 @@ abstract class BaseLoginApi implements LoginApi
                     'judge' => 2,
                     'lock' => 1,
                     'icon' => $info['icon'],
+                    'open_id'=>$info['openid'],
+                    'type'=>Logic::USER_TYPE_WX,
                     'lon' => $longitude,
                     'lat' => $latitude,
                 ]);
@@ -83,16 +86,21 @@ abstract class BaseLoginApi implements LoginApi
             //已注册用户
             $user = User::whereId($hasThreeUser->user_id)->first();
             if ($user) {
+                if($user->parent_id){
+                    $user=User::whereId($user->parent_id)->first();
+                }
                 //更新用户信息
                 $user->sex = $info['sex'];
                 $user->nickname = $info['nickname'];
+                $user->nickname = $info['nickname'];
+                $user->open_id = $info['openid'];
                 $user->icon = $info['icon'];
                 $user->lon =$longitude;
                 $user->lat =$latitude;
+                $user->type=Logic::USER_TYPE_WX;
                 $user->save();
                 return [ErrorCode::SUCCESS, '老用户', $user];
             }
-
         }
         return [$code, $info['message'], null];
     }

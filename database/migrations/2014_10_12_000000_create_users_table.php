@@ -39,6 +39,9 @@ class CreateUsersTable extends Migration
             $table->string('token',80)->unique()->nullable()->default(null)->comment('api token');
             $table->string('phone',20)->nullable()->comment('phone');
             $table->string('area_code',5)->nullable()->comment('area_code');
+            $table->unsignedInteger('parent_id')->default(0)->comment('父id');
+            $table->string('open_id',50)->nullable()->comment('open_id');
+            $table->tinyInteger('type')->default(0)->comment('用户类型1小程序');
             $table->timestamps();
         });
     }

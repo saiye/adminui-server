@@ -19,5 +19,7 @@ class SmsAction
 
     const STORE_CHECK_SUCCESS = 'STORE_CHECK_SUCCESS';
 
+    const BUILD_USER_PHONE = 'BUILD_USER_PHONE';
+
 
 }

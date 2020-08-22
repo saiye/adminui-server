@@ -127,4 +127,8 @@ CHANGE `coupon_price` `coupon_price` DECIMAL(10,2) DEFAULT '0.00' NOT NULL COMME
 
  ALTER TABLE `lrs_manage`.`balance_water` DROP COLUMN `order_id`,    ADD COLUMN `order_sn` VARCHAR(80) NULL COMMENT '订单号' AFTER `balance_sn`;
 
+//合并账号id
+alter table `lrs_manage`.`users` add column `parent_id` int(10) DEFAULT '0' NOT NULL after `token`;
 
+//open_id,考虑到合并账号，支付需要用到
+alter table `lrs_manage`.`users` add column `open_id` varchar(50) NULL COMMENT 'open_id' after `parent_id`;

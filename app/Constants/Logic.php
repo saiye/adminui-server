@@ -16,4 +16,6 @@ class Logic
     //预定房间
     const BOOK_ROOM_TYPE = 2;
 
+    const USER_TYPE_WX=1;
+
 }

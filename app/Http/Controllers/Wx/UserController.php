@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Wx;
 
 
+use App\Constants\SmsAction;
 use App\Models\Channel;
+use App\Models\User;
 use App\Service\GameApi\LrsApi;
 use App\Service\LoginApi\LoginApi;
 use App\Constants\ErrorCode;
 use App\Service\SceneAction\SceneFactory;
+use App\Service\SmsApi\HandelSms;
 use Illuminate\Support\Str;
 
 class UserController extends Base
@@ -34,7 +37,7 @@ class UserController extends Base
     {
         $user = $this->user();
         if ($user) {
-            $user->token=  hash('sha256', Str::random(60));;
+            $user->token = hash('sha256', Str::random(60));;
             $user->save();
             $channel = Channel::whereChannelId($user->channel_id)->first();
             $api = new LrsApi($channel);
@@ -96,6 +99,10 @@ class UserController extends Base
         ]);
     }
 
+    /**
+     * 用户信息
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function info()
     {
         $user = $this->user();
@@ -112,6 +119,8 @@ class UserController extends Base
                 'remaining' => $user->remaining,//余额
                 'income' => $user->income,//收入
                 'withdrawal' => $user->withdrawal,//已提现
+                'phone' => $user->phone,
+                'area_code' => $user->area_code,
                 'code' => ErrorCode::SUCCESS,
             ]);
         } else {
@@ -120,6 +129,100 @@ class UserController extends Base
                 'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
             ]);
         }
+    }
+
+    /**
+     * 绑定手机
+     */
+    public function buildPhone(HandelSms $api)
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'phone' => 'required|numeric',
+            'area_code' => 'required|numeric',
+            'phone_code' => 'required|numeric',
+            'build_type' => 'required|in:1,2',
+        ], [
+            'phone_code.required' => '验证码不能为空！',
+            'phone_code.numeric' => '验证码必须是个数字！',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $area_code = $this->request->input('area_code');
+        $phone = $this->request->input('phone');
+        $phone_code = $this->request->input('phone_code');
+        //1.手机账号绑定到当前登录账号，2。当前登录号，绑定手机账号
+        $build_type= $this->request->input('build_type');
+        $res = $api->phoneCheck($area_code, $phone);
+        if ($res['code'] !== 0) {
+            return $this->json($res);
+        }
+        $user = $this->user();
+        if($user->phone or $user->parent_id){
+            return $this->json([
+                'errorMessage' => '手机账号已绑定请勿重复操作！',
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        if ($build_type==2){
+            $hasUser=whereAreaCode($area_code)->wherePhone($phone)->first();
+            if(!$hasUser){
+                return $this->json([
+                    'errorMessage' => '绑定失败,手机账号不存在！',
+                    'code' => ErrorCode::VALID_FAILURE,
+                ]);
+            }
+        }
+        if (!$api->checkCode('code', SmsAction::BUILD_USER_PHONE, $area_code, $phone, $phone_code, SmsAction::BUILD_USER_PHONE)) {
+            return $this->json([
+                'errorMessage' => '验证码错误',
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        if($build_type==1){
+            //执行账号绑定
+            User::whereAreaCode($area_code)->wherePhone($phone)->update([
+                'parent_id'=>$user->id,
+            ]);
+            $user->phone = $phone;
+            $user->area_code = $area_code;
+            $user->save();
+        }else{
+            $user->parent_id = $hasUser->id;
+            $user->save();
+        }
+        return $this->json([
+            'errorMessage' => '绑定成功!',
+            'code' => ErrorCode::SUCCESS,
+        ]);
+    }
+
+    /**
+     * 绑定手机获取验证码
+     */
+    public function buildPhoneGetCode(HandelSms $api)
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'phone' => 'required|numeric',
+            'area_code' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $area_code = $this->request->input('area_code');
+        $phone = $this->request->input('phone');
+        $res = $api->phoneCheck($area_code, $phone);
+        if ($res['code'] !== 0) {
+            return $this->json($res);
+        }
+        $data = $api->send('code', $area_code, $phone, ['code'=>mt_rand(11111,99999)], SmsAction::BUILD_USER_PHONE);
+        return $this->json($data);
     }
 
     /**

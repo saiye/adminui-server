@@ -243,7 +243,7 @@ class OrderController extends Base
         //记录当前支付方式！
         $order->pay_type = $this->request->input('pay_type');
         $order->save();
-        $order['openid'] = $user->account;
+        $order['openid'] = $user->open_id??$user->account;
         return $api->make($this->request->input('pay_type'))->createOrder($order);
     }
 
