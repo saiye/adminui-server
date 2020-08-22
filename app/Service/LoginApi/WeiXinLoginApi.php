@@ -146,7 +146,7 @@ class WeiXinLoginApi extends BaseLoginApi
                 'g' => 120,
                 'b' => 192,
             ],
-            //  'is_hyaline' => true,
+           // 'page'=>'pages/index/login/login',
         ];
         $url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' . $access_token;
         try {
@@ -163,7 +163,7 @@ class WeiXinLoginApi extends BaseLoginApi
             if ($response->getStatusCode() == 200) {
                 $str = $response->getBody()->getContents();
                 $env=Config::get('app.env');
-                $image_path = 'app/'.$env.'/qrCode/'.md5(http_build_query($data)).'.png';
+                $image_path = 'app/'.$env.'/qrCode/'.date('YmdHis').mt_rand(1,999).'.png';
                 Storage::put($image_path, $str);
                 $full_path = Storage::url($image_path);
                 //二维码入库
