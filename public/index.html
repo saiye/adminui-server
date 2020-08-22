@@ -623,7 +623,7 @@ Request
 ### 对局详情app -&gt; Manage Server]:
 
 &gt; 访问链接: https:<span class="hljs-comment">//lrs-tt.7955.com/wx/game/room</span>
-&gt; 协议发送类型: `POST` 
+&gt; 协议发送类型: `POST`
 Request
 ```typescript
 header
@@ -971,7 +971,7 @@ Request
 		ProphotCheckGood = <span class="hljs-number">1</span>, <span class="hljs-comment">// 预言家查验</span>
 		ProphotCheckWolf = <span class="hljs-number">2</span>, <span class="hljs-comment">// 预言家查杀</span>
 		ProphotPass = <span class="hljs-number">3</span>, <span class="hljs-comment">// 预言家空过</span>
-		
+
 		WereWolfKill = <span class="hljs-number">4</span>, <span class="hljs-comment">// 狼刀</span>
 		WereWolfPass = <span class="hljs-number">5</span>, <span class="hljs-comment">// 空刀</span>
 		WereWolfSelfBurst = <span class="hljs-number">6</span>, <span class="hljs-comment">// 狼人自爆</span>
@@ -979,26 +979,26 @@ Request
 		WhiteWolfPass = <span class="hljs-number">8</span>,<span class="hljs-comment">// 白狼王不带走</span>
 		BlackWoflKill = <span class="hljs-number">9</span>, <span class="hljs-comment">// 黑狼带走</span>
 		BlackWolfPass = <span class="hljs-number">10</span>, <span class="hljs-comment">// 黑狼不带走</span>
-		
+
 		WitchSave = <span class="hljs-number">11</span>, <span class="hljs-comment">// 女巫救</span>
 		WitchKill = <span class="hljs-number">12</span>,<span class="hljs-comment">// 女巫杀</span>
 		WitchPass = <span class="hljs-number">13</span>,<span class="hljs-comment">// 女巫过</span>
-		
+
 		GuardHelp = <span class="hljs-number">14</span>, <span class="hljs-comment">// 守卫守</span>
 		GuardPass = <span class="hljs-number">15</span>,<span class="hljs-comment">// 守卫过</span>
-		
+
 		HunterKill = <span class="hljs-number">16</span>,<span class="hljs-comment">//猎人杀</span>
 		HunterPass = <span class="hljs-number">17</span>,<span class="hljs-comment">// 猎人过</span>
-		
+
 		IdiotShowIdentify = <span class="hljs-number">18</span>,<span class="hljs-comment">// 白痴翻牌</span>
-		
+
 		DelaySelectPolice = <span class="hljs-number">101</span>, <span class="hljs-comment">// 选警长延期</span>
 		SelectPolicePK = <span class="hljs-number">102</span>,<span class="hljs-comment">// 选警长pk</span>
 		AsPolice = <span class="hljs-number">103</span>, <span class="hljs-comment">// 当选警长</span>
 		LossPolice = <span class="hljs-number">104</span>, <span class="hljs-comment">// 警徽流失</span>
 		TransPolice = <span class="hljs-number">105</span>,<span class="hljs-comment">// 转移警长</span>
 		DestroyPolice = <span class="hljs-number">106</span>,<span class="hljs-comment">// 撕毁警徽</span>
-		
+
 		SafeNight = <span class="hljs-number">107</span>,<span class="hljs-comment">// 平安夜</span>
 		SafeDay = <span class="hljs-number">108</span>,<span class="hljs-comment">// 平安日</span>
 		PublishNightDie = <span class="hljs-number">109</span>,<span class="hljs-comment">// 公布死讯</span>
@@ -1366,23 +1366,60 @@ Request
 }
 Request
 {
+
     <span class="hljs-string">'order_id'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
-    <span class="hljs-string">'user_coupon_id'</span> =&gt; <span class="hljs-string">'nullable|numeric'</span>,<span class="hljs-comment">//券id</span>
-    <span class="hljs-string">'data'</span>=&gt;{
-        <span class="hljs-string">"appId"</span>: <span class="hljs-string">"wxa710f094a5283328"</span>,
-        <span class="hljs-string">"timeStamp"</span>: <span class="hljs-number">1597316754</span>,
-        <span class="hljs-string">"nonceStr"</span>: <span class="hljs-string">"gszKPE5ja1rfpGHdfPHmjD43RLKrkFlu"</span>,
-        <span class="hljs-string">"package"</span>: <span class="hljs-string">"prepay_id=wx13190559380970bc0a388987a194370000"</span>,
-        <span class="hljs-string">"signType"</span>: <span class="hljs-string">"MD5"</span>,
-        <span class="hljs-string">"paySign"</span>: <span class="hljs-string">"219365FF170F4B6B6FB363B93A34762B"</span>
-    },
+    <span class="hljs-string">'user_coupon_id'</span> =&gt; <span class="hljs-string">'nullable|numeric'</span>,
+    <span class="hljs-string">'pay_type'</span> =&gt; <span class="hljs-string">'required|numeric|in:1,5'</span>,
 }
 </div></code></pre>
 <p>Response</p>
 <pre class="hljs"><code><div>{
-    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
-    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">"ok"</span>,
-    <span class="hljs-attr">"prepay_id"</span>:'预支付回话标识,吊起支付用!',
+    &quot;code&quot;: 0,
+    &quot;errorMessage&quot;: &quot;ok&quot;,
+    &quot;data&quot;:object,//pay_type 不同,data不一样
+}
+
+关于data的解析
+pay_type:1时，微信支付,data如下，拿到相关参数吊起微信支付
+{
+        &quot;appId&quot;: &quot;wxa710f094a5283328&quot;,
+        &quot;timeStamp&quot;: 1597316754,
+        &quot;nonceStr&quot;: &quot;gszKPE5ja1rfpGHdfPHmjD43RLKrkFlu&quot;,
+        &quot;package&quot;: &quot;prepay_id=wx13190559380970bc0a388987a194370000&quot;,
+        &quot;signType&quot;: &quot;MD5&quot;,
+        &quot;paySign&quot;: &quot;219365FF170F4B6B6FB363B93A34762B&quot;
+},
+
+pay_type:5时,是余额支付方式,data如下,拿到相关参数吊起余额支付
+{
+         &quot;appId&quot;: 1,
+        &quot;timeStamp&quot;: 1597981478,
+        &quot;nonceStr&quot;: &quot;IYK2Sl1g9wmepyJC2z0RgMNymZuakLZ7&quot;,
+        &quot;balance_sn&quot;: &quot;2020082111443860927&quot;,
+        &quot;signType&quot;: &quot;MD5&quot;,
+        &quot;sign&quot;: &quot;8c20966728e5746ed13a2d7eb354e485&quot;
+}
+
+</div></code></pre>
+<h3 id="%E4%BD%99%E9%A2%9D%E5%90%8A%E8%B5%B7%E6%94%AF%E4%BB%98-client--manage-server">余额吊起支付 [Client-&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/balancePay
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">'appId'</span> =&gt; <span class="hljs-string">'required|in:1'</span>,
+    <span class="hljs-string">'timeStamp'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'nonceStr'</span> =&gt; <span class="hljs-string">'required'</span>,
+    <span class="hljs-string">'balance_sn'</span> =&gt; <span class="hljs-string">'required'</span>,
+    <span class="hljs-string">'signType'</span> =&gt; <span class="hljs-string">'required|in:MD5'</span>,
+    <span class="hljs-string">'sign'</span> =&gt; <span class="hljs-string">'required'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">"code"</span>: ERetCode, <span class="hljs-comment">// 返回码</span>
+    <span class="hljs-string">"errorMessage"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// [可选] 错误描述</span>
 }
 </div></code></pre>
 <h3 id="%E8%AE%A2%E5%8D%95%E8%AF%A6%E6%83%85%E8%AE%A2%E5%8D%95%E5%8E%86%E5%8F%B2%E6%9F%A5%E7%9C%8B%E4%B9%8B%E7%B1%BB-app---manage-server">订单详情,订单历史查看之类 app -&gt; Manage Server]:</h3>
