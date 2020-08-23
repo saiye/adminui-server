@@ -22,6 +22,14 @@ class PayController extends Base
         return $api->make(1)->callBack();
     }
 
+    /**
+     * 微信退款通知
+     * @param HandelPay $api
+     * @return mixed
+     */
+    public function callWxRefund(HandelPay $api){
+        return $api->make(1)->refundNotice();
+    }
 
     /**
      * 余额支付,不做回调处理.

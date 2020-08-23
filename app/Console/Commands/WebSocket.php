@@ -32,10 +32,10 @@ class WebSocket extends Command
      *
      * @return void
      */
-    public function __construct(WebSocketServer $server)
+    public function __construct()
     {
         parent::__construct();
-        $this->server=$server;
+       // $this->server=$server;
     }
 
     /**
@@ -45,6 +45,6 @@ class WebSocket extends Command
      */
     public function handle()
     {
-        $this->server->start();
+       // $this->server->start();
     }
 }

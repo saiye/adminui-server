@@ -168,7 +168,7 @@ final class WeiXinPayApi extends PayApi
     }
 
     /**
-     * 退款
+     * 退款申请
      * @param \Closure $call
      */
     public function refundApply($refund_order, $call)
@@ -185,25 +185,31 @@ final class WeiXinPayApi extends PayApi
             'total_fee' => $refund_order->order->total_fee,
             'refund_fee' => $refund_order->refund_fee,
             'refund_fee_type' => 'CNY',
-            'refund_desc' => $refund_order->refund_desc,
-            'notify_url' => '',
+            'refund_desc' => $refund_order->refund_reason,
+            'notify_url' => route('wx-CallWxRefund'),
         ];
         $data['sign'] = $this->MakeSign($data);
         $xml = self::createXml($data);
-        $repose_xml = $this->postXmlCurl($xml, self::getBaseUrl('/pay/unifiedorder'));
+        $repose_xml = $this->postXmlCurl($xml, self::getBaseUrl('/pay/unifiedorder'),true);
         $repose_arr = $this->fromXml($repose_xml);
         //通讯成功
         if (isset($repose_arr['return_code']) and $repose_arr['return_code'] == 'SUCCESS') {
             //业务成功
             if (isset($repose_arr['result_code']) and $repose_arr['result_code'] == 'SUCCESS') {
                 //退款申请成功
-                $call([
-                    'out_refund_no' => '',
-                    'refund_id' => '',
-                    'refund_fee' => '',
+               $flag=  $call([
+                    'refund_no' =>$repose_arr['out_refund_no'],
+                    'refund_id' =>$refund_order['refund_id'],
+                    'cash_fee' => $repose_arr['settlement_refund_fee']/100,
                 ]);
+               if(!$flag){
+                   Log::info('退款申请订单未找到！');
+                   Log::info($repose_arr);
+               }
+               return $flag;
             }
         }
+        return false;
     }
 
     /**
@@ -212,7 +218,75 @@ final class WeiXinPayApi extends PayApi
      */
     public function refundNotice($call)
     {
+        $xml = file_get_contents('php://input');
+        if (!$xml) {
+            return self::createXml([
+                'return_code' => 'FAIL',
+                'return_msg' => '验证失败'
+            ]);
+        }
+        $http_params = $this->fromXml($xml);
+        $appid = $this->config['appId'];
+        $mch_id = $this->config['mchId'];
+        //验证回调参数
+        $tmp_sign = $this->MakeSign($http_params);
+        if (isset($http_params['sign']) and $http_params['sign'] == $tmp_sign) {
+            if (isset($http_params['return_code']) and $http_params['return_code'] == 'SUCCESS') {
+                if (isset($http_params['result_code']) and $http_params['result_code'] == 'SUCCESS') {
+                    if ($http_params['appid'] !== $appid) {
+                        return self::createXml([
+                            'return_code' => 'FAIL',
+                            'return_msg' => 'appid不正确'
+                        ]);
+                    }
+                    if ($http_params['mch_id'] !== $mch_id) {
+                        return self::createXml([
+                            'return_code' => 'FAIL',
+                            'return_msg' => 'mch_id不正确'
+                        ]);
+                    }
+                    $info = $this->decodeReqInfo($http_params['req_info']);
+                    if (isset($info['refund_status']) and $info['refund_status'] == 'SUCCESS') {
+                        //退款成功
+                        $call([
+                            'refund_no' => $info['out_refund_no'],
+                            'refund_id' => $info['refund_id'],
+                            'cash_fee' => $info['settlement_refund_fee'] / 100,
+                            'refund_time' => strtotime($info['success_time']),
+                        ]);
+                        return self::createXml([
+                            'return_code' => 'SUCCESS',
+                            'return_msg' => '退款成功！'
+                        ]);
+                    }
+                }
+            }
+        }
+        Log::info('WX-refundNotice-FAIL');
+        Log::info($xml);
+        return self::createXml([
+            'return_code' => 'FAIL',
+            'return_msg' => '验证失败'
+        ]);
+    }
 
+    /**
+     * 解密退款的req_info字段
+     * https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_16&index=10#menu1
+     * @param $info
+     * @return array
+     */
+    private function decodeReqInfo($info)
+    {
+        if (self::IS_SAND_BOX) {
+            $key = $this->config['sandKey'];
+        } else {
+            $key = $this->config['appSecret'];
+        }
+        //2.对商户key做md5，得到32位小写key
+        $md5Key = strtolower(md5($key));
+        $xml=deCode($md5Key, $info,'aes-256-ecb');
+        return  $this->fromXml($xml);
     }
 
     /**
@@ -247,7 +321,6 @@ final class WeiXinPayApi extends PayApi
             //业务成功
             if (isset($repose_arr['result_code']) and $repose_arr['result_code'] == 'SUCCESS') {
                 if ($repose_arr['trade_state'] == 'SUCCESS') {
-
                     //有用代金券的情况下，应结订单金额作为回调金额
                     $calPrice = $repose_arr['settlement_total_fee'] ?? $repose_arr['total_fee'];
                     $call([

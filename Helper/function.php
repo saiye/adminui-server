@@ -340,4 +340,31 @@ if (!function_exists("my_rad")) {
     }
 }
 
+if (!function_exists("enCode")) {
+    function enCode( $key, $value,$cipher='aes-256-ecb')
+    {
+        if (in_array($cipher, openssl_get_cipher_methods())) {
+            $value = openssl_encrypt($value,
+                $cipher, $key, OPENSSL_RAW_DATA
+            );
+        }else{
+            $value='-';
+        }
+        return base64_encode($value);
+    }
+}
+if (!function_exists("deCode")) {
+    function deCode($key, $value,$cipher='aes-256-ecb')
+    {
+        if (in_array($cipher, openssl_get_cipher_methods())) {
+            $str= openssl_decrypt(base64_decode($value),$cipher,$key,OPENSSL_RAW_DATA);
+        }else{
+            $str='';
+        }
+        return $str;
+    }
+}
+
+
+
 

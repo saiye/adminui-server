@@ -23,16 +23,21 @@ Route::group([
     Route::post('order/doPay', 'OrderController@doPay');
     Route::post('order/list', 'OrderController@orderList');
     Route::post('order/cancel', 'OrderController@cancel');
+    //余额支付
+    Route::post('balancePay', 'PayController@balancePay')->name('wx-balancePay');
 });
 Route::post('game/fightHistorical', 'GameController@fightHistorical');
 
 Route::post('user/login', 'UserController@login')->middleware('ApiLogRecord');
 Route::post('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
 Route::any('qrCode/test', 'QrCodeController@testQrCode')->name('wx-QrCodeTestQrCode');
+
 //微信支付回调
 Route::post('call/wx', 'PayController@callWx')->name('wx-callWx');
-//余额支付
-Route::post('balancePay', 'PayController@balancePay')->name('wx-balancePay');
+//微信退款
+Route::post('call/callWxRefund', 'PayController@callWxRefund')->name('wx-CallWxRefund');
+
+
 
 
 

@@ -35,9 +35,8 @@ foreach ($goodsIds as $item){
 echo json_encode($data['buys']);*/
 
 
-
 //消息
-$data=[
+/*$data=[
     'channel'=>'sendMessage',
     'code'=>'0',
     'data'=>[
@@ -61,4 +60,7 @@ $data=[
             'nickname'=>'',
         ]
     ],
-];
+];*/
+
+
+

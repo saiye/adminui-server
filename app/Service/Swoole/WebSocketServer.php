@@ -10,7 +10,7 @@ class WebSocketServer implements Server
 
     public function __construct()
     {
-        $this->server=new \Swoole\Websocket\Server("127.0.0.1", 9502);
+      //  $this->server=new \Swoole\Websocket\Server("127.0.0.1", 9502);
         $this->server->on('open', [$this, 'open']);
         $this->server->on('message', [$this, 'message']);
         $this->server->on('close', [$this, 'close']);

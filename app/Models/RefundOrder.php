@@ -10,4 +10,8 @@ class RefundOrder extends Model
     protected $guarded = [
         'id'
     ];
+
+    public function order(){
+        return $this->hasOne(Order::class,'order_id','order_id');
+    }
 }

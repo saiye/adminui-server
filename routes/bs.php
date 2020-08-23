@@ -62,6 +62,10 @@ Route::group([
     Route::post('order/index/detail', 'Order\IndexController@orderDetail')->name('bs-orderDetail');
     Route::post('order/index/set', 'Order\IndexController@setOrder')->name('bs-setOrder');
     Route::post('order/index/findOrder', 'Order\IndexController@findOrder')->name('bs-findOrder');
+    Route::post('order/index/refundApply', 'Order\IndexController@refundApply')->name('bs-refundApply');
+    Route::post('order/index/createOrder', 'Order\IndexController@createOrder')->name('bs-createOrder');
+    Route::post('order/index/refundApplyList', 'Order\IndexController@refundApplyList')->name('bs-refundApplyList');
+    Route::post('order/index/agreeRefund', 'Order\IndexController@agreeRefund')->name('bs-agreeRefund');
 
     //提现订单
     Route::post('order/withdraw/orderList', 'Order\WithdrawController@orderList')->name('bs-WithdrawOrderList');

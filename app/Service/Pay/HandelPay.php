@@ -8,6 +8,7 @@ namespace App\Service\Pay;
 
 use App\Constants\ErrorCode;
 use App\Models\Order;
+use App\Models\RefundOrder;
 use App\TraitInterface\ApiTrait;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Log;
@@ -57,9 +58,9 @@ class HandelPay
             if ($order) {
                 $delta = 0.01;
                 $status = $order->status == 3 ? 3 : 1;
-                $is_abnormal=0;
-                if ((abs($data['actual_payment'] - $order->due_price) < $delta) and (abs($data['total_price']-$order->total_price)<$delta)) {
-                    $post=[
+                $is_abnormal = 0;
+                if ((abs($data['actual_payment'] - $order->due_price) < $delta) and (abs($data['total_price'] - $order->total_price) < $delta)) {
+                    $post = [
                         'pay_time' => strtotime($data['time_end']),
                         'pay_status' => 1,
                         'pay_type' => $data['pay_type'],
@@ -69,15 +70,15 @@ class HandelPay
                         'status' => $status,
                     ];
                 } else {
-                    $is_abnormal=1;
+                    $is_abnormal = 1;
                     //订单异常：
-                    $post=[
+                    $post = [
                         'actual_payment' => $data['actual_payment'],
                         'is_abnormal' => $is_abnormal,
                     ];
                 }
                 Order::whereOrderSn($data['order_sn'])->update($post);
-                if($is_abnormal==0){
+                if ($is_abnormal == 0) {
                     return true;
                 }
                 return false;
@@ -96,7 +97,35 @@ class HandelPay
     public function refundApply($refund_order)
     {
         return $this->handel->refundApply($refund_order, function ($data) {
+            $refundOrder = RefundOrder::whereRefundNo($data['refund_no'])->first();
+            if ($refundOrder) {
+                $refundOrder->refund_id = $data['refund_id'];
+                $refundOrder->cash_fee = $data['cash_fee'];
+                $refundOrder->save();
+                return false;
+            }
+            return true;
+        });
+    }
 
+    /**
+     * 退款回调通知
+     * @return mixed
+     */
+    public function refundNotice()
+    {
+        return $this->handel->refundNotice(function ($data) {
+            //回调成功
+            $refundOrder = RefundOrder::whereRefundNo($data['refund_no'])->first();
+            if ($refundOrder) {
+                $refundOrder->refund_status = 1;
+                $refundOrder->refund_id = $data['refund_id'];
+                $refundOrder->cash_fee = $data['cash_fee'];
+                $refundOrder->refund_time = $data['refund_time'];
+                $refundOrder->save();
+                return true;
+            }
+            return false;
         });
     }
 
@@ -113,27 +142,27 @@ class HandelPay
             if ($order) {
                 $delta = 0.01;
                 $status = $order->status == 3 ? 3 : 1;
-                $is_abnormal=0;
-                if ((abs($data['actual_payment'] - $order->due_price) < $delta) and (abs($data['total_price']-$order->total_price)<$delta)) {
-                    $post=[
-                            'pay_time' => strtotime($data['time_end']),
-                            'pay_status' => 1,
-                            'pay_type' => $data['pay_type'],
-                            'prepay_id' => $data['prepay_id'],
-                            'actual_payment' => $data['actual_payment'],
-                            'is_abnormal' => 0,
-                            'status' => $status,
+                $is_abnormal = 0;
+                if ((abs($data['actual_payment'] - $order->due_price) < $delta) and (abs($data['total_price'] - $order->total_price) < $delta)) {
+                    $post = [
+                        'pay_time' => strtotime($data['time_end']),
+                        'pay_status' => 1,
+                        'pay_type' => $data['pay_type'],
+                        'prepay_id' => $data['prepay_id'],
+                        'actual_payment' => $data['actual_payment'],
+                        'is_abnormal' => 0,
+                        'status' => $status,
                     ];
                 } else {
                     //订单异常：
-                    $is_abnormal=1;
-                    $post=[
+                    $is_abnormal = 1;
+                    $post = [
                         'actual_payment' => $data['actual_payment'],
                         'is_abnormal' => $is_abnormal,
                     ];
                 }
                 Order::whereOrderSn($data['order_sn'])->update($post);
-                if($is_abnormal==0){
+                if ($is_abnormal == 0) {
                     return true;
                 }
                 return false;
