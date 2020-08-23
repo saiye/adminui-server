@@ -132,3 +132,7 @@ alter table `lrs_manage`.`users` add column `parent_id` int(10) DEFAULT '0' NOT 
 
 //open_id,考虑到合并账号，支付需要用到
 alter table `lrs_manage`.`users` add column `open_id` varchar(50) NULL COMMENT 'open_id' after `parent_id`;
+
+alter table `lrs_manage`.`staff` add column `area_code` tinyint(4) DEFAULT '0' NULL COMMENT '地区码' after `sex`;
+
+ alter table `lrs_manage`.`company` change `state_id` `area_code` init(10) default 0 NOT NULL comment '地区码';

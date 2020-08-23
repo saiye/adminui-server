@@ -12,20 +12,20 @@ Route::group([
     'middleware' => ['auth:cp-api', 'rbac:cp-api', 'action.log:cp-api']
 ], function () {
     //权限管理
-    Route::post('/main/sys/add-role', 'Main\SysController@postAddRole')->name('cp-doAddRole');
-    Route::get('/main/sys/edit-role', 'Main\SysController@getEditRole')->name('cp-editRole');
-    Route::post('/main/sys/edit-role', 'Main\SysController@postEditRole')->name('cp-doEditRole');
-    Route::post('/main/sys/del-role', 'Main\SysController@getDelRole')->name('cp-doDelRole');
-    Route::get('/main/sys/role-list', 'Main\SysController@getRoleList')->name('cp-roleList');
-    Route::get('/main/sys/del-role', 'Main\SysController@getDelRole')->name('cp-delRole');
-    Route::post('/main/sys/add-user', 'Main\SysController@postAddUser')->name('cp-doAddUser');
-    Route::get('/main/sys/add-user', 'Main\SysController@getAddUser')->name('cp-addUser');
-    Route::get('/main/sys/edit-user', 'Main\SysController@getEditUser')->name('cp-editUser');
-    Route::post('/main/sys/edit-user', 'Main\SysController@postEditUser')->name('cp-doEditUser');
-    Route::post('/main/sys/user-list', 'Main\SysController@getUserList')->name('cp-userList');
-    Route::any('/main/sys/lock-user', 'Main\SysController@getLockUser')->name('cp-lockUser');
-    Route::get('/main/sys/edit-act', 'Main\SysController@getEditAct')->name('cp-editAct');
-    Route::post('/main/sys/edit-act', 'Main\SysController@postEditAct')->name('cp-doEditAct');
+    Route::post('main/sys/add-role', 'Main\SysController@postAddRole')->name('cp-doAddRole');
+    Route::get('main/sys/edit-role', 'Main\SysController@getEditRole')->name('cp-editRole');
+    Route::post('main/sys/edit-role', 'Main\SysController@postEditRole')->name('cp-doEditRole');
+    Route::post('main/sys/del-role', 'Main\SysController@getDelRole')->name('cp-doDelRole');
+    Route::get('main/sys/role-list', 'Main\SysController@getRoleList')->name('cp-roleList');
+    Route::get('main/sys/del-role', 'Main\SysController@getDelRole')->name('cp-delRole');
+    Route::post('main/sys/add-user', 'Main\SysController@postAddUser')->name('cp-doAddUser');
+    Route::get('main/sys/add-user', 'Main\SysController@getAddUser')->name('cp-addUser');
+    Route::get('main/sys/edit-user', 'Main\SysController@getEditUser')->name('cp-editUser');
+    Route::post('main/sys/edit-user', 'Main\SysController@postEditUser')->name('cp-doEditUser');
+    Route::post('main/sys/user-list', 'Main\SysController@getUserList')->name('cp-userList');
+    Route::any('main/sys/lock-user', 'Main\SysController@getLockUser')->name('cp-lockUser');
+    Route::get('main/sys/edit-act', 'Main\SysController@getEditAct')->name('cp-editAct');
+    Route::post('main/sys/edit-act', 'Main\SysController@postEditAct')->name('cp-doEditAct');
     //系统状态信息
     Route::get('main/info/phpinfo', 'Main\InfoController@getPhpInfo')->name('cp-phpinfo');
     Route::any('main/info/probe', 'Main\InfoController@getProbe')->name('cp-getProbe');
@@ -47,6 +47,7 @@ Route::group([
     //商户管理
     Route::post('company/index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');
     Route::post('company/index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');
+    Route::post('company/index/editCompany', 'Company\IndexController@editCompany')->name('cp-editCompany');
     Route::post('company/index/checkCompany', 'Company\IndexController@checkCompany')->name('cp-checkCompany');
     Route::post('company/index/lockCompany', 'Company\IndexController@lockCompany')->name('cp-lockCompany');
     Route::post('company/index/getState', 'Company\IndexController@getState')->name('cp-getState');

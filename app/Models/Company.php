@@ -35,9 +35,12 @@ class Company extends Model
 
     public function getStateAttribute()
     {
-        return $this->attributes['state'] = Config::get('deploy.state.' . $this->state_id);
+        return $this->attributes['state'] = Config::get('phone.route.' . $this->area_code);
     }
 
+    public function image(){
+        return $this->hasMany(Image::class,'foreign_id','company_id');
+    }
     /**
      * 营业执照
      */

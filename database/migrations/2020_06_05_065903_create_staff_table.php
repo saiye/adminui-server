@@ -15,6 +15,7 @@ class CreateStaffTable extends Migration
     {
         Schema::create('staff', function (Blueprint $table) {
             $table->increments('staff_id')->comment('员工id');
+            $table->integer('area_code')->default(86)->comment('地区码');
             $table->char('account', 20)->unique()->comment('登录账号');
             $table->string('password')->comment('登录密码');
             $table->string('real_name',20)->nullable()->comment('真实姓名');

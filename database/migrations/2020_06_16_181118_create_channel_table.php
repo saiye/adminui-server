@@ -17,7 +17,7 @@ class CreateChannelTable extends Migration
             $table->increments('channel_id')->comment('渠道id');
             $table->string('channel_name',30)->comment('渠道名称');
             $table->string('gameSrvAddr',100)->comment('游戏服地址');
-            $table->string('loginCallBackAddr',100)->comment('登录回调地址');
+            $table->string('callBackServer',100)->comment('登录回调地址');
         });
     }
 

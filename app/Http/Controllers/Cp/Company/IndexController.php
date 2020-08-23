@@ -29,22 +29,24 @@ class IndexController extends Controller
     public function companyList()
     {
         $data = new Company();
-        $data = $data->whereIn('check', $this->req->input('check', [1]))->with('manage');
+        $data = $data->with(['manage', 'image' => function ($r) {
+            $r->whereType(1)->whereIsDel(0);
+        }])->whereIn('check', $this->req->input('check', [1]))->with('manage');
         if ($this->req->company_id) {
             $data = $data->whereCompanyId($this->req->company_id);
         }
         if ($this->req->company_name) {
             $data = $data->where('company_name', 'like', '%' . trim($this->req->company_name) . '%');
         }
-        if ($this->req->state_id) {
-            $data = $data->whereStateId($this->req->state_id);
+        if ($this->req->area_code) {
+            $data = $data->whereAreaCode($this->req->area_code);
         }
         if ($this->req->status) {
             $data = $data->whereStatus($this->req->status);
         }
         if ($this->req->listDate) {
-            if($this->req->listDate[0])
-            $data = $data->whereBetween('created_at', $this->req->listDate);
+            if ($this->req->listDate[0])
+                $data = $data->whereBetween('created_at', $this->req->listDate);
         }
         if ($this->req->real_name) {
             $data = $data->where('staff.real_name', 'like', '%' . $this->req->real_name . '%')->leftJoin('staff', 'company.staff_id', '=', 'staff.staff_id');
@@ -57,25 +59,26 @@ class IndexController extends Controller
     /**
      * 添加商户
      */
-    public function addCompany()
+    public function addCompany(HandelSms $api)
     {
         $validator = Validator::make($this->req->all(), [
             'company_name' => ['required', 'max:30', 'unique:company,company_name'],
-            'state_id' => 'required|integer',
+            'area_code' => 'required|integer',
             'imageData' => 'required|array',
             'account' => ['regex:/^[0-9A-Za-z]+$/', 'required', 'max:20', 'unique:staff,account'],
             'password' => 'required|max:100',
             'real_name' => 'required|max:100',
             'sex' => 'required|in:1,2',
-            'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/'],
+            'phone' => ['required'],
+            'phone_area_code' => ['required'],
             'proportion' => 'required|integer|min:1|max:100',
         ], [
             'imageData.required' => '商户营业执照不能为空！',
             'imageData.array' => '商户营业执照参数格式错误！',
             'company_name.required' => '商户名称不能为空！',
             'company_name.unique' => '商户名称已存在！',
-            'state_id.required' => '商户所在国家不能为空！',
-            'state_id.integer' => '商户所在国家参数必须是一个整数！',
+            'area_code.required' => '商户所在国家不能为空！',
+            'area_code.integer' => '商户所在国家参数必须是一个整数！',
             'account.required' => '账号，不能为空！',
             'account.max' => '商户账号最大长度20！',
             'account.regex' => '商户账号必须是字母数字的组合！',
@@ -85,7 +88,7 @@ class IndexController extends Controller
             'sex.required' => '性别必须选择',
             'sex.in' => '性别选择错误',
             'phone.required' => '手机号码，不能为空！',
-            'phone.regex' => '你输入的不是手机号码',
+            'phone_area_code.required' => '手机区号，不能为空！',
             'phone.unique' => '你输入的手机号码已存在!',
             'proportion.required' => '分成比例不能为空！',
             'proportion.min' => '分成比例不能小于1！',
@@ -94,10 +97,18 @@ class IndexController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
+        $phone = $this->req->input('phone');
+        $area_code = $this->req->input('area_code');
+        $phone_area_code = $this->req->input('phone_area_code');
+
+        $res = $api->phoneCheck($phone_area_code, $phone);
+        if ($res['code'] !== 0) {
+            return $this->errorJson($res['errorMessage'], 2);
+        }
         DB::beginTransaction();
         //商家入库
         $data['company_name'] = $this->req->company_name;
-        $data['state_id'] = $this->req->state_id;
+        $data['area_code'] = $area_code;
         $data['proportion'] = $this->req->proportion;
         $company = Company::create($data);
 
@@ -106,7 +117,8 @@ class IndexController extends Controller
             'account' => $this->req->account,
             'real_name' => $this->req->real_name,
             'sex' => $this->req->sex,
-            'phone' => $this->req->phone,
+            'area_code' => $phone_area_code,
+            'phone' => $phone,
             'lock' => 2,
             'role_id' => 1,
             'company_id' => $company->company_id,
@@ -125,11 +137,11 @@ class IndexController extends Controller
             if ($imageJson) {
                 $tmp = json_decode($imageJson, true);
                 $tmp = array_uintersect($tmp, $imagedata, "strcasecmp");
-                if($tmp){
+                if ($tmp) {
                     Image::whereIn('id', $tmp)->update([
                         'foreign_id' => $company->company_id
                     ]);
-                }else{
+                } else {
                     return $this->errorJson('营业执照入库失败！');
                 }
             }
@@ -142,6 +154,139 @@ class IndexController extends Controller
             return $this->errorJson('入库失败');
         }
 
+    }
+
+
+    /**
+     * 编辑商户
+     */
+    public function editCompany(HandelSms $api)
+    {
+        $validator = Validator::make($this->req->all(), [
+            'company_name' => ['required', 'max:30'],
+            'company_id' => ['required', 'numeric'],
+            'area_code' => 'required|integer',
+            'imageData' => 'required|array',
+            'account' => ['regex:/^[0-9A-Za-z]+$/', 'required', 'max:20'],
+            'password' => 'nullable|max:100|min:6',
+            'real_name' => 'required|max:100',
+            'sex' => 'required|in:1,2',
+            'phone' => ['required'],
+            'phone_area_code' => ['required'],
+            'proportion' => 'required|integer|min:1|max:100',
+        ], [
+            'imageData.required' => '商户营业执照不能为空！',
+            'imageData.array' => '商户营业执照参数格式错误！',
+            'company_name.required' => '商户名称不能为空！',
+            'company_name.unique' => '商户名称已存在！',
+            'area_code.required' => '商户所在国家不能为空！',
+            'area_code.integer' => '商户所在国家参数必须是一个整数！',
+            'account.required' => '账号，不能为空！',
+            'account.max' => '商户账号最大长度20！',
+            'account.regex' => '商户账号必须是字母数字的组合！',
+            'account.unique' => '商户账号已存在，请用其他账号注册！',
+            'password.required' => '商户密码，不能为空！',
+            'real_name.required' => '联系人，不能为空！',
+            'sex.required' => '性别必须选择',
+            'sex.in' => '性别选择错误',
+            'phone.required' => '手机号码，不能为空！',
+            'phone_area_code.required' => '手机区号，不能为空！',
+            'proportion.required' => '分成比例不能为空！',
+            'proportion.min' => '分成比例不能小于1！',
+            'proportion.max' => '分成比例不能大于于100！',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
+        }
+        $phone = $this->req->input('phone');
+        $area_code = $this->req->input('area_code');
+        $phone_area_code = $this->req->input('phone_area_code');
+        $res = $api->phoneCheck($phone_area_code, $phone);
+        if ($res['code'] !== 0) {
+            return $this->errorJson($res['errorMessage'], 2);
+        }
+
+        $company_id = $this->req->input('company_id');
+        $account = $this->req->input('account');
+        $password = $this->req->input('password');
+        $imagedata = $this->req->input('imageData', []);
+        DB::beginTransaction();
+        //商家入库
+        $data['company_name'] = $this->req->company_name;
+        $data['area_code'] = $area_code;
+        $data['proportion'] = $this->req->proportion;
+        $company = Company::whereCompanyId($company_id)->first();
+        if (!$company) {
+            return $this->errorJson('商户不存在！');
+        }
+        $company->fill($data);
+        $company->save();
+
+        $staff = Staff::whereAccount($account)->first();
+
+        if ($staff) {
+            if ($staff->company_id !== $company_id) {
+                return $this->errorJson('商户账号冲突！');
+            }
+            //修改
+            $staffData = [
+                'real_name' => $this->req->real_name,
+                'sex' => $this->req->sex,
+                'phone' => $phone,
+                'area_code' => $phone_area_code,
+                'lock' => 2,
+                'role_id' => 1,
+                'company_id' => $company->company_id,
+            ];
+            if ($password) {
+                $staffData['password'] = Hash::make($password);
+            }
+            $staff->fill($staffData);
+            $staffObj = $staff->save();
+        } else {
+            //新增
+            if (!$password) {
+                return $this->errorJson('密码不能为空！');
+            }
+            $staffData = [
+                'account' => $this->req->account,
+                'real_name' => $this->req->real_name,
+                'sex' => $this->req->sex,
+                'phone' => $phone,
+                'area_code' => $phone_area_code,
+                'lock' => 2,
+                'role_id' => 1,
+                'company_id' => $company->company_id,
+                'password' => Hash::make($password),
+            ];
+            $staffObj = Staff::create($staffData);
+            //更新商户表
+            $company->staff_id = $staffObj->staff_id;
+            $company->save();
+        }
+
+        if ($imagedata) {
+            //图片是你上传的,才关联
+            $user = Auth::guard('cp-api')->user();
+            $key = CacheKey::CP_UPLOAD_KEY . $user->id;
+            $imageJson = Cache::get($key, '');
+            if ($imageJson) {
+                $tmp = json_decode($imageJson, true);
+                $tmp = array_uintersect($tmp, $imagedata, "strcasecmp");
+                if ($tmp) {
+                    Image::whereIn('id', $tmp)->update([
+                        'foreign_id' => $company->company_id
+                    ]);
+                }
+            }
+        }
+        if ($company and $staffObj) {
+            DB::commit();
+            return $this->successJson([], '修改成功');
+        } else {
+            DB::rollBack();
+            return $this->errorJson('入库失败');
+        }
     }
 
     /**
@@ -163,30 +308,30 @@ class IndexController extends Controller
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-        $company=Company::whereCompanyId($this->req->input('company_id'))->first();
-        $reason=$this->req->input('reason', '');
-        if(!$company){
+        $company = Company::whereCompanyId($this->req->input('company_id'))->first();
+        $reason = $this->req->input('reason', '');
+        if (!$company) {
             return $this->errorJson('商户不存在！');
         }
-        $check=$this->req->input('check');
+        $check = $this->req->input('check');
         $success = Company::whereCompanyId($this->req->company_id)->update([
             'check' => $check,
             'status' => $check,
-            'reason' =>$reason,
+            'reason' => $reason,
         ]);
-       $checkStaff= Staff::whereCompanyId($this->req->company_id)->update([
-            'lock'=>1,
+        $checkStaff = Staff::whereCompanyId($this->req->company_id)->update([
+            'lock' => 1,
         ]);
         if ($success and $checkStaff) {
-            $staff=Staff::whereCompanyId($this->req->company_id)->whereStaffId($company->staff_id)->first();
-            if($check==1){
-                $action=SmsAction::COMPANY_CHECK_SUCCESS;
-                $tmpCode='company_check_success';
-            }else{
-                $action=SmsAction::COMPANY_CHECK_FAIL;
-                $tmpCode='company_check_fail';
+            $staff = Staff::whereCompanyId($this->req->company_id)->whereStaffId($company->staff_id)->first();
+            if ($check == 1) {
+                $action = SmsAction::COMPANY_CHECK_SUCCESS;
+                $tmpCode = 'company_check_success';
+            } else {
+                $action = SmsAction::COMPANY_CHECK_FAIL;
+                $tmpCode = 'company_check_fail';
             }
-            $api->send($tmpCode, 86, $staff->phone, ['company_name'=>$company->company_name,'reason'=>$reason],$action);
+            $api->send($tmpCode, 86, $staff->phone, ['company_name' => $company->company_name, 'reason' => $reason], $action);
             return $this->successJson([], '操作成功');
         }
         return $this->errorJson('审核失败！');
@@ -222,7 +367,15 @@ class IndexController extends Controller
 
     public function getState()
     {
-        $data = Config::get('deploy.state');
+
+        $conf = Config::get('phone.route');
+        $data = [];
+        foreach ($conf as $k => $v) {
+            array_push($data, [
+                'value' => $k,
+                'name' => $v['name'],
+            ]);
+        }
         $assign = compact('data');
         return $this->successJson($assign);
     }

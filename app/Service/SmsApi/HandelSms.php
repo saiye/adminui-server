@@ -11,9 +11,9 @@ namespace App\Service\SmsApi;
 use App\Constants\ErrorCode;
 use App\Jobs\SendSmsJob;
 use App\Models\NoteSms;
-use App\TraitInterface\ApiTrait;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Config;
 
 class HandelSms
 {
@@ -82,24 +82,7 @@ class HandelSms
         return false;
     }
     public function phoneCheck($area_code,$phone){
-        $route=[
-            '86'=>[
-                'name'=>'中国',
-                'pattern'=>'/^1[345789]\d{9}$/',
-            ],
-            '852'=>[
-                'name'=>'中国香港',
-                'pattern'=>'/^[569]\d{3}\-?\d{4}$/',
-            ],
-            '886'=>[
-                'name'=>'中国台湾',
-                'pattern'=>'/^9\d{8}$/',
-            ],
-            '1'=>[
-                'name'=>'美国',
-                'pattern'=>'/^[2-9]\d{2}[2-9](?!11)\d{6}$/',
-            ],
-        ];
+        $route=Config::get('phone.route');
         $res=$route[$area_code]??[];
         if(empty($res)){
             return [

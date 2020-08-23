@@ -18,7 +18,14 @@ class IndexController extends Controller
 {
     public function getState()
     {
-        $data = Config::get('deploy.state');
+        $conf = Config::get('phone.route');
+        $data = [];
+        foreach ($conf as $k => $v) {
+            array_push($data, [
+                'value' => $k,
+                'name' => $v['name'],
+            ]);
+        }
         $assign = compact('data');
         return $this->successJson($assign);
     }
@@ -50,7 +57,7 @@ class IndexController extends Controller
     }
     public function companyDetail(){
         $companyId=$this->loginUser->company_id;
-        $item=Company::select('company_name','company_id','state_id','staff_id')->with(['manage'=>function($r){
+        $item=Company::select('company_name','company_id','area_code','staff_id')->with(['manage'=>function($r){
             $r->select('path')->select('account','staff_id','real_name','phone');
         },'license'=>function($r){
             $r->select('path','foreign_id','id')->whereType(1)->whereIsDel(0);

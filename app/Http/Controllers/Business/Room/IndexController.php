@@ -38,11 +38,6 @@ class IndexController extends Controller
             $data = $data->where('store.store_name', 'like', '%' . $this->req->store_name . '%')->leftJoin('store', 'room.store_id', '=', 'store.company_id');
         }
         $data = $data->orderBy('room.room_id', 'desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
-        $game = [
-            'playing_count' => 100,//游戏中人数
-            'use_room_count' => Room::whereIsUse(1)->count(),//使用中房间数
-            'leisure_room_count' => Room::whereIsUse(0)->count(),//空闲房间数
-        ];
         $assign = compact('data');
         return $this->successJson($assign);
     }
