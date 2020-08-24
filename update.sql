@@ -128,11 +128,11 @@ CHANGE `coupon_price` `coupon_price` DECIMAL(10,2) DEFAULT '0.00' NOT NULL COMME
  ALTER TABLE `lrs_manage`.`balance_water` DROP COLUMN `order_id`,    ADD COLUMN `order_sn` VARCHAR(80) NULL COMMENT '订单号' AFTER `balance_sn`;
 
 //合并账号id
-alter table `lrs_manage`.`users` add column `parent_id` int(10) DEFAULT '0' NOT NULL after `token`;
+ALTER TABLE `lrs_manage`.`users` ADD COLUMN `parent_id` INT(10) DEFAULT '0' NOT NULL AFTER `token`;
 
 //open_id,考虑到合并账号，支付需要用到
-alter table `lrs_manage`.`users` add column `open_id` varchar(50) NULL COMMENT 'open_id' after `parent_id`;
+ALTER TABLE `lrs_manage`.`users` ADD COLUMN `open_id` VARCHAR(50) NULL COMMENT 'open_id' AFTER `parent_id`;
 
-alter table `lrs_manage`.`staff` add column `area_code` tinyint(4) DEFAULT '0' NULL COMMENT '地区码' after `sex`;
+ALTER TABLE `lrs_manage`.`staff` ADD COLUMN `area_code` INT(10) DEFAULT '0' NULL COMMENT '地区码' AFTER `sex`;
 
- alter table `lrs_manage`.`company` change `state_id` `area_code` init(10) default 0 NOT NULL comment '地区码';
+ ALTER TABLE `lrs_manage`.`company` CHANGE `state_id` `area_code` INT(10) DEFAULT '0' NOT NULL COMMENT '地区码';

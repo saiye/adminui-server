@@ -5,6 +5,7 @@ namespace App\Service\LoginApi;
 use App\Constants\CacheKey;
 use App\Constants\ErrorCode;
 use App\Models\PhysicsAddress;
+use App\Models\QrCodePath;
 use Illuminate\Cache\DynamoDbStore;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
@@ -84,7 +85,7 @@ class WeiXinLoginApi extends BaseLoginApi
         $cacheToken = Cache::get(CacheKey::WX_ACCESS_TOKEN_KEY);
         if ($cacheToken) {
             Log::info('WX_ACCESS_TOKEN_KEY return');
-            return $cacheToken;
+           // return $cacheToken;
         }
         $url = 'https://api.weixin.qq.com/cgi-bin/token?';
         $config = $this->config();
@@ -104,7 +105,7 @@ class WeiXinLoginApi extends BaseLoginApi
                 $res = json_decode($response->getBody()->getContents(), true);
                 if (isset($res['access_token'])) {
                     $access_token = $res['access_token'];
-                    $expires_in = $res['expires_in'];
+                    $expires_in = $res['expires_in']-10;
                     //缓存
                     Cache::put(CacheKey::WX_ACCESS_TOKEN_KEY, $access_token, $expires_in);
                     return $access_token;
@@ -167,8 +168,11 @@ class WeiXinLoginApi extends BaseLoginApi
                 Storage::put($image_path, $str);
                 $full_path = Storage::url($image_path);
                 //二维码入库
-                PhysicsAddress::whereId($data['deviceShortId'])->update([
-                    'qrCodePath' => $image_path,
+                QrCodePath::create([
+                    'device_id'=>$data['deviceShortId'],
+                    'channel_id'=>$data['channelId'],
+                    'width'=>$data['width'],
+                    'path'=>$image_path,
                 ]);
                 return ['image_path' => $image_path, 'full_path' => $full_path];
             } else {

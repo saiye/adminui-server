@@ -30,6 +30,8 @@ class GoodsQuickCat extends Model
         $price=0;
         $defaultTagArr=[];
         $sumPriceCount=0;
+        //计算各个组合价格
+        $groupPrice=[];
         foreach ($config as $item) {
             $validator2 = Validator::make($item, [
                 'tag_name' => 'required|max:50',
@@ -43,6 +45,7 @@ class GoodsQuickCat extends Model
             if ($validator2->fails()) {
                 return [false, $validator2->errors()->first()];
             }
+            $tmpPrice=[];
             foreach ($item['tags'] as $sub) {
                 $validator3 = Validator::make($sub, [
                     'sku_name' => 'required|max:50',
@@ -68,15 +71,30 @@ class GoodsQuickCat extends Model
                     $price+=$sub['goods_price'];
                     array_push($defaultTagArr,$sub['sku_name']);
                 }
-
+                array_push($tmpPrice,$sub['goods_price']+0);
             }
+            sort($tmpPrice);
+            array_push($groupPrice,$tmpPrice);
         }
         if($sumPriceCount!=count($config)){
             return [false,'默认规格选择错误!',[]];
+        }
+        if(!self::checkPrice($groupPrice)){
+            return [false,'默认规格存在组合价格为零，入库失败!',[]];
         }
         return [true, 'success',[
             'price'=>$price,
             'defaultTagArr'=>$defaultTagArr,
         ]];
+    }
+    public static function checkPrice($groupPrice){
+        $minPrice=0;
+        foreach ($groupPrice as $group){
+            foreach ($group as $price){
+                $minPrice+=$price;
+                break;
+            }
+        }
+        return $minPrice>0;
     }
 }

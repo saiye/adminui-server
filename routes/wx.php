@@ -14,6 +14,8 @@ Route::group([
     Route::post('game/nowGame', 'GameController@nowGame');
     Route::post('user/images', 'UserController@images');
     Route::post('user/scene', 'UserController@scene');
+    Route::post('user/buildPhoneGetCode', 'UserController@buildPhoneGetCode');
+    Route::post('user/doBuildPhone', 'UserController@doBuildPhone');
     Route::post('store/detail', 'StoreController@detail');
     Route::post('store/storeList', 'StoreController@storeList');
     Route::post('store/goodsList', 'StoreController@goodsList');

@@ -37,7 +37,7 @@ class UserController extends Base
     {
         $user = $this->user();
         if ($user) {
-            $user->token = hash('sha256', Str::random(60));;
+            $user->token = hash('sha256', Str::random(60));
             $user->save();
             $channel = Channel::whereChannelId($user->channel_id)->first();
             $api = new LrsApi($channel);
@@ -57,7 +57,7 @@ class UserController extends Base
         $validator = $this->validationFactory->make($this->request->all(), [
             'js_code' => 'required',
             'nickName' => 'required',
-            'avatarUrl' => 'required',
+            'avatarUrl' => 'nullable|url',
             'gender' => 'nullable|numeric', //可选
             'longitude' => 'nullable|numeric', //可选 经度 longitude
             'latitude' => 'nullable|numeric', //可选 纬度
@@ -134,7 +134,7 @@ class UserController extends Base
     /**
      * 绑定手机
      */
-    public function buildPhone(HandelSms $api)
+    public function doBuildPhone(HandelSms $api)
     {
         $validator = $this->validationFactory->make($this->request->all(), [
             'phone' => 'required|numeric',
@@ -176,7 +176,7 @@ class UserController extends Base
                 ]);
             }
         }
-        if (!$api->checkCode('code', SmsAction::BUILD_USER_PHONE, $area_code, $phone, $phone_code, SmsAction::BUILD_USER_PHONE)) {
+        if (!$api->checkCode('code', $area_code, $phone, $phone_code, SmsAction::BUILD_USER_PHONE)) {
             return $this->json([
                 'errorMessage' => '验证码错误',
                 'code' => ErrorCode::VALID_FAILURE,

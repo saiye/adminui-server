@@ -1,11 +1,12 @@
 <?php
 namespace App\Models;
+use App\TraitInterface\ModelDataFormat;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class Staff extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable,ModelDataFormat;
     public  $primaryKey='staff_id';
     protected $table = 'staff';
 

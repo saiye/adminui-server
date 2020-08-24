@@ -35,7 +35,7 @@ class SysController extends BaseController
         if ($this->req->role_id) {
             $data = $data->whereRoleId($this->req->role_id);
         }
-        $data = $data->select(['staff.staff_id','staff.real_name','staff.account','staff.role_id','staff.lock','staff.phone','staff.store_id','store.store_name'])->leftJoin('store','staff.store_id','=','store.store_id')->orderBy('staff.staff_id', 'desc')->paginate($this->req->input('limit',PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->select(['staff.staff_id','staff.real_name','staff.account','staff.role_id','staff.lock','staff.phone','staff.store_id','store.store_name','store.created_at'])->leftJoin('store','staff.store_id','=','store.store_id')->orderBy('staff.staff_id', 'desc')->paginate($this->req->input('limit',PaginateSet::LIMIT))->appends($this->req->except('page'));
 
 
         $roleList=Config::get('business.role_list');

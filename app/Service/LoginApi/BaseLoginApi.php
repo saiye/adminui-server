@@ -61,7 +61,7 @@ abstract class BaseLoginApi implements LoginApi
                     'sex' => $info['sex'],
                     'judge' => 2,
                     'lock' => 1,
-                    'icon' => $info['icon'],
+                    'icon' => $info['icon']??'',
                     'open_id'=>$info['openid'],
                     'type'=>Logic::USER_TYPE_WX,
                     'lon' => $longitude,
@@ -94,7 +94,7 @@ abstract class BaseLoginApi implements LoginApi
                 $user->nickname = $info['nickname'];
                 $user->nickname = $info['nickname'];
                 $user->open_id = $info['openid'];
-                $user->icon = $info['icon'];
+                $user->icon = $info['icon']??'';
                 $user->lon =$longitude;
                 $user->lat =$latitude;
                 $user->type=Logic::USER_TYPE_WX;

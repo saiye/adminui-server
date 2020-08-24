@@ -4,12 +4,16 @@ namespace App\Models;
 
 use App\TraitInterface\ModelDataFormat;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
 
 class Store extends Model
 {
     use ModelDataFormat;
     public $primaryKey = 'store_id';
     protected $table = 'store';
+
+    protected $appends = ['check_word'];
+
     protected $guarded = [
         'store_id'
     ];
@@ -54,4 +58,11 @@ class Store extends Model
     public function image(){
         return $this->hasMany(Image::class,'foreign_id','store_id');
     }
+
+    public function getCheckWordAttribute()
+    {
+        return $this->attributes['check_word'] = Config::get('deploy.check.'.$this->check);
+    }
+
+
 }
