@@ -37,11 +37,6 @@ return [
 
     'guards' => [
         'cp' => [
-            'driver' => 'session',
-            'provider' => 'cp_users',
-            'hash' => true,
-        ],
-        'cp-api' => [
             'driver' => 'token',
             'provider' => 'cp_users',
             'hash' => false,

@@ -10,6 +10,7 @@
 namespace App\Http\Controllers\Cp\Main;
 
 use App\Http\Controllers\Cp\BaseController;
+use Illuminate\Support\Facades\Hash;
 use Redirect;
 use App\Models\CpUser;
 use Auth;
@@ -46,14 +47,13 @@ class HomeController extends BaseController
             //返回默认支付
             return $this->errorJson($validator->errors()->first(), 2);
         }
-        $u1 = CpUser::whereUserName($this->req->user_name)->first();
-        if ($u1) {
-            if ($u1->lock) {
+        $user = CpUser::whereUserName($this->req->user_name)->first();
+        if ($user) {
+            if ($user->lock) {
                 return $this->errorJson('用户名已被锁定，请联系管理员!', 2, []);
             }
-            if (Auth::guard('cp')->attempt(['user_name' => $this->req->user_name, 'password' => $this->req->password])) {
+            if (Hash::check($this->req->password, $user->password)) {
                 $token = hash('sha256', Str::random(60));
-                $user = Auth::guard('cp')->user();
                 $data['last_ip'] = $user->current_ip;
                 $data['current_ip'] = $this->req->ip();
                 $data['current_login_at'] = date('Y-m-d H:i:s');
@@ -61,9 +61,9 @@ class HomeController extends BaseController
                 $data['api_token'] = $token;
                 CpUser::where('id', $user->id)->update($data);
                 return $this->successJson([
-                    'token' =>$token,
-                    'user_name' => $u1->user_name,
-                    'avatar' => $u1->avatar,
+                    'token' => $token,
+                    'user_name' => $user->user_name,
+                    'avatar' => $user->avatar,
                 ], '登录成功');
             }
         }
@@ -73,14 +73,17 @@ class HomeController extends BaseController
     public function getLogin()
     {
         return $this->errorJson('login view', 2, []);
-       // return $this->view('layout.app');
+        // return $this->view('layout.app');
     }
 
     public function getLogout()
     {
-        $user = Auth::guard('cp-api')->user();
+        $user = Auth::guard('cp')->user();
         if ($user) {
-            Auth::guard('cp')->logout();
+            $token = hash('sha256', Str::random(60));
+            CpUser::whereId($user->id)->update([
+                'api_token' => $token
+            ]);
         }
         return $this->successJson([], '退出登录成功!');
     }
@@ -92,7 +95,7 @@ class HomeController extends BaseController
 
     public function getUserInfo()
     {
-        $user = Auth::guard('cp-api')->user();
+        $user = Auth::guard('cp')->user();
         if ($user) {
             return $this->successJson([
                 'user_id' => $user->id,

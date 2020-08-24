@@ -131,7 +131,7 @@ class IndexController extends Controller
         $imagedata = $this->req->input('imageData', []);
         if ($imagedata) {
             //图片是你上传的,才关联
-            $user = Auth::guard('cp-api')->user();
+            $user = Auth::guard('cp')->user();
             $key = CacheKey::CP_UPLOAD_KEY . $user->id;
             $imageJson = Cache::get($key, '');
             if ($imageJson) {
@@ -267,7 +267,7 @@ class IndexController extends Controller
 
         if ($imagedata) {
             //图片是你上传的,才关联
-            $user = Auth::guard('cp-api')->user();
+            $user = Auth::guard('cp')->user();
             $key = CacheKey::CP_UPLOAD_KEY . $user->id;
             $imageJson = Cache::get($key, '');
             if ($imageJson) {

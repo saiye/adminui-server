@@ -9,7 +9,7 @@ Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('cp-cantAc
 Route::get('/', 'Main\HomeController@getHome')->name('cp-home')->middleware('auth:cp');
 Route::get('/user/info', 'Main\HomeController@getUserInfo')->name('cp-getUserInfo')->middleware('auth:cp-api');
 Route::group([
-    'middleware' => ['auth:cp-api', 'rbac:cp-api', 'action.log:cp-api']
+    'middleware' => ['auth:cp', 'rbac:cp', 'action.log:cp']
 ], function () {
     //权限管理
     Route::post('main/sys/add-role', 'Main\SysController@postAddRole')->name('cp-doAddRole');

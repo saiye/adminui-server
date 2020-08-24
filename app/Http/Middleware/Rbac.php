@@ -11,9 +11,6 @@ use App\TraitInterface\BaseTrait;
 class Rbac
 {
     use BaseTrait;
-
-    private $prefix='admin';
-
     /**
      * Handle an incoming request.
      *
@@ -45,7 +42,9 @@ class Rbac
             return true;
         }
         //去掉$prefix
-        $path =substr($request->path(),6);
+
+        $tmpPath=$request->path();
+        $path =substr($tmpPath,strpos($tmpPath,'/'));
         //不需要rbac权限的路由,pass
         if ($this->checkAct($path,'cp')) {
             return true;

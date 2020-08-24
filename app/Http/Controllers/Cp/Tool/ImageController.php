@@ -58,7 +58,7 @@ class ImageController extends Controller
             Storage::delete($path);
             $this->errorJson('上传成功，入库失败!');
         }
-        $user=Auth::guard('cp-api')->user();
+        $user=Auth::guard('cp')->user();
         //标记图片是你上传的
         $key=CacheKey::CP_UPLOAD_KEY.$user->id;
         $imageJson=Cache::get($key,'');
