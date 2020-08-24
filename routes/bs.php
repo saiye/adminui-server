@@ -8,7 +8,7 @@ Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('bs-cantAc
 Route::get('/', 'Main\HomeController@getHome')->name('bs-home')->middleware('auth:staff');
 Route::any('/user/info', 'Main\HomeController@getUserInfo')->name('bs-getUserInfo')->middleware('auth:staff');
 Route::group([
-    'middleware' => ['auth:staff', 'rbac:staff']
+    'middleware' => ['auth:staff']
 ], function () {
     //权限管理
     Route::post('/main/sys/add-role', 'Main\SysController@postAddRole')->name('bs-doAddRole');

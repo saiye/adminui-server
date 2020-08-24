@@ -42,11 +42,11 @@ class Rbac
             return true;
         }
         //去掉$prefix
-
         $tmpPath=$request->path();
-        $path =substr($tmpPath,strpos($tmpPath,'/'));
+
+        $path =substr($tmpPath,strpos($tmpPath,'/')+1);
         //不需要rbac权限的路由,pass
-        if ($this->checkAct($path,'cp')) {
+        if ($this->checkAct($path,$guard)) {
             return true;
         }
         $acts = $user->acts->pluck('act')->toArray();

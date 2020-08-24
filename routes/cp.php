@@ -7,7 +7,7 @@ Route::post('/user/login', 'Main\HomeController@postLogin')->name('cp-dologin');
 Route::any('/user/logout', 'Main\HomeController@getLogout')->name('cp-logout');
 Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('cp-cantAccess');
 Route::get('/', 'Main\HomeController@getHome')->name('cp-home')->middleware('auth:cp');
-Route::get('/user/info', 'Main\HomeController@getUserInfo')->name('cp-getUserInfo')->middleware('auth:cp-api');
+Route::get('/user/info', 'Main\HomeController@getUserInfo')->name('cp-getUserInfo')->middleware('auth:cp');
 Route::group([
     'middleware' => ['auth:cp', 'rbac:cp', 'action.log:cp']
 ], function () {
@@ -34,8 +34,8 @@ Route::group([
     Route::post('main/log/error', 'Main\LogController@getError')->name('cp-error');
     Route::post('main/log/show', 'Main\LogController@showLog')->name('cp-showLog');
     Route::post('main/log/action-log-list', 'Main\LogController@getActionLog')->name('cp-actionLog');
-    Route::post('main/log/api-log-list', 'Main\LogController@getApiLog')->name('cp-ApiLog');
-    Route::post('main/log/set-api-log-switch', 'Main\LogController@setApiLog')->name('cp-ApiSetLogSwitch');
+    Route::post('main/log/api-log-list', 'Main\LogController@getApiLog')->name('cpLog');
+    Route::post('main/log/set-api-log-switch', 'Main\LogController@setApiLog')->name('cpSetLogSwitch');
 
     //站点配置
     Route::post('main/set/getList', 'Main\SettingController@getList')->name('cp-WebConfigList');
