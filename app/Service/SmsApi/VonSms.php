@@ -38,12 +38,17 @@ class VonSms implements SmsInterface
                 $templateCode=WebConfig::getKeyByFile('aliSms852.'.$tmpCode);
         }
         try {
+            $new=[];
+            foreach ($TemplateParam as $k=>$v){
+                $_k='${'.$k.'}';
+                $new[$_k]=$v;
+            }
             $basic  = new \Nexmo\Client\Credentials\Basic($accessKeyId, $accessSecret);
             $client = new \Nexmo\Client($basic);
             $message = $client->message()->send([
                 'to' => $phone,
                 'from' =>$from,
-                'text' => $templateCode
+                'text' => strtr($templateCode,$new)
             ]);
            $status= $message->getStatus();
             if($status==0){
@@ -51,7 +56,7 @@ class VonSms implements SmsInterface
             }
             Log::info('VonSmsStatus:'.$status);
         }catch (Exception $e){
-               Log::info('VonageSendSms:');
+               Log::info('VonageSendSms-Exception:');
                Log::info($e->getMessage());
         }
         return false;
