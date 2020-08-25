@@ -39,7 +39,3 @@ Route::post('call/wx', 'PayController@callWx')->name('wx-callWx');
 //微信退款
 Route::post('call/callWxRefund', 'PayController@callWxRefund')->name('wx-CallWxRefund');
 
-
-
-
-

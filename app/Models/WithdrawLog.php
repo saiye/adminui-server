@@ -30,5 +30,4 @@ class WithdrawLog extends Model
         return $this->hasOne(Company::class, 'company_id', 'company_id');
     }
 
-
 }

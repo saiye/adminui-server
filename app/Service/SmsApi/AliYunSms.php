@@ -26,13 +26,13 @@ class AliYunSms implements SmsInterface
         $signName =$conf['signName'];
         $regionId = 'cn-hangzhou';
         $host = 'dysmsapi.aliyuncs.com';
+        $phone=$area_code.$phone;
         switch ($area_code){
             case 86:
-                $templateCode=WebConfig::getKeyByFile('sms86.'.$tmpCode);
+                $templateCode=WebConfig::getKeyByFile('aliSms86.'.$tmpCode);
                 break;
             default:
-                $phone=$area_code.$phone;
-                $templateCode=WebConfig::getKeyByFile('sms852.'.$tmpCode);
+                $templateCode=WebConfig::getKeyByFile('aliSms852.'.$tmpCode);
         }
         AlibabaCloud::accessKeyClient($accessKeyId, $accessSecret)
             ->regionId($regionId)
@@ -52,7 +52,7 @@ class AliYunSms implements SmsInterface
                         'SignName' => $signName,
                         'TemplateCode' => $templateCode,
                         'AccessKeyId' => $accessKeyId,
-                        'TemplateParam' => $TemplateParam
+                        'TemplateParam' => json_encode($TemplateParam)
                     ],
                 ])->request();
             Log::info($result->toArray());

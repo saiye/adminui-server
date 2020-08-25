@@ -59,4 +59,9 @@ return [
         'accessSecret'=>env('AliSmsAccessSecret',''),
         'signName'=>env('AliSmsSignName',''),
     ],
+    'vonSmsKey'=>[
+        'accessKeyId'=>env('VonSmsAccessKeyId',''),
+        'accessSecret'=>env('VonSmsAccessSecret',''),
+        'from'=>env('AliSmsSignName',''),
+    ],
 ];

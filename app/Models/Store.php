@@ -18,11 +18,6 @@ class Store extends Model
         'store_id'
     ];
 
-    protected $casts = [
-       // 'store_id' => 'string',
-       // 'company_id' => 'string',
-    ];
-
     public function staff()
     {
         return $this->hasOne('App\Models\Staff', 'staff_id', 'staff_id');
@@ -53,6 +48,10 @@ class Store extends Model
 
     public function tags(){
         return $this->hasMany(StoreTag::class,'store_id','store_id');
+    }
+
+    public function room(){
+        return $this->hasMany(Room::class,'store_id','store_id');
     }
 
     public function image(){

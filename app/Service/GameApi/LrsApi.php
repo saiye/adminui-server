@@ -97,8 +97,6 @@ class LrsApi extends BaseGameApi
                     }
                     $status = $res['status'];//,状态 1-未登陆，2-未开始，3 游戏中
                     $room = Room::with('store')->whereRoomId($roomId)->first();
-                    //sets_num
-                    $seats_num=$room->seats_num;
                     $list = User::select(['nickname', 'icon', 'sex', 'id'])->whereIn('id', $userIdArr)->get();
                     $item = [];
                     if (!empty($list->toArray())) {

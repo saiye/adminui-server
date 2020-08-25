@@ -2,12 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Models\NoteSms;
 use App\Service\SmsApi\AliYunSms;
+use App\Service\SmsApi\VonSms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+
 class SendSmsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -19,9 +22,9 @@ class SendSmsJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($NoteSms)
+    public function __construct(NoteSms $NoteSms)
     {
-        $this->noteSms= $NoteSms;
+        $this->noteSms = $NoteSms;
     }
 
     /**
@@ -29,8 +32,13 @@ class SendSmsJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(AliYunSms $api)
+    public function handle()
     {
-        $api->send($this->noteSms->type,$this->noteSms->area_code,$this->noteSms->phone,$this->noteSms->msg,$this->noteSms->action);
+        if ($this->noteSms->area_code == 86) {
+            $api = new AliYunSms();
+        } else {
+            $api = new VonSms();
+        }
+        $api->send($this->noteSms->type, $this->noteSms->area_code, $this->noteSms->phone, $this->noteSms->msg, $this->noteSms->action);
     }
 }

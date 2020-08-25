@@ -20,6 +20,7 @@ class CreateStoreTable extends Migration
             $table->unsignedInteger('province_id')->comment('所在省份id');
             $table->unsignedInteger('city_id')->comment('所在城市id');
             $table->unsignedInteger('region_id')->comment('所在地区id');
+            $table->unsignedInteger('room_count')->default(0)->comment('房间数量');
             $table->string('address',100)->comment('店面详细地址');
             $table->unsignedInteger('company_id')->index()->comment('所属商户，对应公司表id');
             $table->string('describe', 100)->nullable()->comment('店面描述');

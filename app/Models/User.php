@@ -28,6 +28,13 @@ class User extends Authenticatable
 
     public function getIconAttribute($v)
     {
-        return $v ? $v : '';
+        if(!$v or $v=="''"){
+            if($this->sex==0){
+                $v=WebConfig::getKeyByFile('icon.boy','');
+            }else{
+                $v=WebConfig::getKeyByFile('icon.girl','');
+            }
+        }
+        return $v;
     }
 }

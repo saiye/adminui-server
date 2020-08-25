@@ -34,7 +34,7 @@ class HandelSms
         $frequencyKey = $area_code . '_' . $phone;
         $frequencyKeyCode = $area_code . '_code' . $phone . '_' . $type.'_'.$action;
         $canSend = Cache::get($frequencyKey);
-        $count=3;
+        $count=300;
         if ($canSend<$count) {
             if ($type=='code'){
                 if(!isset($array['code'])){
@@ -49,7 +49,7 @@ class HandelSms
             $NoteSms = NoteSms::create([
                 'area_code' => $area_code,
                 'phone' => $phone,
-                'msg' =>json_encode($array),
+                'msg' =>$array,
                 'create_time' => time(),
                 'status' => 0,
                 'type' => $type,
@@ -85,9 +85,8 @@ class HandelSms
         $route=Config::get('phone.route');
         $res=$route[$area_code]??[];
         if(empty($res)){
-            return [
-                'errorMessage' => '不支持该地区',
-                'code' => ErrorCode::SMS_NOT_SUPPORT,
+            $res=[
+                'pattern'=>'/^[0-9]*$/',
             ];
         }
         $validator = $this->validationFactory->make([

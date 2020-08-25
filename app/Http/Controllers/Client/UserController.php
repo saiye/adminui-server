@@ -433,7 +433,7 @@ class UserController extends Base
                     "userId" => $user->id,
                     "name" => $user->nickname,
                     "sex" => $user->sex,
-                    "icon" => $user->icon ?? '',
+                    "icon" => empty($user->icon)?'':$user->icon,
                     "roomId" => $device->room_id, // [可选] 房间唯一id
                     "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
                     "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是

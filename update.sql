@@ -136,3 +136,7 @@ ALTER TABLE `lrs_manage`.`users` ADD COLUMN `open_id` VARCHAR(50) NULL COMMENT '
 ALTER TABLE `lrs_manage`.`staff` ADD COLUMN `area_code` INT(10) DEFAULT '0' NULL COMMENT '地区码' AFTER `sex`;
 
  ALTER TABLE `lrs_manage`.`company` CHANGE `state_id` `area_code` INT(10) DEFAULT '0' NOT NULL COMMENT '地区码';
+
+
+//8.25
+ ALTER TABLE `lrs_manage`.`store`     ADD COLUMN `room_count` INT(10) DEFAULT '0' NOT NULL COMMENT '房间数量' AFTER `region_id`;

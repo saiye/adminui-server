@@ -61,9 +61,9 @@ class WithdrawController extends Controller
         if ($data->check_status !== 1) {
             $data->check_status = 3;
             $data->save();
-            return $this->successJson([], '操作成功！');
+            return $this->successJson([], '添加成功！');
         }
-        return $this->errorJson('操作失败');
+        return $this->errorJson('添加失败');
     }
 
     /**
@@ -71,13 +71,12 @@ class WithdrawController extends Controller
      */
     public function addReceiptAccount()
     {
-
         $validator = Validator::make($this->req->all(), [
-            'account' => 'required|max:50',
+            'account' => 'required|max:20',
             'pay_type' => 'required',
             'active' => 'required|in:0,1',
             'username' => 'required|max:20',
-            'bank_name' => 'required|max:100',
+            'bank_name' => 'nullable|max:30',
         ]);
         if ($validator->fails()) {
             return $this->errorJson($validator->errors()->first(), 2);
@@ -87,9 +86,9 @@ class WithdrawController extends Controller
         $data['company_id'] = $company_id;
         $createAccount = ReceiptAccount::create($data);
         if ($createAccount) {
-            return $this->successJson([], '操作成功！');
+            return $this->successJson([], '修改成功！');
         }
-        return $this->errorJson('操作失败');
+        return $this->errorJson('修改失败');
     }
 
     /**
@@ -99,11 +98,11 @@ class WithdrawController extends Controller
     {
         $validator = Validator::make($this->req->all(), [
             'id' => 'required|numeric',
-            'account' => 'required|max:50',
+            'account' => 'required|max:20',
             'pay_type' => 'required',
             'active' => 'required|in:0,1',
             'username' => 'required|max:20',
-            'bank_name' => 'required|max:100',
+            'bank_name' => 'nullable|max:30',
         ]);
         if ($validator->fails()) {
             return $this->errorJson($validator->errors()->first(), 2);
@@ -121,9 +120,9 @@ class WithdrawController extends Controller
     {
         $data = new ReceiptAccount();
         $data = $data->where('company_id', $this->loginUser->company_id);
-        $account = $this->req->input('account');
+        $account = $this->req->input('searchName');
         if ($account) {
-            $data->where('account', $account);
+            $data=$data->where('account','like','%'.$account.'%');
         }
         if ($this->req->pay_type) {
             $data = $data->wherePayType($this->req->pay_type);

@@ -71,7 +71,7 @@ Route::group([
     Route::post('order/withdraw/orderList', 'Order\WithdrawController@orderList')->name('bs-WithdrawOrderList');
     Route::post('order/withdraw/setStatus', 'Order\WithdrawController@setStatus')->name('bs-WithdrawSetStatus');
     Route::post('order/withdraw/addReceiptAccount', 'Order\WithdrawController@addReceiptAccount')->name('bs-addReceiptAccount');
-    Route::post('order/withdraw/editReceiptAccount', 'Order\WithdrawController@addReceiptAccount')->name('bs-editReceiptAccount');
+    Route::post('order/withdraw/editReceiptAccount', 'Order\WithdrawController@editReceiptAccount')->name('bs-editReceiptAccount');
     Route::post('order/withdraw/receiptAccountList', 'Order\WithdrawController@receiptAccountList')->name('bs-receiptAccountList');
     Route::post('order/withdraw/conf', 'Order\WithdrawController@conf')->name('bs-receiptConf');
 
@@ -106,4 +106,5 @@ Route::group([
     Route::post('goods/quick/list', 'Goods\QuickCatController@quickCatList')->name('bs-quickCatList');
     Route::post('goods/quick/add', 'Goods\QuickCatController@addQuickCat')->name('bs-addQuickCat');
 });
+
 
