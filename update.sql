@@ -140,3 +140,5 @@ ALTER TABLE `lrs_manage`.`staff` ADD COLUMN `area_code` INT(10) DEFAULT '0' NULL
 
 //8.25
  ALTER TABLE `lrs_manage`.`store`     ADD COLUMN `room_count` INT(10) DEFAULT '0' NOT NULL COMMENT '房间数量' AFTER `region_id`;
+
+ALTER TABLE `lrs_manage`.`note_sms`     ADD COLUMN `res` json NULL COMMENT '结果' AFTER `action`;

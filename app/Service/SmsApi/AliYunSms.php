@@ -20,7 +20,8 @@ class AliYunSms implements SmsInterface
 
     public function send($tmpCode,$area_code, $phone, $TemplateParam,$action)
     {
-        $conf=Config::get('deploy.aliSmsKey');
+        //return [true,['ok'=>111,'nn'=>2]];
+        $conf=Config::get('phone.aliSmsKey');
         $accessKeyId = $conf['accessKeyId'];
         $accessSecret = $conf['accessSecret'];
         $signName =$conf['signName'];
@@ -55,12 +56,16 @@ class AliYunSms implements SmsInterface
                         'TemplateParam' => json_encode($TemplateParam)
                     ],
                 ])->request();
-            Log::info($result->toArray());
+           $res= $result->toArray();
+           if(isset($res['Code']) and  $res['Code']=='OK'){
+               return [true,$result->toArray()];
+           }
+           return [false,$result->toArray()];
         } catch (ClientException $e) {
             Log::info($e->getErrorMessage());
         } catch (ServerException $e) {
             Log::info($e->getErrorMessage());
         }
-        return true;
+        return [false,[]];
     }
 }

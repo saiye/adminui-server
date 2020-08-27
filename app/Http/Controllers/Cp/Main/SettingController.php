@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Cp\Main;
 
 use App\Constants\PaginateSet;
 use App\Http\Controllers\Cp\BaseController;
+use App\Models\NoteSms;
 use App\Models\WebConfig;
 use Illuminate\Support\Facades\Storage;
 use Redirect;
@@ -109,5 +110,20 @@ class SettingController extends BaseController
         return $this->errorJson('刷新失败');
     }
 
+    public function sendSmsList(){
+        $list=new NoteSms();
+        if($this->req->area_code){
+            $list=$list->where('area_code',$this->req->area_code);
+        }
+        if($this->req->phone){
+            $list=$list->where('phone',$this->req->phone);
+        }
+        if($this->req->type){
+            $list=$list->where('type',$this->req->type);
+        }
+        $data= $list->orderBy('id','desc')->paginate(PaginateSet::LIMIT)->appends($this->req->except('page'));
+        $assign = compact('data');
+        return $this->successJson($assign);
+    }
 
 }

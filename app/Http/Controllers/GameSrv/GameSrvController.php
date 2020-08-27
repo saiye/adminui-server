@@ -96,7 +96,6 @@ class GameSrvController extends Base
         $data=[];
         if($json){
             $data=  json_decode($json,true);
-            Log::info($data);
         }
          if(empty($data)){
              return $this->json([

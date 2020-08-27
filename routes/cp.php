@@ -43,6 +43,7 @@ Route::group([
     Route::post('main/set/edit', 'Main\SettingController@postEdit')->name('cp-WebConfigPostEdit');
     Route::post('main/set/edit', 'Main\SettingController@postEdit')->name('cp-WebConfigPostEdit');
     Route::post('main/set/putFile', 'Main\SettingController@putConfigToFile')->name('cp-WebConfigPutFile');
+    Route::post('main/set/sendSmsList', 'Main\SettingController@sendSmsList')->name('cp-sendSmsList');
 
     //商户管理
     Route::post('company/index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');

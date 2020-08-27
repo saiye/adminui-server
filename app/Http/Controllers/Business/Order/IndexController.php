@@ -179,7 +179,7 @@ class IndexController extends Controller
      * 搜索条件
      * @return \Illuminate\Http\JsonResponse
      */
-    public function selectConfig()
+    public function conf()
     {
         $data = Config::get('pay.selectConf');
 

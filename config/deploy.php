@@ -50,18 +50,4 @@ return [
         3=>'可停车',
         4=>'有充电宝',
     ],
-    'sms_type'=>[
-        1=>'注册',
-        2=>'找回密码',
-    ],
-    'aliSmsKey'=>[
-        'accessKeyId'=>env('AliSmsAccessKeyId',''),
-        'accessSecret'=>env('AliSmsAccessSecret',''),
-        'signName'=>env('AliSmsSignName',''),
-    ],
-    'vonSmsKey'=>[
-        'accessKeyId'=>env('VonSmsAccessKeyId',''),
-        'accessSecret'=>env('VonSmsAccessSecret',''),
-        'from'=>env('AliSmsSignName',''),
-    ],
 ];

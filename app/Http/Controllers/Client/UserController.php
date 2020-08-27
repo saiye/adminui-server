@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 
+use App\Constants\Logic;
 use App\Constants\SmsAction;
 use App\Models\Certificate;
 use App\Models\Channel;
@@ -78,6 +79,9 @@ class UserController extends Base
         }
         $area_code = $this->request->input('area_code');
         $phone = $this->request->input('phone');
+        if($area_code==885){
+            $area_code=855;
+        }
         $account = $area_code . $phone;
         $user = User::whereAccount($account)->first();
         if ($user) {
@@ -87,6 +91,8 @@ class UserController extends Base
             ]);
         }
         $data = $this->request->only('area_code', 'phone', 'nickname', 'sex');
+        $data['area_code']=$area_code;
+
         //1.验证用户信息,ok入库
         $certificate = Str::random(32);
 
@@ -97,7 +103,7 @@ class UserController extends Base
             'ext' => $data,
         ]);
         //2.发送验证码，和凭证给客户端
-        $res = $api->send($type, $this->request->area_code, $this->request->phone, ['code' => mt_rand(11111, 99999)], SmsAction::USER_REG);
+        $res = $api->send($type, $area_code, $phone, ['code' => mt_rand(11111, 99999)], SmsAction::USER_REG);
         if ($res['code'] == 0) {
             return $this->json([
                 'errorMessage' => '验证码已下发！',
@@ -205,6 +211,7 @@ class UserController extends Base
                         'nickname' => $data['nickname'],
                         'area_code' => $data['area_code'],
                         'password' => Str::random(32),
+                        'type'=>Logic::USER_TYPE_PHONE,
                         'token' => $token,
                     ]);
                     if ($user) {
@@ -276,6 +283,9 @@ class UserController extends Base
         $phone = $this->request->input('phone');
         $area_code = $this->request->input('area_code');
         $data = $this->request->only('phone', 'area_code');
+        if($area_code==885){
+            $area_code=855;
+        }
         $account = $area_code . $phone;
         $user = User::whereAccount($account)->first();
         if (!$user) {
@@ -292,7 +302,7 @@ class UserController extends Base
             'action' => SmsAction::USER_FORGET_PASSWORD,
             'ext' => $data,
         ]);
-        $res = $api->send($type, $this->request->area_code, $this->request->phone, ['code' => mt_rand(11111, 99999)], SmsAction::USER_FORGET_PASSWORD);
+        $res = $api->send($type,$area_code, $phone, ['code' => mt_rand(11111, 99999)], SmsAction::USER_FORGET_PASSWORD);
         if ($res['code'] == 0) {
             return $this->json([
                 'errorMessage' => "验证码下发成功",
@@ -381,6 +391,9 @@ class UserController extends Base
         $password = $this->request->input('password');
         $deviceShortId = $this->request->input('deviceShortId');
         $channelId = $this->request->input('channelId');
+        if($area_code==885){
+            $area_code=855;
+        }
         $account = $area_code . $phone;
         $res = $api->phoneCheck($area_code, $phone);
         if ($res['code'] !== 0) {
@@ -396,9 +409,6 @@ class UserController extends Base
                     'code' => ErrorCode::ACCOUNT_NOT_EXIST,
                 ]);
             }
-        }
-        if ($user->parent_id) {
-            $user = User::whereId($user->parent_id)->first();
         }
         if ($user and Hash::check($password, $user->password)) {
             if ($user->lock == 2) {

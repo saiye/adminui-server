@@ -30,6 +30,7 @@ return array(
                     'add' => array('name' => '添加配置', 'checked' => false, 'display' => false, 'url' => 'main/set/add', 'act' => 'default'),
                     'edit' => array('name' => '修改配置', 'checked' => false, 'display' => false, 'url' => 'main/set/edit', 'act' => 'default'),
                     'putFile' => array('name' => '刷新配置文件', 'checked' => false, 'display' => false, 'url' => 'main/set/putFile', 'act' => 'default'),
+                    'sendSmsList' => array('name' => '短信消息', 'checked' => false, 'display' => false, 'url' => 'main/set/sendSmsList', 'act' => 'default'),
                 ),
             ),
         ),

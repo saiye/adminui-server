@@ -19,6 +19,11 @@ class Staff extends Authenticatable
         'password',
     ];
 
+    public function acts()
+    {
+        return $this->hasMany('App\Models\StaffAct','role_id','role_id');
+    }
+
     /**
      * 导航栏过滤
      */

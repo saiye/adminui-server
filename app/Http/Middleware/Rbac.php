@@ -33,8 +33,18 @@ class Rbac
 
     public function rbac($request, $user, $guard)
     {
-        if ($user->lock) {
-            return false;
+        if($guard=='cp'){
+            if ($user->lock) {
+                return false;
+            }
+        }
+        if($guard=='staff'){
+            if ($user->lock==2) {
+                return false;
+            }
+            if($user->role_id==1){
+                return true;
+            }
         }
         //超级管理员，一般是开发者账号，直接跳过数据库权限判断
         $super_admin = Config::get('role.super_admin', []);

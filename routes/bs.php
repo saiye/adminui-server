@@ -8,7 +8,7 @@ Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('bs-cantAc
 Route::get('/', 'Main\HomeController@getHome')->name('bs-home')->middleware('auth:staff');
 Route::any('/user/info', 'Main\HomeController@getUserInfo')->name('bs-getUserInfo')->middleware('auth:staff');
 Route::group([
-    'middleware' => ['auth:staff']
+    'middleware' => ['auth:staff','rbac:staff']
 ], function () {
     //权限管理
     Route::post('/main/sys/add-role', 'Main\SysController@postAddRole')->name('bs-doAddRole');
@@ -33,20 +33,16 @@ Route::group([
     Route::post('company/index/companyDetail', 'Company\IndexController@companyDetail')->name('bs-companyDetail');
 
     //新增会员
-    Route::post('game/index/userList', 'Game\IndexController@userList')->name('bs-GameUserList');
+/*    Route::post('game/index/userList', 'Game\IndexController@userList')->name('bs-GameUserList');
     Route::post('game/index/addUser', 'Game\IndexController@addUser')->name('bs-GameAddUser');
     Route::post('game/index/editUser', 'Game\IndexController@editUser')->name('bs-GameEditUser');
     Route::post('game/index/lockUser', 'Game\IndexController@lockUser')->name('bs-GameLockUser');
-
-    //新增渠道
-    Route::post('game/channel/channelList', 'Game\ChannelController@channelList')->name('bs-GameChannelList');
-    Route::post('game/channel/addChannel', 'Game\ChannelController@addChannel')->name('bs-GameAddChannel');
-    Route::post('game/channel/editChannel', 'Game\ChannelController@editChannel')->name('bs-GameEditChannel');
-
+*/
     //板子管理
     Route::post('game/board/boardList', 'Game\BoardController@boardList')->name('bs-GameBoardList');
     Route::post('game/board/addBoard', 'Game\BoardController@addBoard')->name('bs-GameAddBoard');
     Route::post('game/board/editBoard', 'Game\BoardController@editBoard')->name('bs-GameEditBoard');
+
 
     //工具类接口
     Route::post('tool/image/upload', 'Tool\ImageController@upload')->name('bs-toolImageUpload');
@@ -57,8 +53,7 @@ Route::group([
 
     //订单管理
     Route::post('order/index/orderList', 'Order\IndexController@orderList')->name('bs-OrderList');
-    Route::post('order/index/addOrder', 'Order\IndexController@createOrder')->name('bs-CreateOrder');
-    Route::post('order/index/conf', 'Order\IndexController@selectConfig')->name('bs-OrderSelectConfig');
+    Route::post('order/index/conf', 'Order\IndexController@conf')->name('bs-OrderConf');
     Route::post('order/index/detail', 'Order\IndexController@orderDetail')->name('bs-orderDetail');
     Route::post('order/index/set', 'Order\IndexController@setOrder')->name('bs-setOrder');
     Route::post('order/index/findOrder', 'Order\IndexController@findOrder')->name('bs-findOrder');
@@ -83,7 +78,6 @@ Route::group([
 
     //设备管理
     Route::post('room/device/deviceList', 'Room\DeviceController@deviceList')->name('bs-deviceList');
-    Route::post('room/device/addDevice', 'Room\DeviceController@addDevice')->name('bs-addDevice');
     //计费管理
     Route::post('room/billing/billingList', 'Room\BillingController@billingList')->name('bs-billingList');
     Route::post('room/billing/addBilling', 'Room\BillingController@addBilling')->name('bs-addBilling');

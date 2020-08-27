@@ -18,4 +18,6 @@ class Logic
 
     const USER_TYPE_WX=1;
 
+    const USER_TYPE_PHONE=2;
+
 }
