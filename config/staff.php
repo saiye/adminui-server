@@ -133,6 +133,12 @@ return array(
                     'move' => array('name' => '移动商品,到其他分类', 'checked' => false, 'display' => true, 'url' => 'goods/cat/move', 'act' => 'default'),
                 ),
             ),
+            'quick' => array('name' => '商品快速标签管理', 'checked' => false, 'display' => true, 'act' => 'default', 'class' => 'fa fa-circle-o',
+                'child' => array(
+                    'list' => array('name' => '标签列表', 'checked' => false, 'display' => true, 'url' => 'goods/quick/list', 'act' => 'login'),
+                    'add' => array('name' => '添加标签', 'checked' => false, 'display' => true, 'url' => 'goods/quick/add', 'act' => 'login'),
+                ),
+            ),
         ),
     ),
     'tool' => array('name' => '全局功能管理', 'checked' => false, 'display' => true, 'act' => 'default', 'class' => 'fa fa-share',

@@ -134,7 +134,7 @@ class SysController extends BaseController
             if (!in_array($this->req->role_id,$roleIds)) {
                 return $this->errorJson('角色不存在！');
             }
-            $menu = Config::get('bs');
+            $menu = Config::get('staff');
             //采集
             $data = $acts->whereCompanyId($this->loginUser->company_id)->whereRoleId($this->req->role_id)->pluck('act')->toArray();
             foreach ($menu as $k => &$v) {

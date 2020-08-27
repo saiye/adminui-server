@@ -11,11 +11,20 @@ class OrderGoods extends Model
     use ModelDataFormat;
     protected $table = 'order_goods';
 
-    protected $appends = ['img100', 'img50'];
+    protected $appends = ['img100', 'img50','refund_num','refund_fee'];
 
     protected $guarded = [
         'id'
     ];
+
+    public function getRefundNumAttribute()
+    {
+        return $this->attributes['refund_num']='';
+    }
+    public function getRefundFeeAttribute()
+    {
+        return $this->attributes['refund_fee']='';
+    }
 
     public function getImageAttribute($value)
     {

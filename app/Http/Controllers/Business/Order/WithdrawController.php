@@ -136,7 +136,6 @@ class WithdrawController extends Controller
     {
         $payTypeListConf=Config::get('pay.pay_type');
         $checkStatusListConf=Config::get('pay.check_status');
-        $payTypeList=$checkStatusList=[];
         $payTypeList=$this->formatType($payTypeListConf);
         $checkStatusList=$this->formatType($checkStatusListConf);
         $assign = compact('payTypeList','checkStatusList');
