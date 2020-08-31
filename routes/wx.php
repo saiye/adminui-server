@@ -16,6 +16,7 @@ Route::group([
     Route::post('user/buildPhoneGetCode', 'UserController@buildPhoneGetCode');
     Route::post('user/doBuildPhone', 'UserController@doBuildPhone');
     Route::post('user/editPassword', 'UserController@editPassword');
+    Route::post('user/decryptData', 'UserController@decryptData');
     Route::post('user/phoneAccountBuildOpenId', 'UserController@phoneAccountBuildOpenId');
     Route::post('store/detail', 'StoreController@detail');
     Route::post('store/storeList', 'StoreController@storeList');
@@ -29,9 +30,14 @@ Route::group([
     //余额支付
     Route::post('balancePay', 'PayController@balancePay')->name('wx-balancePay');
 });
+
 Route::post('game/fightHistorical', 'GameController@fightHistorical');
 Route::post('user/login', 'UserController@login')->middleware('ApiLogRecord');
 Route::post('user/phoneLogin', 'UserController@phoneLogin')->middleware('ApiLogRecord');
+//忘记密码
+Route::post('user/forgetPasswordSendCode', 'UserController@forgetPasswordSendCode');
+//验证忘记密码的验证码
+Route::post('user/forgetPasswordCheckPhoneCode', 'UserController@forgetPasswordCheckPhoneCode');
 
 Route::post('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
 Route::any('qrCode/test', 'QrCodeController@testQrCode')->name('wx-QrCodeTestQrCode');

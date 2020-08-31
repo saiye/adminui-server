@@ -147,7 +147,7 @@ class WeiXinLoginApi extends BaseLoginApi
                 'g' => 120,
                 'b' => 192,
             ],
-            'page'=>'pages/index/login/login',
+           // 'page'=>'pages/index/login/login',
         ];
         $url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' . $access_token;
         try {
@@ -183,5 +183,53 @@ class WeiXinLoginApi extends BaseLoginApi
             Log::info($e->getMessage());
         }
         return false;
+    }
+
+    public function decryptData($sessionKey,$iv,$encryptedData){
+        if (strlen($sessionKey) != 24) {
+            return [false,'session_key长度错误!',[]];
+        }
+/*        $sessionKey='oSVI/iiUha+u+3VnQP2UpA==';
+        $iv='WTlzqIZqQnQIweu8OXtv7g==';
+        $encryptedData='mLsKhohQCIbfF8VEEJKUy/V62jz40XMvgHRvy2CFlwNPoM8lOeFBD8mlPm6JB2mqJWT5m9pDPhWYlTAetvitZEVZkMTdu9D9U+p+rSV7jmo6LuLeoAN+gTfHEuetmgBnObiZJsoVgWrlTVdjtuAv1pHYIA/BSslsNeYodvXiJ0X3/ZQLhfTOpr39ky6CgxwCc2I/GMnUJ7N9+XXcFyOkFA==';
+*/
+
+      /*  $sessionKey = 'tiihtNczf5v6AKRyjwEUhQ==';
+        $encryptedData="CiyLU1Aw2KjvrjMdj8YKliAjtP4gsMZM
+                QmRzooG2xrDcvSnxIMXFufNstNGTyaGS
+                9uT5geRa0W4oTOb1WT7fJlAC+oNPdbB+
+                3hVbJSRgv+4lGOETKUQz6OYStslQ142d
+                NCuabNPGBzlooOmB231qMM85d2/fV6Ch
+                evvXvQP8Hkue1poOFtnEtpyxVLW1zAo6
+                /1Xx1COxFvrc2d7UL/lmHInNlxuacJXw
+                u0fjpXfz/YqYzBIBzD6WUfTIF9GRHpOn
+                /Hz7saL8xz+W//FRAUid1OksQaQx4CMs
+                8LOddcQhULW4ucetDf96JcR3g0gfRK4P
+                C7E/r7Z6xNrXd2UIeorGj5Ef7b1pJAYB
+                6Y5anaHqZ9J6nKEBvB4DnNLIVWSgARns
+                /8wR2SiRS7MNACwTyrGvt9ts8p12PKFd
+                lqYTopNHR1Vf7XjfhQlVsAJdNiKdYmYV
+                oKlaRv85IfVunYzO0IKXsyl7JCUjCpoG
+                20f0a04COwfneQAGGwd5oa+T8yO5hzuy
+                Db/XcxxmK01EpqOyuxINew==";
+        $iv = 'r7BXXKkLb8qrSNn05n0qiA==';*/
+
+        $aesKey=base64_decode($sessionKey);
+        $aesIV=base64_decode($iv);
+        $aesCipher=$this->base64urlDecode($encryptedData);
+        $result=openssl_decrypt($aesCipher, "AES-128-CBC", $aesKey, 1, $aesIV);
+        $dataObj=json_decode($result,true);
+        if($dataObj){
+            return [true,'解密成功!',$dataObj];
+          /*  $config = $this->config();
+            if($dataObj->watermark->appid==$config['AppId']){
+                return [true,'解密成功!',$dataObj];
+            }*/
+        }
+        return [false,'解密失败!',[]];
+    }
+
+   public function base64urlDecode($data) {
+        return base64_decode(str_replace(array('-', '_'), array('+', '/'), $data));
     }
 }
