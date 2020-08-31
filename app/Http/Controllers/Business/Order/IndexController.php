@@ -68,38 +68,50 @@ class IndexController extends Controller
     {
         $validator = Validator::make($this->req->all(), [
             'order_id' => 'required|numeric',
-            'pay_type' => 'required|numeric',
+            'refund_type' => 'required|in:1,2',
+            'refund_reason_type' => 'required|numeric|in:1,2,3,4',
             'refund_reason' => 'required|max:100',
-            'goodsArr' => 'required|array',
+            'refund_fee' => 'required|numeric|min:0.01',
+            'refundGoodsArr' => 'required|array',
+        ], [
+            'refund_reason_type.required' => '请选择退款原因！',
+            'refund_reason.required' => '请输入与客人沟通情况！',
+            'refund_type.required' => '退款类型错误！',
+            'refund_fee.min' => '退款金额错误！',
+            'refund_fee.numeric' => '退款金额错误！',
+            'refund_fee.required' => '退款金额错误！',
         ]);
         if ($validator->fails()) {
             return $this->errorJson($validator->errors()->first(), 2);
         }
-        $goodsArr = $this->req->input('goodsArr');
-        $refund_fee = 0;
-        foreach ($goodsArr as $sub) {
+        $refundGoodsArr = $this->req->input('refundGoodsArr',[]);
+        $refund_type = $this->req->input('refund_type');
+        $order_id = $this->req->input('order_id');
+        $refund_fee = $this->req->input('refund_fee');
+        $refund_reason = $this->req->input('refund_reason');
+
+        $company_id = $this->loginUser->company_id;
+        $store_id = $this->loginUser->store_id;
+        foreach ($refundGoodsArr as $sub) {
             $validator2 = Validator::make($sub, [
                 'order_goods_id' => 'required|numeric',
-                'price' => 'required|numeric',
+                'type' => 'required|numeric',
                 'count' => 'required|numeric|min:1',
             ]);
             if ($validator2->fails()) {
                 return $this->errorJson($validator->errors()->first(), 2);
             }
-            $refund_fee += $sub['price'];
         }
-        $order_id = $this->req->input('order_id');
-        $order = Order::whereCompanyId($this->loginUser->company_id)->whereOrderId($order_id)->first();
+        if (!($refund_fee > 0)) {
+            return $this->errorJson('退款金额有误！');
+        }
+        $order = Order::whereCompanyId($company_id)->whereOrderId($order_id)->first();
         if (!$order) {
             return $this->errorJson('订单不存在!');
         }
         if ($order->pay_status !== 1) {
             return $this->errorJson('订单未支付!');
         }
-        //申请退款金额
-        $pay_type = $this->req->input('pay_type');
-
-        $refund_reason = $this->req->input('refund_reason');
         //检查是否可以退款
         //申请中的金额+已经退款金额
         $totalApplyRefundFee = RefundOrder::whereOrderId($order_id)->whereIn('check_status', [0, 1])->sum('refund_fee');
@@ -108,22 +120,20 @@ class IndexController extends Controller
             $canApplyFee = 0;
         }
         if (!$canApplyFee > 0 or $canApplyFee < $refund_fee) {
-            return $this->errorJson('你无法再次申请退款，可申请退款金额为:' . $canApplyFee);
+            return $this->errorJson('申请失败，你目前可申请退款金额为:' . $canApplyFee);
         }
         //可以退款的话，生成申请记录
         $refundOrderArr = [
             'refund_no' => date('YmdHis') . mt_rand(111, 9999),
             'order_id' => $order_id,
             'refund_fee' => $refund_fee,
-            'pay_type' => $pay_type,
+            'pay_type' => $order->pay_type,
             'refund_reason' => $refund_reason,
-            'info' => $refund_reason,
             'user_id' => $order->user_id,
-            'comapny_id' => $this->loginUser->company_id,
-            'store_id' => $this->loginUser->store_id,
+            'company_id' => $company_id,
+            'store_id' => $store_id,
         ];
         $refundOrder = RefundOrder::create($refundOrderArr);
-
         return $this->errorJson('申请成功，等待审核！');
     }
 
@@ -173,6 +183,13 @@ class IndexController extends Controller
         $order->check_status = $check_status;
         $order->save();
         return $this->successJson([], '审核成功！');
+    }
+
+    public function refundConf()
+    {
+        $refundReasonType =Config::get('pay.refund_reason_type');
+        $data = compact('refundReasonType');
+        return $this->successJson($data);
     }
 
     /**

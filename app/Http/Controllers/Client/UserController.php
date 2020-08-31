@@ -260,7 +260,7 @@ class UserController extends Base
                 }
                 return $this->json([
                     'errorMessage' => '验证码无效!',
-                    'code' => ErrorCode::VALID_FAILURE,
+                    'code' => ErrorCode::SMS_CODE_FAILURE,
                 ]);
         }
     }

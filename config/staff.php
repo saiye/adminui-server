@@ -74,6 +74,7 @@ return array(
                     'createOrder' => array('name' => '后台下单', 'checked' => false, 'display' => true, 'url' => 'order/index/createOrder', 'act' => 'default'),
                     'refundApplyList' => array('name' => '退款申请列表', 'checked' => false, 'display' => true, 'url' => 'order/index/refundApplyList', 'act' => 'default'),
                     'agreeRefund' => array('name' => '同意退款', 'checked' => false, 'display' => true, 'url' => 'order/index/agreeRefund', 'act' => 'default'),
+                    'refundConf' => array('name' => '退款配置', 'checked' => false, 'display' => true, 'url' => 'order/index/refundConf', 'act' => 'login'),
                 ),
             ),
             'withdraw' => array('name' => '提现管理', 'checked' => false, 'display' => true, 'act' => 'default', 'class' => 'fa fa-circle-o',

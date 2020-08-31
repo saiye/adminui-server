@@ -79,6 +79,8 @@ class IndexController extends Controller
             'area' => 'required|array',
             'address' => 'required|max:100',
             'describe' => 'max:100',
+            'open_at' => 'required|numeric|min:0|max:24',
+            'close_at' => 'required|numeric|min:0|max:24',
             'account' => ['regex:/^[0-9A-Za-z]+$/', 'required', 'max:20', 'unique:staff,account'],
             'password' => 'required|max:100',
             'real_name' => 'required|max:100',
@@ -152,6 +154,8 @@ class IndexController extends Controller
         $data['staff_id'] = $staffObj->staff_id;
         $data['lon'] = $pointArr[0];
         $data['lat'] = $pointArr[1];
+        $data['open_at'] =$this->req->open_at;
+        $data['close_at'] =$this->req->close_at;
         $store = Store::create($data);
         $tags = $this->req->input('tags', []);
         if ($tags) {
@@ -204,6 +208,8 @@ class IndexController extends Controller
             'password' => 'nullable|min:6|max:100',
             'real_name' => 'required|max:100',
             'sex' => 'required|in:1,2',
+            'open_at' => 'required|numeric|min:0|max:24',
+            'close_at' => 'required|numeric|min:0|max:24',
             'tags' => 'array',
             'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/'],
             'point' => ['required', 'regex:/^([-+])?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180),([-+])?([0-8]?\d{1}\.\d{0,6}|90\.0{0,6}|[0-8]?\d{1}|90)$/'],
@@ -298,6 +304,8 @@ class IndexController extends Controller
         $data['staff_id'] = $staffObj->staff_id;
         $data['lon'] = $pointArr[0];
         $data['lat'] = $pointArr[1];
+        $data['open_at'] =$this->req->open_at;
+        $data['close_at'] =$this->req->close_at;
         $store->fill($data);
         $save_store = $store->save();
         if ($imageData) {

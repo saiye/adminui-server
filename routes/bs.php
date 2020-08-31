@@ -8,7 +8,7 @@ Route::get('/cant-access', 'Main\HomeController@getCantAccess')->name('bs-cantAc
 Route::get('/', 'Main\HomeController@getHome')->name('bs-home')->middleware('auth:staff');
 Route::any('/user/info', 'Main\HomeController@getUserInfo')->name('bs-getUserInfo')->middleware('auth:staff');
 Route::group([
-    'middleware' => ['auth:staff','rbac:staff']
+    'middleware' => ['auth:staff']
 ], function () {
     //权限管理
     Route::post('/main/sys/add-role', 'Main\SysController@postAddRole')->name('bs-doAddRole');
@@ -61,6 +61,7 @@ Route::group([
     Route::post('order/index/createOrder', 'Order\IndexController@createOrder')->name('bs-createOrder');
     Route::post('order/index/refundApplyList', 'Order\IndexController@refundApplyList')->name('bs-refundApplyList');
     Route::post('order/index/agreeRefund', 'Order\IndexController@agreeRefund')->name('bs-agreeRefund');
+    Route::post('order/index/refundConf', 'Order\IndexController@refundConf')->name('bs-refundConf');
 
     //提现订单
     Route::post('order/withdraw/orderList', 'Order\WithdrawController@orderList')->name('bs-WithdrawOrderList');

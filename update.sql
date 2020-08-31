@@ -142,3 +142,7 @@ ALTER TABLE `lrs_manage`.`staff` ADD COLUMN `area_code` INT(10) DEFAULT '0' NULL
  ALTER TABLE `lrs_manage`.`store`     ADD COLUMN `room_count` INT(10) DEFAULT '0' NOT NULL COMMENT '房间数量' AFTER `region_id`;
 
 ALTER TABLE `lrs_manage`.`note_sms`     ADD COLUMN `res` json NULL COMMENT '结果' AFTER `action`;
+
+//退款类型
+ ALTER TABLE `lrs_manage`.`refund_order`
+ADD COLUMN `refund_reason_type` TINYINT(4) DEFAULT '4' NOT NULL COMMENT '退款类型' AFTER `check_status`;

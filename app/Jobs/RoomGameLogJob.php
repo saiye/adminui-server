@@ -59,18 +59,19 @@ class RoomGameLogJob implements ShouldQueue
         $playerlogs = [];
         $playercounts = [];
         foreach ($this->post['unitInfos'] as $unit) {
-            // 跟新统计数据
-            $record = PlayerCountRecord::find($unit["userId"]);
-            if (!$record) {
-                $countdata['user_id'] = $unit["userId"];
-                $countdata['total_game'] = 1;
-                $countdata['win_game'] = $unit["res"] == 2 ? 1 : 0;
-                $countdata['mvp'] = $unit["mvp"] != 0 ? 1 : 0;
-                $countdata['svp'] = $unit["svp"] != 0 ? 1 : 0;
-                $countdata['police'] = $unit["police"] != 0 ? 1 : 0;
-                array_push($playercounts, $countdata);
-            } else {
-                if($unit['res']!==1){
+
+            if($unit['res']!==1){
+                // 跟新统计数据
+                $record = PlayerCountRecord::find($unit["userId"]);
+                if (!$record) {
+                    $countdata['user_id'] = $unit["userId"];
+                    $countdata['total_game'] = 1;
+                    $countdata['win_game'] = $unit["res"] == 2 ? 1 : 0;
+                    $countdata['mvp'] = $unit["mvp"] != 0 ? 1 : 0;
+                    $countdata['svp'] = $unit["svp"] != 0 ? 1 : 0;
+                    $countdata['police'] = $unit["police"] != 0 ? 1 : 0;
+                    array_push($playercounts, $countdata);
+                } else {
                     $record->total_game += 1;
                     $record->win_game += $unit["res"] == 2 ? 1 : 0;
                     $record->mvp += $unit["mvp"] != 0 ? 1 : 0;

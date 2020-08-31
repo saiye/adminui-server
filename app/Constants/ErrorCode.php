@@ -36,6 +36,7 @@ class ErrorCode
     const  BALANCE_CANT= -28; //余额不足
     const  SMS_OFTEN= -29; //操作短信太频繁
     const  SMS_NOT_SUPPORT= -30; //不支持该地区短信
+    const  LOGOUT_FAILURE_IN_GAMING=-31; //游戏中无法退出
+    const  SMS_CODE_FAILURE=-32; //验证码无效
     const  SUCCESS = 0; // 成功
-
 }

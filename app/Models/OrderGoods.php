@@ -11,19 +11,24 @@ class OrderGoods extends Model
     use ModelDataFormat;
     protected $table = 'order_goods';
 
-    protected $appends = ['img100', 'img50','refund_num','refund_fee'];
+    protected $appends = ['img100', 'img50','refund_num','active'];
 
     protected $guarded = [
         'id'
+    ];
+
+
+    protected $casts = [
+         'active' => 'boolean',
     ];
 
     public function getRefundNumAttribute()
     {
         return $this->attributes['refund_num']='';
     }
-    public function getRefundFeeAttribute()
+    public function getActiveAttribute()
     {
-        return $this->attributes['refund_fee']='';
+        return $this->attributes['active']=false;
     }
 
     public function getImageAttribute($value)

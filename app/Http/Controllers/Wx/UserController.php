@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Wx;
 
 
+use App\Constants\Logic;
 use App\Constants\SmsAction;
 use App\Models\Channel;
 use App\Models\User;
@@ -124,6 +125,7 @@ class UserController extends Base
                 'phone' => $user->phone,
                 'area_code' => $user->area_code,
                 'is_build_openid' => $user->type==1?1:($user->open_id?1:0),
+                'type' => $user->type,
                 'code' => ErrorCode::SUCCESS,
             ]);
         } else {
@@ -280,6 +282,7 @@ class UserController extends Base
         if ($user and Hash::check($password, $user->password)) {
             $token = hash('sha256', Str::random(32));
             $user->token = $token;
+            $user->type=Logic::USER_TYPE_PHONE;
             $user->save();
             return $this->json([
                 'errorMessage' => 'success',

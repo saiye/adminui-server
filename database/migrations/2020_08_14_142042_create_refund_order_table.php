@@ -23,6 +23,7 @@ class CreateRefundOrderTable extends Migration
             $table->tinyInteger('pay_type')->default(0)->comment('退款方式');
             $table->tinyInteger('refund_status')->default(0)->comment('退款状态0未退，1已退');
             $table->tinyInteger('check_status')->default(0)->comment('退款审核状态0未审核，1通过，2不通过');
+            $table->tinyInteger('refund_reason_type')->comment('退款类型');
             $table->string('refund_reason')->comment('退款原因');
             $table->string('refund_id',32)->comment('支付平台退款单号');
             $table->string('info')->comment('退款商品说明');

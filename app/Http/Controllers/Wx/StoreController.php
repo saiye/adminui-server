@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Wx;
 
 use App\Models\Goods;
 use App\Models\GoodsCategory;
-use App\Models\GoodsSku;
 use App\Models\Store;
 use App\Constants\ErrorCode;
 use App\Models\StoreTag;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
 
 class StoreController extends Base
 {
@@ -30,7 +30,7 @@ class StoreController extends Base
             ]);
         }
         $storeId = $this->request->input('store_id');
-        $store = Store::select(['store_id', 'store_name', 'open_at', 'close_at','address','logo'])->whereStoreId($storeId)->whereCheck(1)->first();
+        $store = Store::select(['store_id', 'store_name', 'open_at', 'close_at', 'address', 'logo'])->whereStoreId($storeId)->whereCheck(1)->first();
         if (!$store) {
             return $this->json(
                 [
@@ -79,7 +79,7 @@ class StoreController extends Base
         $user = $this->user();
         $lon = $user->lon;
         $lat = $user->lat;
-        $list = Store::select(['store_name', 'store_id', 'describe','address', 'close_at', 'open_at', DB::raw(" ROUND(
+        $list = Store::select(['store_name', 'store_id', 'describe', 'address', 'close_at', 'open_at', DB::raw(" ROUND(
         6378.138 * 2 * ASIN(
             SQRT(
                 POW(
@@ -101,18 +101,34 @@ class StoreController extends Base
         ),2
     ) AS distance")])->whereCheck(1)->whereIsClose(0);
 
-        if($searchName){
-            $list=$list->where('store_name','like','%'.$searchName.'%');
+        if ($searchName) {
+            $list = $list->where('store_name', 'like', '%' . $searchName . '%');
         }
 
-        $list=$list->orderBy('distance', 'asc')->skip($skip)->take($limit)->get();
-
+        $list = $list->orderBy('distance', 'asc')->skip($skip)->take($limit)->get();
         if ($list) {
+            //上次购物过？
+            $storeIds = $list->pluck('store_id')->toArray();
+            $tradeStoreIds = Order::whereUserId($user->id)->wherePayStatus(1)->whereIn('store_id', $storeIds)->get()->pluck('store_id')->toArray();
+            $data = [];
+            $isEmpty = empty($tradeStoreIds);
+            foreach ($list as $store) {
+                array_push($data, [
+                    "store_name" => $store->store_name,
+                    "store_id" => $store->store_id,
+                    "describe" => $store->describe,
+                    "address" => $store->address,
+                    "close_at" => $store->close_at,
+                    "open_at" => $store->open_at,
+                    "distance" => $store->distance,
+                    "trade" => $isEmpty ? 0 : (in_array($store->store_id, $tradeStoreIds) ? 1 : 0),
+                ]);
+            }
             return $this->json(
                 [
                     'errorMessage' => '',
                     'code' => ErrorCode::SUCCESS,
-                    'list' => $list,
+                    'list' => $data,
                 ]
             );
         }
@@ -146,9 +162,9 @@ class StoreController extends Base
         $page = $this->request->input('page', 1);
         $category_id = $this->request->input('category_id', 1);
         $skip = ceil($page - 1) * $limit;
-        $list = Goods::select(['goods_name', 'goods_price', 'goods_id', 'image', 'info','tag','stock'])->whereCategoryId($category_id)->whereStatus(1)->skip($skip)->take($limit)->get();
+        $list = Goods::select(['goods_name', 'goods_price', 'goods_id', 'image', 'info', 'tag', 'stock'])->whereCategoryId($category_id)->whereStatus(1)->skip($skip)->take($limit)->get();
         if ($list) {
-            $list=Goods::tagList($list);
+            $list = Goods::tagList($list);
             return $this->json(
                 [
                     'errorMessage' => '',
