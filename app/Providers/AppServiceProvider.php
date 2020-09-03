@@ -11,6 +11,7 @@ use App\Service\Order\CheckGoodsOrder;
 use App\Service\Order\CheckRoomOrder;
 use App\Service\Order\DefaultCheckOrder;
 use App\Service\Pay\DefaultPayApi;
+use App\Service\LoginApi\WeiXinAppLoginApi;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,10 @@ class AppServiceProvider extends ServiceProvider
             'App\Service\GameApi\GameApi',
             'App\Service\GameApi\LrsApi'
         );
+        //微信app登录api
+        $this->app->bind('WeiXinAppLoginApi', function ($app) {
+            return new WeiXinAppLoginApi($app->make('request'));
+        });
         $this->app->bind('CheckGoodsOrder', function ($app) {
             return new CheckGoodsOrder($app);
         });
@@ -44,9 +49,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('DefaultPayApi', function ($app) {
             return new DefaultPayApi($app->make('request'));
         });
-
-
-
     }
 
     /**

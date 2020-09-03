@@ -38,18 +38,19 @@ class SendSmsJob implements ShouldQueue
 
         $env=Config::get('app.env');
         if($env!=='local'){
-          /*    if ($this->noteSms->area_code == 86) {
-                  $api = new AliYunSms();
-              } else {
-                  $api = new VonSms();
-              }*/
-            $api = new AliYunSms();
-            list($status,$res)=$api->send($this->noteSms->type, $this->noteSms->area_code, $this->noteSms->phone, $this->noteSms->msg, $this->noteSms->action);
-            $this->noteSms->res=$res;
-            $this->noteSms->status=$status?1:2;
-            $this->noteSms->save();
+            /*    if ($this->noteSms->area_code == 86) {
+                    $api = new AliYunSms();
+                } else {
+                    $api = new VonSms();
+                }*/
+                $api = new AliYunSms();
+                list($status, $res) = $api->send($this->noteSms->type, $this->noteSms->area_code, $this->noteSms->phone, $this->noteSms->msg, $this->noteSms->action);
+                if ($status) {
+                    $this->noteSms->res = $res;
+                    $this->noteSms->status = $status ? 1 : 2;
+                    $this->noteSms->save();
+                }
         }
-
     }
 
 }

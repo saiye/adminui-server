@@ -52,6 +52,8 @@ class VonSms implements SmsInterface
             if($status==0){
                 return [true,$message->toArray()];
             }
+            Log::info('VonSmsError:');
+            Log::info($message->toArray());
             return [false,$message->toArray()];
         }catch (Exception $e){
                Log::info('VonageSendSms-Exception:');

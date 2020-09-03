@@ -146,3 +146,6 @@ ALTER TABLE `lrs_manage`.`note_sms`     ADD COLUMN `res` json NULL COMMENT '结�
 //退款类型
  ALTER TABLE `lrs_manage`.`refund_order`
 ADD COLUMN `refund_reason_type` TINYINT(4) DEFAULT '4' NOT NULL COMMENT '退款类型' AFTER `check_status`;
+
+
+ALTER TABLE `lrs_manage`.`qr_code_path`     ADD COLUMN `type` TINYINT(4) NOT NULL COMMENT '1进游戏，2.成为法官' AFTER `time`,

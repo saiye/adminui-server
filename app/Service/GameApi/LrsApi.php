@@ -9,11 +9,14 @@
 namespace App\Service\GameApi;
 
 
+use App\Constants\CacheKey;
 use App\Constants\ErrorCode;
 use App\Jobs\CallBackGameLogin;
 use App\Models\Room;
 use App\Models\User;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class LrsApi extends BaseGameApi
 {
@@ -24,18 +27,49 @@ class LrsApi extends BaseGameApi
         $uri = '/loginCallback';
         $url = $this->channel->callBackServer . $uri;
         try {
-            //立即调用接口队列
-            dispatch_now(new CallBackGameLogin($url, $data));
-        } catch (\Exception $e) {
+            $client = new Client([
+                'timeout' => 3,
+            ]);
+            $response = $client->post($url, [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+                'verify' => false,
+                'json' => $data
+            ]);
+            if ($response->getStatusCode() == 200) {
+                $str=$response->getBody()->getContents();
+                $res=json_decode($str,true);
+                switch ($res['code']){
+                    case ErrorCode::SUCCESS:
+                        return $this->json([
+                            'errorMessage' => '扫码成功，马上进入游戏！',
+                            'gameSrvAddr' => $this->channel->gameSrvAddr,
+                            'code' => ErrorCode::SUCCESS,
+                        ]);
+                        break;
+                   case ErrorCode::REPETITION_CODE:
+                       return $this->json([
+                           'errorMessage' => '不能重复扫码登录',
+                           'code' =>ErrorCode::REPETITION_CODE,
+                       ]);
+                        break;
+                    default:
+                        return $this->json([
+                            'errorMessage' => 'ErrorCode:'.$res['code'],
+                            'code' =>$res['code'],
+                        ]);
+                }
+            }
+        }catch (\Exception $e) {
             return $this->json([
                 'errorMessage' => $e->getMessage(),
                 'code' => ErrorCode::CONNECTION_TIMEOUT,
             ]);
         }
         return $this->json([
-            'errorMessage' => 'success',
-            'gameSrvAddr' => $this->channel->gameSrvAddr,
-            'code' => ErrorCode::SUCCESS,
+            'errorMessage' => '登录回调失败！',
+            'code' => ErrorCode::VALID_FAILURE,
         ]);
     }
 

@@ -20,4 +20,8 @@ class RoomGameLog extends Model
     {
         return $value/10;
     }
+
+    public function getReplayContentJsonAttribute($value){
+        return json_decode($value, true);
+    }
 }

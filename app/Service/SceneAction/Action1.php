@@ -11,6 +11,7 @@ namespace App\Service\SceneAction;
 use App\Constants\ErrorCode;
 use App\Models\Channel;
 use App\Models\Device;
+use App\Models\QrCodePath;
 use App\Models\User;
 use App\Service\GameApi\LrsApi;
 use Illuminate\Support\Facades\Auth;
@@ -27,8 +28,8 @@ class Action1 extends SceneBase
     public function run()
     {
         $validator2 = $this->validationFactory->make($this->data, [
-            'd' => 'required|numeric|min:1',
-            'c' => 'required|numeric|min:1',
+            'id' => 'required|numeric',
+            'time' => 'required|numeric|min:1',
         ]);
         if ($validator2->fails()) {
             return $this->json([
@@ -43,8 +44,17 @@ class Action1 extends SceneBase
                 'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
             ]);
         }
-        $deviceShortId = $this->data['d'];
-        $channelId = $this->data['c'];
+        $id = $this->data['id'];
+        $hasQrCodeModel=QrCodePath::whereId($id)->first();
+        if(!$hasQrCodeModel){
+            return $this->json([
+                'errorMessage' => '找不到二维码!',
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $deviceShortId =  $hasQrCodeModel->device_id;
+        $channelId = $hasQrCodeModel->channel_id;
+        $time = $this->data['time'];
         $device = Device::whereDeviceId($deviceShortId)->first();
         if (!$device) {
             return $this->json([
@@ -60,11 +70,19 @@ class Action1 extends SceneBase
         }
         $channel = Channel::whereChannelId($channelId)->first();
         if ($channel) {
+         /*   if( $hasQrCodeModel->time!==$time){
+                return $this->json([
+                    'errorMessage' => '二维码已过期!',
+                    'code' => ErrorCode::REPETITION_CODE,
+                ]);
+            }*/
+            $hasQrCodeModel->time=0;
+            $hasQrCodeModel->save();
             //更新最后登录的渠道
             User::whereId($user->id)->update([
                 'channel_id' => $channelId,
             ]);
-            (new LrsApi($channel))->loginCallBack([
+            return (new LrsApi($channel))->loginCallBack([
                 "deviceShortId" => $device->device_id,
                 "account" => $user->account,
                 "userId" => $user->id,
@@ -76,10 +94,6 @@ class Action1 extends SceneBase
                 "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是
                 "seatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
                 "deviceMqttTopic" => $device->room->deviceMqttTopic ?? '', // [可选]房间设备mqtt主题
-            ]);
-            return $this->json([
-                'errorMessage' => '扫码成功，马上进入游戏!',
-                'code' => ErrorCode::SUCCESS,
             ]);
         }
         return $this->json([

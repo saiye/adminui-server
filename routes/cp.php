@@ -99,6 +99,28 @@ Route::group([
     Route::post('room/billing/billingList', 'Room\BillingController@billingList')->name('cp-billingList');
     Route::post('room/billing/addBilling', 'Room\BillingController@addBilling')->name('cp-addBilling');
     Route::post('room/billing/billingConfig', 'Room\BillingController@billingConfig')->name('cp-billingConfig');
+
+
+    //订单管理
+    Route::post('order/index/orderList', 'Order\IndexController@orderList')->name('bs-OrderList');
+    Route::post('order/index/conf', 'Order\IndexController@conf')->name('bs-OrderConf');
+    Route::post('order/index/detail', 'Order\IndexController@orderDetail')->name('bs-orderDetail');
+    Route::post('order/index/set', 'Order\IndexController@setOrder')->name('bs-setOrder');
+    Route::post('order/index/findOrder', 'Order\IndexController@findOrder')->name('bs-findOrder');
+    Route::post('order/index/refundApply', 'Order\IndexController@refundApply')->name('bs-refundApply');
+    Route::post('order/index/createOrder', 'Order\IndexController@createOrder')->name('bs-createOrder');
+    Route::post('order/index/refundApplyList', 'Order\IndexController@refundApplyList')->name('bs-refundApplyList');
+    Route::post('order/index/agreeRefund', 'Order\IndexController@agreeRefund')->name('bs-agreeRefund');
+    Route::post('order/index/refundConf', 'Order\IndexController@refundConf')->name('bs-refundConf');
+
+    //提现订单
+    Route::post('order/withdraw/orderList', 'Order\WithdrawController@orderList')->name('bs-WithdrawOrderList');
+    Route::post('order/withdraw/setStatus', 'Order\WithdrawController@setStatus')->name('bs-WithdrawSetStatus');
+    Route::post('order/withdraw/addReceiptAccount', 'Order\WithdrawController@addReceiptAccount')->name('bs-addReceiptAccount');
+    Route::post('order/withdraw/editReceiptAccount', 'Order\WithdrawController@editReceiptAccount')->name('bs-editReceiptAccount');
+    Route::post('order/withdraw/receiptAccountList', 'Order\WithdrawController@receiptAccountList')->name('bs-receiptAccountList');
+    Route::post('order/withdraw/conf', 'Order\WithdrawController@conf')->name('bs-receiptConf');
+
 });
 
 

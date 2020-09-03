@@ -79,11 +79,7 @@ class UserController extends Base
         }
         $area_code = $this->request->input('area_code');
         $phone = $this->request->input('phone');
-        if($area_code==885){
-            $area_code=855;
-        }
-        $account = $area_code . $phone;
-        $user = User::whereAccount($account)->first();
+        $user=User::wherePhone($phone)->whereAreaCode($area_code)->first();
         if ($user) {
             return $this->json([
                 'errorMessage' => "用户已注册",
@@ -195,8 +191,9 @@ class UserController extends Base
                 }
                 //验证码检查
                 if ($api->checkCode($post['type'], $data['area_code'], $data['phone'], $this->request->phone_code, $post['action'])) {
-                    $account = $data['area_code'] . $data['phone'];
-                    $user = User::whereAccount($account)->first();
+                    //考虑到，用户变更手机的情况，账号随机串
+                    $account = time().mt_rand(1111,99999);
+                    $user = User::whereAreaCode($data['area_code'])->wherePhone($data['phone'])->first();
                     if ($user) {
                         return $this->json([
                             'errorMessage' => '用户已经存在,请移步到登录界面！',
@@ -244,11 +241,16 @@ class UserController extends Base
                         'code' => ErrorCode::VALID_FAILURE,
                     ]);
                 }
-                if ($api->checkCode($post['type'], $data['area_code'], $data['phone'], $this->request->phone_code, $post['action'])) {
-                    $account = $data['area_code'] . $data['phone'];
-                    $save = User::whereAccount($account)->update([
-                        'token' => $token,
+                $user=User::whereAreaCode($data['area_code'])->wherePhone($data['phone'])->first();
+                if(!$user){
+                    return $this->json([
+                        'errorMessage' => "用户不存在",
+                        'code' => ErrorCode::ACCOUNT_NOT_EXIST,
                     ]);
+                }
+                if ($api->checkCode($post['type'], $data['area_code'], $data['phone'], $this->request->phone_code, $post['action'])) {
+                    $user->token=$token;
+                    $save=  $user->save();
                     if ($save) {
                         $this->removeCacheSte($certificate);
                         return $this->json([
@@ -283,11 +285,7 @@ class UserController extends Base
         $phone = $this->request->input('phone');
         $area_code = $this->request->input('area_code');
         $data = $this->request->only('phone', 'area_code');
-        if($area_code==885){
-            $area_code=855;
-        }
-        $account = $area_code . $phone;
-        $user = User::whereAccount($account)->first();
+        $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if (!$user) {
             return $this->json([
                 'errorMessage' => "用户不存在！",
@@ -391,24 +389,16 @@ class UserController extends Base
         $password = $this->request->input('password');
         $deviceShortId = $this->request->input('deviceShortId');
         $channelId = $this->request->input('channelId');
-        if($area_code==885){
-            $area_code=855;
-        }
-        $account = $area_code . $phone;
         $res = $api->phoneCheck($area_code, $phone);
         if ($res['code'] !== 0) {
             return $this->json($res);
         }
-        $user = User::whereAccount($account)->first();
+        $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if (!$user) {
-            //是否存在绑定手机的小程序账号？
-            $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
-            if (!$user) {
                 return $this->json([
                     'errorMessage' => '账号不存在！',
                     'code' => ErrorCode::ACCOUNT_NOT_EXIST,
                 ]);
-            }
         }
         if ($user and Hash::check($password, $user->password)) {
             if ($user->lock == 2) {

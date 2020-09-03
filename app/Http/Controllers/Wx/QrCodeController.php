@@ -31,29 +31,22 @@ class QrCodeController extends Base
         }
         $data = $this->request->input();
         $deviceShortId = $this->request->input('deviceShortId');
-        $channelId = $this->request->input('channelId');
-        $width = $this->request->input('width');
         $hasDevice = PhysicsAddress::whereId($deviceShortId)->first();
         if (!$hasDevice) {
             return $this->json([
-                'errorMessage' => '设置不存在!',
+                'errorMessage' => '设备不存在!',
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-         $qrCode=  QrCodePath::whereDeviceId($deviceShortId)->whereChannelId($channelId)->first();
-         if($qrCode){
-             $full_path=$qrCode->path;
-         }else{
-             $data['type']=1;//表示登录游戏
-             $imageRes = $api->getQrCode($data);
-             if ($imageRes) {
-                 $full_path = $imageRes['full_path'];
-             } else {
-                 return $this->json([
-                     'errorMessage' => '二维码生成失败',
-                     'code' => ErrorCode::CREATE_ERCODE_ERROR,
-                 ]);
-             }
+         $data['type']=1;//表示登录游戏
+         $imageRes = $api->getQrCode($data);
+         if ($imageRes) {
+             $full_path = $imageRes['full_path'];
+         } else {
+             return $this->json([
+                 'errorMessage' => '二维码生成失败',
+                 'code' => ErrorCode::CREATE_ERCODE_ERROR,
+             ]);
          }
         return $this->json([
             'errorMessage' => 'success',
@@ -61,39 +54,5 @@ class QrCodeController extends Base
             'full_path' => $full_path,
         ]);
     }
-
-
-    public function testQrCode()
-    {
-
-        $url = route('wx-QrCodeImage');
-        $data = [
-            'deviceShortId' => 1113,
-            'channelId' => 1,
-            'width' => 300,
-        ];
-        $client = new Client([
-            // 'handler' => HandlerStack::create(new CoroutineHandler()),
-            'timeout' => 5,
-            'verify' => false,
-            'swoole' => [
-                'timeout' => 10,
-                'socket_buffer_size' => 1024 * 1024 * 2,
-            ],
-        ]);
-        $response = $client->post($url, [
-            'form_params' => $data,
-        ]);
-        if ($response->getStatusCode() == 200) {
-            $res = json_decode($response->getBody()->getContents(), true);
-            if (isset($res['code']) and $res['code'] == 0) {
-                return $res['full_path'];
-            }
-            return $res['errorMessage'];
-        } else {
-            return 'cant create erCode';
-        }
-    }
-
 
 }

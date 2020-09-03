@@ -26,6 +26,7 @@ abstract class BaseLoginApi implements LoginApi
         $this->request = $request;
     }
 
+
     /**
      * 获取api相关配置数组
      */
@@ -43,11 +44,6 @@ abstract class BaseLoginApi implements LoginApi
         //维度
         $latitude =$this->request->input('latitude',0);
         //已注册用户
-        $env=Config::get('app.env');
-        if($env=='local'){
-            $user = User::whereId(1)->first();
-            return [ErrorCode::SUCCESS, '老用户', $user];
-        }
         list($code, $info) = $this->code2Session();
         if ($code == 0) {
             $hasThreeUser = ThreeUser::whereOpenId($info['openid'])->first();
@@ -82,16 +78,15 @@ abstract class BaseLoginApi implements LoginApi
                     DB::rollBack();
                     return [ErrorCode::CREATE_ACCOUNT_ERROR, '创建用户失败', null];
                 }
+            }else{
+                $hasThreeUser->session_key=$info['session_key'];
+                $hasThreeUser->save();
             }
             //已注册用户
             $user = User::whereId($hasThreeUser->user_id)->first();
             if ($user) {
-                if($user->parent_id){
-                    $user=User::whereId($user->parent_id)->first();
-                }
                 //更新用户信息
                 $user->sex = $info['sex'];
-                $user->nickname = $info['nickname'];
                 $user->nickname = $info['nickname'];
                 $user->open_id = $info['openid'];
                 $user->icon = $info['icon']??'';
@@ -103,6 +98,18 @@ abstract class BaseLoginApi implements LoginApi
             }
         }
         return [$code, $info['message'], null];
+    }
+
+    public function analyJson($json_str) {
+        $json_str = str_replace('＼＼', '', $json_str);
+        $out_arr = array();
+        preg_match('/{.*}/', $json_str, $out_arr);
+        if (!empty($out_arr)) {
+            $result = json_decode($out_arr[0], TRUE);
+        } else {
+            return false;
+        }
+        return $result;
     }
 
 

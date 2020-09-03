@@ -23,7 +23,7 @@ class WeiXinLoginApi extends BaseLoginApi
 {
     public function type()
     {
-        return 'wx';
+        return 'wxMin';
     }
 
     public function code2Session()
@@ -133,21 +133,35 @@ class WeiXinLoginApi extends BaseLoginApi
             Log::info('获取access_token失败,无法创建二维码!');
             return false;
         }
+        $time=time();
+        $hasQrCodeModel=QrCodePath::whereDeviceId($data['deviceShortId'])->whereChannelId($data['channelId'])->whereWidth($data['width'])->first();
+        $deviceShortId=$data['deviceShortId'];
+        $channelId=$data['channelId'];
+        $width=$data['width'];
+        $type=$data['type'];
+        if(!$hasQrCodeModel){
+            $hasQrCodeModel= QrCodePath::create([
+                'device_id'=>$deviceShortId,
+                'channel_id'=>$channelId,
+                'width'=>$width,
+                'type'=>$type,
+                'time'=>$time,
+            ]);
+        }
         $sceneData = scene_encode([
-            'd' => $data['deviceShortId'],
-            'c' => $data['channelId'],
-            't' => $data['type'],//1进游戏，2.成为法官
+            'id' => $hasQrCodeModel->id,
+            't' => $type,
+            'time' =>$time,
         ]);
         $post = [
             'scene' => $sceneData,
             'width' => $data['width'],
-            'auto_color' => true,
+            'auto_color' => false,
             'line_color' => [
-                'r' => 153,
-                'g' => 120,
-                'b' => 192,
+                'r' => mt_rand(1,255),
+                'g' => mt_rand(1,255),
+                'b' => mt_rand(1,255),
             ],
-           // 'page'=>'pages/index/login/login',
         ];
         $url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' . $access_token;
         try {
@@ -163,18 +177,26 @@ class WeiXinLoginApi extends BaseLoginApi
             ]);
             if ($response->getStatusCode() == 200) {
                 $str = $response->getBody()->getContents();
-                $env=Config::get('app.env');
-                $image_path = 'app/'.$env.'/qrCode/'.date('YmdHis').mt_rand(1,999).'.png';
-                Storage::put($image_path, $str);
-                $full_path = Storage::url($image_path);
-                //二维码入库
-                QrCodePath::create([
-                    'device_id'=>$data['deviceShortId'],
-                    'channel_id'=>$data['channelId'],
-                    'width'=>$data['width'],
-                    'path'=>$image_path,
-                ]);
-                return ['image_path' => $image_path, 'full_path' => $full_path];
+                $res=$this->analyJson($str);
+                if(!$res){
+                    $env=Config::get('app.env');
+                    $image_path = 'app/'.$env.'/qrCode/'.date('YmdHis').mt_rand(1,999).'.png';
+                    Storage::put($image_path, $str);
+                    $full_path = Storage::url($image_path);
+                    //二维码入库
+                    if($hasQrCodeModel->path){
+                        Storage::delete($hasQrCodeModel->path);
+                    }
+                    $hasQrCodeModel->path=$image_path;
+                    $hasQrCodeModel->time=$time;
+                    $hasQrCodeModel->type=$type;
+                    $hasQrCodeModel->save();
+                    return ['image_path' => $image_path, 'full_path' => $full_path];
+                }elseif (isset($res['errmsg'])){
+                    Log::info('erCode Cant generate');
+                    Log::info($res);
+                    return false;
+                }
             } else {
                 Log::info('getQrCode:status code not 200!');
             }
@@ -185,46 +207,22 @@ class WeiXinLoginApi extends BaseLoginApi
         return false;
     }
 
+
+
     public function decryptData($sessionKey,$iv,$encryptedData){
         if (strlen($sessionKey) != 24) {
             return [false,'session_key长度错误!',[]];
         }
-/*        $sessionKey='oSVI/iiUha+u+3VnQP2UpA==';
-        $iv='WTlzqIZqQnQIweu8OXtv7g==';
-        $encryptedData='mLsKhohQCIbfF8VEEJKUy/V62jz40XMvgHRvy2CFlwNPoM8lOeFBD8mlPm6JB2mqJWT5m9pDPhWYlTAetvitZEVZkMTdu9D9U+p+rSV7jmo6LuLeoAN+gTfHEuetmgBnObiZJsoVgWrlTVdjtuAv1pHYIA/BSslsNeYodvXiJ0X3/ZQLhfTOpr39ky6CgxwCc2I/GMnUJ7N9+XXcFyOkFA==';
-*/
-
-      /*  $sessionKey = 'tiihtNczf5v6AKRyjwEUhQ==';
-        $encryptedData="CiyLU1Aw2KjvrjMdj8YKliAjtP4gsMZM
-                QmRzooG2xrDcvSnxIMXFufNstNGTyaGS
-                9uT5geRa0W4oTOb1WT7fJlAC+oNPdbB+
-                3hVbJSRgv+4lGOETKUQz6OYStslQ142d
-                NCuabNPGBzlooOmB231qMM85d2/fV6Ch
-                evvXvQP8Hkue1poOFtnEtpyxVLW1zAo6
-                /1Xx1COxFvrc2d7UL/lmHInNlxuacJXw
-                u0fjpXfz/YqYzBIBzD6WUfTIF9GRHpOn
-                /Hz7saL8xz+W//FRAUid1OksQaQx4CMs
-                8LOddcQhULW4ucetDf96JcR3g0gfRK4P
-                C7E/r7Z6xNrXd2UIeorGj5Ef7b1pJAYB
-                6Y5anaHqZ9J6nKEBvB4DnNLIVWSgARns
-                /8wR2SiRS7MNACwTyrGvt9ts8p12PKFd
-                lqYTopNHR1Vf7XjfhQlVsAJdNiKdYmYV
-                oKlaRv85IfVunYzO0IKXsyl7JCUjCpoG
-                20f0a04COwfneQAGGwd5oa+T8yO5hzuy
-                Db/XcxxmK01EpqOyuxINew==";
-        $iv = 'r7BXXKkLb8qrSNn05n0qiA==';*/
-
         $aesKey=base64_decode($sessionKey);
         $aesIV=base64_decode($iv);
         $aesCipher=$this->base64urlDecode($encryptedData);
         $result=openssl_decrypt($aesCipher, "AES-128-CBC", $aesKey, 1, $aesIV);
-        $dataObj=json_decode($result,true);
+        $dataObj=json_decode($result);
         if($dataObj){
-            return [true,'解密成功!',$dataObj];
-          /*  $config = $this->config();
+            $config = $this->config();
             if($dataObj->watermark->appid==$config['AppId']){
                 return [true,'解密成功!',$dataObj];
-            }*/
+            }
         }
         return [false,'解密失败!',[]];
     }

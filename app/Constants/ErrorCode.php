@@ -38,5 +38,9 @@ class ErrorCode
     const  SMS_NOT_SUPPORT= -30; //不支持该地区短信
     const  LOGOUT_FAILURE_IN_GAMING=-31; //游戏中无法退出
     const  SMS_CODE_FAILURE=-32; //验证码无效
+    const  REPEAT_BUILD_PHONE=-33; //请勿重复绑定
+    const  REPETITION_CODE=-34; //不能重复扫码登录
+    const  GAME_REPLAY_NULL=-35; //游戏复盘数据不存在
+
     const  SUCCESS = 0; // 成功
 }

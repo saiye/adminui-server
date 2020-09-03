@@ -58,8 +58,8 @@ class StoreController extends Base
     {
         $validator = $this->validationFactory->make($this->request->all(), [
             'searchName' => 'nullable',
-            'page' => 'required|numeric|min:1',
-            'limit' => 'required|numeric|min:1',
+            'page' => 'required|numeric',
+            'limit' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -79,6 +79,15 @@ class StoreController extends Base
         $user = $this->user();
         $lon = $user->lon;
         $lat = $user->lat;
+        if($lon=='0.000000' and $lat=='0.000000'){
+            return $this->json(
+                [
+                    'errorMessage' => '你没有定位,无法获取数据！',
+                    'code' => ErrorCode::DATA_NULL,
+                    'list' => [],
+                ]
+            );
+        }
         $list = Store::select(['store_name', 'store_id', 'describe', 'address', 'close_at', 'open_at', DB::raw(" ROUND(
         6378.138 * 2 * ASIN(
             SQRT(

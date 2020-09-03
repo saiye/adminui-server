@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Service\GameApi\LrsApi;
 use App\Service\LoginApi\LoginApi;
 use App\Constants\ErrorCode;
+use App\Service\LoginApi\WeiXinAppLoginApi;
 use App\Service\LoginApi\WeiXinLoginApi;
 use App\Service\SceneAction\SceneFactory;
 use App\Service\SmsApi\HandelSms;
@@ -21,6 +22,10 @@ use Illuminate\Support\Str;
 class UserController extends Base
 {
 
+    /**
+     * 小程序扫码登录游戏接口
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function scene()
     {
         $validator = $this->validationFactory->make($this->request->all(), [
@@ -38,6 +43,10 @@ class UserController extends Base
         return SceneFactory::make($scene)->run();
     }
 
+    /**
+     * 登录退出接口
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
     public function logout()
     {
         $user = $this->user();
@@ -51,6 +60,54 @@ class UserController extends Base
         return $this->json([
             'errorMessage' => '你未登录!',
             'code' => ErrorCode::VALID_FAILURE,
+        ]);
+    }
+
+    /**
+     * android ,ios端微信登录接口
+     * @param WeiXinAppLoginApi $loginApi
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function wxAppLogin(WeiXinAppLoginApi $loginApi)
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'code' => 'required',
+            'longitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        //效验用户，获取用户信息
+        list($status, $message, $user) = $loginApi->getUser();
+        if ($status !== 0) {
+            return $this->json([
+                'errorMessage' => $message,
+                'code' => ErrorCode::ACCOUNT_NOT_EXIST,
+            ]);
+        }
+        if (!$user) {
+            return $this->json([
+                'errorMessage' => '未找到用户',
+                'code' => ErrorCode::ACCOUNT_NOT_EXIST,
+            ]);
+        }
+        if ($user->lock == 2) {
+            return $this->json([
+                'errorMessage' => '账号已锁定!',
+                'code' => ErrorCode::ACCOUNT_LOCK,
+            ]);
+        }
+        $token = hash('sha256', Str::random(32));
+        $user->token = $token;
+        $user->save();
+        return $this->json([
+            'errorMessage' => 'success',
+            'token' => $token,
+            'code' => ErrorCode::SUCCESS,
         ]);
     }
 
@@ -139,7 +196,7 @@ class UserController extends Base
     }
 
     /**
-     * 绑定手机
+     * 执行绑定手机操作
      */
     public function doBuildPhone(HandelSms $api)
     {
@@ -165,7 +222,7 @@ class UserController extends Base
             return $this->json($res);
         }
         $user = $this->user();
-        if ($user->phone==$phone) {
+        if ($user->phone == $phone) {
             return $this->json([
                 'errorMessage' => '手机账号已绑定请勿重复操作！',
                 'code' => ErrorCode::VALID_FAILURE,
@@ -263,18 +320,12 @@ class UserController extends Base
         if ($res['code'] !== 0) {
             return $this->json($res);
         }
-        $account = $area_code . $phone;
-
-        $user = User::whereAccount($account)->first();
+        $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if (!$user) {
-            //是否存在绑定手机的小程序账号？
-            $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
-            if (!$user) {
-                return $this->json([
-                    'errorMessage' => '账号不存在！',
-                    'code' => ErrorCode::ACCOUNT_NOT_EXIST,
-                ]);
-            }
+            return $this->json([
+                'errorMessage' => '账号不存在！',
+                'code' => ErrorCode::ACCOUNT_NOT_EXIST,
+            ]);
         }
         if ($user and Hash::check($password, $user->password)) {
             $token = hash('sha256', Str::random(32));
@@ -282,13 +333,13 @@ class UserController extends Base
             $user->type = Logic::USER_TYPE_PHONE;
             $user->save();
             return $this->json([
-                'errorMessage' => 'success',
+                'errorMessage' => '登录成功',
                 'token' => $token,
                 'code' => ErrorCode::SUCCESS,
             ]);
         }
         return $this->json([
-            'errorMessage' => '登录失败',
+            'errorMessage' => '密码错误',
             'code' => ErrorCode::ACCOUNT_VALID_FAILURE,
         ]);
     }
@@ -309,21 +360,32 @@ class UserController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        list($status, $res) = $loginApi->code2Session();
-        if ($status) {
-            $user = $this->user();
-            $user->open_id = $res['openid'];
-            $user->lon = $this->request->input('longitude', 0);
-            $user->lat = $this->request->input('latitude', 0);
-            $user->save();
+        $lon = $this->request->input('longitude', 0);
+        $lat = $this->request->input('latitude', 0);
+        $user = $this->user();
+        $user->lon = $lon;
+        $user->lat = $lat;
+        if ($user->type !== Logic::USER_TYPE_WX) {
+            //非小程序用户,绑定openid到当前账号，因为微信支付需要openid！
+            list($status, $res) = $loginApi->code2Session();
+            if ($status == 0) {
+                $user->open_id = $res['openid'];
+                $user->save();
+                return $this->json([
+                    'errorMessage' => '绑定成功！',
+                    'code' => ErrorCode::SUCCESS,
+                ]);
+            }
             return $this->json([
-                'errorMessage' => '绑定信息成功！',
-                'code' => ErrorCode::SUCCESS,
+                'errorMessage' => $res['message'],
+                'code' => ErrorCode::ACCOUNT_VALID_FAILURE,
             ]);
         }
+        //小程序用户操作
+        $user->save();
         return $this->json([
-            'errorMessage' => '授权验证失败！',
-            'code' => ErrorCode::ACCOUNT_VALID_FAILURE,
+            'errorMessage' => '绑定成功！',
+            'code' => ErrorCode::SUCCESS,
         ]);
     }
 
@@ -361,6 +423,11 @@ class UserController extends Base
         ]);
     }
 
+    /**
+     * 小程序端，解密用户手机信息，并绑定当前登录用户
+     * @param WeiXinLoginApi $api
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function decryptData(WeiXinLoginApi $api)
     {
         $validator = $this->validationFactory->make($this->request->all(), [
@@ -377,25 +444,43 @@ class UserController extends Base
         $iv = $this->request->input('iv');
         $user = $this->user();
         $threeUser = ThreeUser::whereUserId($user->id)->first();
-       // $threeUser = ThreeUser::whereUserId(1)->first();
         if ($threeUser) {
             list($status, $msg, $data) = $api->decryptData($threeUser->session_key, $iv, $encryptedData);
             if ($status) {
-                return $this->json([
-                    'errorMessage' => $msg,
-                    'code' => ErrorCode::SUCCESS,
-                    'data' => $data,
-                ]);
+                if ($data->purePhoneNumber and $data->countryCode) {
+                    if ($user->phone == $data->purePhoneNumber and $user->area_code == $data->countryCode) {
+                        return $this->json([
+                            'errorMessage' => '请勿重复绑定手机号！',
+                            'code' => ErrorCode::REPEAT_BUILD_PHONE,
+                        ]);
+                    }
+                    $hasOtherUser = User::whereAreaCode($data->countryCode)->wherePhone($data->purePhoneNumber)->first();
+                    if ($hasOtherUser) {
+                        return $this->json([
+                            'errorMessage' => '该手机号码已经注册，绑定失败！',
+                            'code' => ErrorCode::REPEAT_BUILD_PHONE,
+                        ]);
+                    }
+                    $user = $this->user();
+                    $user->phone = $data->purePhoneNumber;
+                    $user->area_code = $data->countryCode;
+                    $user->save();
+                    return $this->json([
+                        'errorMessage' => '绑定成功！',
+                        'code' => ErrorCode::SUCCESS,
+                    ]);
+                }
             }
+            return $this->json([
+                'errorMessage' => $msg,
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
         }
         return $this->json([
-            'errorMessage' => $msg,
+            'errorMessage' => '用户不存在！',
             'code' => ErrorCode::VALID_FAILURE,
         ]);
     }
-
-
-
 
     /**
      * 忘记密码,获取验证码
@@ -422,7 +507,7 @@ class UserController extends Base
             ]);
         }
         $type = 'code';
-        $res = $api->send($type,$area_code, $phone, ['code' => mt_rand(11111, 99999)], SmsAction::USER_FORGET_PASSWORD);
+        $res = $api->send($type, $area_code, $phone, ['code' => mt_rand(11111, 99999)], SmsAction::USER_FORGET_PASSWORD);
         if ($res['code'] == 0) {
             return $this->json([
                 'errorMessage' => "验证码下发成功",
@@ -435,7 +520,13 @@ class UserController extends Base
         ]);
     }
 
-    public function forgetPasswordCheckPhoneCode(HandelSms $api){
+    /**
+     * 对忘记密码的验证码，执行验证，成功返回token.后续用token修改密码
+     * @param HandelSms $api
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function forgetPasswordCheckPhoneCode(HandelSms $api)
+    {
         $validator = $this->validationFactory->make($this->request->all(), [
             'phone' => 'required|numeric',
             'phone_code' => 'required|numeric',
@@ -447,19 +538,19 @@ class UserController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $area_code=$this->request->input('area_code');
-        $phone=$this->request->input('phone');
-        $phone_code=$this->request->input('phone_code');
+        $area_code = $this->request->input('area_code');
+        $phone = $this->request->input('phone');
+        $phone_code = $this->request->input('phone_code');
         $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
-        if(!$user){
+        if (!$user) {
             return $this->json([
-                'errorMessage' =>'用户不存在！',
+                'errorMessage' => '用户不存在！',
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        if ($api->checkCode('code',$area_code, $phone, $phone_code, SmsAction::USER_FORGET_PASSWORD)) {
+        if ($api->checkCode('code', $area_code, $phone, $phone_code, SmsAction::USER_FORGET_PASSWORD)) {
             $token = Str::random(32);
-            $user->token=$token;
+            $user->token = $token;
             $save = $user->save();
             if ($save) {
                 return $this->json([
@@ -475,5 +566,108 @@ class UserController extends Base
         ]);
     }
 
+    /**
+     * 手机号码注册,检测是否可以注册，可以注册则下发验证码
+     */
+    public function phoneRegCheckAndSendCode(HandelSms $api)
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'area_code' => 'required',
+            'phone' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $area_code = $this->request->input('area_code');
+        $phone = $this->request->input('phone');
+        $res = $api->phoneCheck($area_code, $phone);
+        if ($res['code'] !== 0) {
+            return $this->json($res);
+        }
+        $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
+        if ($user) {
+            return $this->json([
+                'errorMessage' => "用户已注册",
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        //2.发送验证码，和凭证给客户端
+        $res = $api->send('code', $area_code, $phone, ['code' => mt_rand(11111, 99999)], SmsAction::USER_REG);
+        if ($res['code'] == 0) {
+            return $this->json([
+                'errorMessage' => '验证码已下发！',
+                'code' => ErrorCode::SUCCESS,
+            ]);
+        }
+        return $this->json([
+            'errorMessage' => $res['errorMessage'],
+            'code' => $res['code'],
+        ]);
+    }
 
+    /**
+     * 手机号码,进行注册
+     */
+    public function doPhoneReg(HandelSms $api)
+    {
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'area_code' => 'required',
+            'phone' => 'required',
+            'nickname' => 'required|max:20',
+            'sex' => 'required|in:0,1',
+            'phone_code' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $area_code = $this->request->input('area_code');
+        $phone = $this->request->input('phone');
+        $phone_code = $this->request->input('phone_code');
+        $nickname = $this->request->input('nickname');
+        $sex = $this->request->input('sex');
+        $res = $api->phoneCheck($area_code, $phone);
+        if ($res['code'] !== 0) {
+            return $this->json($res);
+        }
+        $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
+        if ($user) {
+            return $this->json([
+                'errorMessage' => "用户已注册",
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+
+        if ($api->checkCode('code',$area_code,$phone, $phone_code, SmsAction::USER_REG)) {
+            //考虑到，用户变更手机的情况，账号随机串
+            $account = time().mt_rand(1111,99999);
+            $token = Str::random(32);
+            $user = User::create([
+                'phone' =>  $phone,
+                'account' => $account,
+                'sex' => $sex,
+                'nickname' => $nickname,
+                'area_code' =>$area_code,
+                'password' => Str::random(32),
+                'type'=>Logic::USER_TYPE_PHONE,
+                'token' => $token,
+            ]);
+            if ($user) {
+                return $this->json([
+                    'errorMessage' => '注册成功!',
+                    'code' => ErrorCode::SUCCESS,
+                    'token' => $token,
+                ]);
+            }
+        }
+        return $this->json([
+            'errorMessage' => '验证码无效!',
+            'code' => ErrorCode::VALID_FAILURE,
+        ]);
+    }
 }

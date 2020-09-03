@@ -30,19 +30,30 @@ Route::group([
     //余额支付
     Route::post('balancePay', 'PayController@balancePay')->name('wx-balancePay');
 });
-
 Route::post('game/fightHistorical', 'GameController@fightHistorical');
-Route::post('user/login', 'UserController@login')->middleware('ApiLogRecord');
-Route::post('user/phoneLogin', 'UserController@phoneLogin')->middleware('ApiLogRecord');
+//游戏复盘
+Route::post('game/roomReplay', 'GameController@roomReplay');
+//小程序登录
+Route::post('user/login', 'UserController@login');
+//手机账号登录
+Route::post('user/phoneLogin', 'UserController@phoneLogin');
 //忘记密码
 Route::post('user/forgetPasswordSendCode', 'UserController@forgetPasswordSendCode');
-//验证忘记密码的验证码
+//验证忘记密码,执行验证code
 Route::post('user/forgetPasswordCheckPhoneCode', 'UserController@forgetPasswordCheckPhoneCode');
-
+//app端微信登录
+Route::post('user/wxAppLogin', 'UserController@wxAppLogin');
+//手机注册检测成功下发验证码
+Route::post('user/phoneRegCheckAndSendCode', 'UserController@phoneRegCheckAndSendCode');
+//执行手机注册
+Route::post('user/doPhoneReg', 'UserController@doPhoneReg');
+//获取二维码
 Route::post('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
-Route::any('qrCode/test', 'QrCodeController@testQrCode')->name('wx-QrCodeTestQrCode');
 //微信支付回调
 Route::post('call/wx', 'PayController@callWx')->name('wx-callWx');
 //微信退款
 Route::post('call/callWxRefund', 'PayController@callWxRefund')->name('wx-CallWxRefund');
+
+
+
 

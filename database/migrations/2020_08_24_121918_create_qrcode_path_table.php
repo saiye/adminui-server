@@ -18,7 +18,9 @@ class CreateQrcodePathTable extends Migration
             $table->bigInteger('device_id')->comment('device_id');
             $table->bigInteger('channel_id')->comment('channel_id');
             $table->bigInteger('width')->comment('width');
-            $table->string('path',100)->comment('qrCode图片地址');
+            $table->string('path',100)->nullable()->comment('qrCode图片地址');
+            $table->bigInteger('time')->default(0)->comment('time');
+            $table->tinyInteger('type')->default(0)->comment('1进游戏，2.成为法官');
             $table->timestamps();
         });
     }

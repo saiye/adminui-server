@@ -7,6 +7,8 @@ use App\Models\Channel;
 use App\Models\GameBoard;
 use App\Models\PlayerCountRecord;
 use App\Models\PlayerGameLog;
+use App\Models\RoomGameLog;
+use App\Models\User;
 use App\Service\GameApi\LrsApi;
 use Illuminate\Support\Facades\Config;
 
@@ -212,5 +214,45 @@ class GameController extends Base
             'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
         ]);
     }
+
+    public function  roomReplay(){
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'room_game_id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $roomGameId=$this->request->input('room_game_id');
+        $res=RoomGameLog::whereId($roomGameId)->first();
+        if($res){
+            $playerRes=PlayerGameLog::select('seat','user_id')->whereRoomGameId($roomGameId)->get()->keyBy('user_id');
+            //采集
+            $userIds=$playerRes->pluck('user_id');
+            $userList=User::select('nickname','icon')->whereIn('id',$userIds)->get();
+            $playerList=[];
+            foreach ($userList as $user){
+                array_push($playerList,[
+                    'seat'=>isset($playerRes[$user->id])?$playerRes[$user->id]->seat:0,
+                    'nickname'=>$user->nickname,
+                    'icon'=>$user->icon,
+                ]);
+            }
+            return $this->json([
+                'errorMessage' => '复盘数据不存在',
+                'code' => ErrorCode::SUCCESS,
+                'replayData'=>$res->replayContentJson,
+                'playerList'=>$playerList,
+            ]);
+        }
+        return $this->json([
+            'errorMessage' => '复盘数据不存在',
+            'code' => ErrorCode::GAME_REPLAY_NULL,
+        ]);
+    }
+
+
 
 }
