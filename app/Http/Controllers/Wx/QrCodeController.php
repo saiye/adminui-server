@@ -31,12 +31,25 @@ class QrCodeController extends Base
         }
         $data = $this->request->input();
         $deviceShortId = $this->request->input('deviceShortId');
+        $channelId = $this->request->input('channelId');
+        $width = $this->request->input('width');
         $hasDevice = PhysicsAddress::whereId($deviceShortId)->first();
         if (!$hasDevice) {
             return $this->json([
                 'errorMessage' => '设备不存在!',
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
+        }
+       $qrcodeModel=QrCodePath::whereDeviceId($deviceShortId)->whereChannelId($channelId)->whereWidth($width)->first();
+        if($qrcodeModel){
+            if($qrcodeModel->time>0 and $qrcodeModel->path){
+                //小程序接口限制每分钟5000次，预防乱刷新，消耗二维码次数
+                return $this->json([
+                    'errorMessage' => '二维码未使用过,不刷新处理',
+                    'code' => ErrorCode::SUCCESS,
+                    'full_path' => $qrcodeModel->path,
+                ]);
+            }
         }
          $data['type']=1;//表示登录游戏
          $imageRes = $api->getQrCode($data);

@@ -258,12 +258,6 @@ class UserController extends Base
         $validator = $this->validationFactory->make($this->request->all(), [
             'phone' => 'required|numeric',
             'area_code' => 'required|numeric',
-        ], [
-            'password.required' => '密码必填!',
-            'password.min' => '密码最短6位!',
-            'password.max' => '密码最长18位!',
-            'password.regex' => '密码必须包含字母，数字，特殊符号中的两种,6-18位',
-            'area_code.numeric' => '区号只能是数字!',
         ]);
         if ($validator->fails()) {
             return $this->json([

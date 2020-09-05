@@ -59,14 +59,4 @@ class Order extends Model
     {
         return $this->hasOne(UserCoupon::class,'user_coupon_id','coupon_id');
     }
-
-    /**
-     * 计算退款金额
-     */
-    public static function calculateRefundFee($goodsArr){
-        $fee=0;
-
-        return $fee;
-    }
-
 }

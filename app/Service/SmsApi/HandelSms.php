@@ -85,8 +85,9 @@ class HandelSms
         $route=Config::get('phone.route');
         $res=$route[$area_code]??[];
         if(empty($res)){
-            $res=[
-                'pattern'=>'/^[0-9]*$/',
+            return [
+                'errorMessage' => '暂不支持地区短信!',
+                'code' => ErrorCode::VALID_FAILURE,
             ];
         }
         $validator = $this->validationFactory->make([

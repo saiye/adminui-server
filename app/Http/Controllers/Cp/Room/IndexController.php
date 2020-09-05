@@ -35,7 +35,7 @@ class IndexController extends Controller
         if ($this->req->store_name) {
             $data = $data->where('store.store_name', 'like', '%' . $this->req->store_name . '%')->leftJoin('store', 'room.store_id', '=', 'store.company_id');
         }
-        $data = $data->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->orderBy('room_id','desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

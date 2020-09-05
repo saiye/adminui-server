@@ -62,7 +62,7 @@ class ChannelController extends Controller
         }else{
             $res = Channel::insert($data);
             if ($res) {
-                return $this->successJson('添加成功');
+                return $this->successJson([],'添加成功');
             }
             return $this->errorJson('添加失败!');
         }
@@ -90,6 +90,22 @@ class ChannelController extends Controller
             return $this->errorJson('参数错误!',10001, $validator->errors()->toArray());
         }
         return $this->doEditOrAddChannel();
+    }
+
+    public function delChannel(){
+        $validator = Validator::make($this->req->all(), [
+            'channel_id' => 'required|numeric|min:1|max:300000',
+            'channel_id' => 'required',
+        ], [
+            'channel_id.required' => '渠道id不能为空',
+            'channel_id.min' => '渠道id不能小于1',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorJson('参数错误!',10001, $validator->errors()->toArray());
+        }
+        $channelId=$this->req->input('channel_id');
+        Channel::whereChannelId($channelId)->delete();
+        return $this->successJson([],'删除成功');
     }
 }
 

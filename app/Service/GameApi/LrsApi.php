@@ -50,7 +50,7 @@ class LrsApi extends BaseGameApi
                         break;
                    case ErrorCode::REPETITION_CODE:
                        return $this->json([
-                           'errorMessage' => '不能重复扫码登录',
+                           'errorMessage' => '该设备已有用户登录',
                            'code' =>ErrorCode::REPETITION_CODE,
                        ]);
                         break;

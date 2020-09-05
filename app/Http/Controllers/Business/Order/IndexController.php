@@ -82,7 +82,7 @@ class IndexController extends Controller
             'refund_fee.required' => '退款金额错误！',
         ]);
         if ($validator->fails()) {
-            return $this->errorJson($validator->errors()->first(), 2);
+            return $this->errorJson($validator->errors()->first());
         }
         $refundGoodsArr = $this->req->input('refundGoodsArr',[]);
         $refund_type = $this->req->input('refund_type');
@@ -92,14 +92,16 @@ class IndexController extends Controller
 
         $company_id = $this->loginUser->company_id;
         $store_id = $this->loginUser->store_id;
-        foreach ($refundGoodsArr as $sub) {
-            $validator2 = Validator::make($sub, [
-                'order_goods_id' => 'required|numeric',
-                'type' => 'required|numeric',
-                'count' => 'required|numeric|min:1',
-            ]);
-            if ($validator2->fails()) {
-                return $this->errorJson($validator->errors()->first(), 2);
+        if($refund_type==1){
+            foreach ($refundGoodsArr as $sub) {
+                $validator2 = Validator::make($sub, [
+                    'order_goods_id' => 'required|numeric',
+                    'type' => 'required|numeric',
+                    'count' => 'required|numeric|min:1',
+                ]);
+                if ($validator2->fails()) {
+                    return $this->errorJson($validator2->errors()->first());
+                }
             }
         }
         if (!($refund_fee > 0)) {
@@ -134,7 +136,10 @@ class IndexController extends Controller
             'store_id' => $store_id,
         ];
         $refundOrder = RefundOrder::create($refundOrderArr);
-        return $this->errorJson('申请成功，等待审核！');
+        if($refundOrder){
+            return $this->successJson([],'申请成功，等待审核！');
+        }
+        return $this->errorJson('申请失败!');
     }
 
     /**
@@ -142,7 +147,7 @@ class IndexController extends Controller
      */
     public function refundApplyList()
     {
-        $list = RefundOrder::whereCompanyId($this->loginUser->company_id);
+        $list = RefundOrder::with('order')->whereCompanyId($this->loginUser->company_id);
         if ($this->loginUser->store_id) {
             $list = $list->whereStoreId($this->loginUser->store_id);
         }

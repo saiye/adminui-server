@@ -15,7 +15,7 @@ class CreateNoteSmsTable extends Migration
     {
         Schema::create('note_sms', function (Blueprint $table) {
             $table->id();
-            $table->string('area_code', 10)->comment('地区码');
+            $table->integer('area_code')->comment('地区码');
             $table->string('phone', 20)->comment('phone');
             $table->json('msg')->comment('msg');
             $table->bigInteger('create_time')->default(0)->comment('创建时间');

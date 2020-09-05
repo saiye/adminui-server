@@ -26,9 +26,10 @@ class CreateRefundOrderTable extends Migration
             $table->tinyInteger('refund_reason_type')->comment('退款类型');
             $table->string('refund_reason')->comment('退款原因');
             $table->string('refund_id',32)->comment('支付平台退款单号');
-            $table->string('info')->comment('退款商品说明');
             $table->unsignedInteger('user_id')->comment('退款用户id');
             $table->unsignedInteger('refund_time')->default(0)->comment('退款时间');
+            $table->unsignedInteger('store_id')->default(0)->comment('所属店面');
+            $table->unsignedInteger('company_id')->default(0)->comment('所属公司id');
             $table->timestamps();
         });
     }

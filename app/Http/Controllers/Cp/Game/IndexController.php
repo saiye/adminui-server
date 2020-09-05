@@ -25,7 +25,7 @@ class IndexController extends Controller
                 ->orWhere('nickname', 'like', '%' . $this->req->search_name . '%')
                 ->orWhere('email', 'like', '%' . $this->req->search_name . '%');
         }
-        $data = $data->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->orderBy('id','desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

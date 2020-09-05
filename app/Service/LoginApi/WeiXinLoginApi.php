@@ -158,10 +158,11 @@ class WeiXinLoginApi extends BaseLoginApi
             'width' => $data['width'],
             'auto_color' => false,
             'line_color' => [
-                'r' => mt_rand(1,255),
-                'g' => mt_rand(1,255),
-                'b' => mt_rand(1,255),
+                'r' => 132,
+                'g' => 98,
+                'b' => 74,
             ],
+            'is_hyaline'=>true,
         ];
         $url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' . $access_token;
         try {
