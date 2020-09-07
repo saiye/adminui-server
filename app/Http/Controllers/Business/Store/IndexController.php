@@ -28,31 +28,31 @@ class IndexController extends Controller
             $r->whereType(2)->whereIsDel(0);
         }])->with('tags')->with('company')->with('region')->with('province')->with('city');
 
-        $data = $data->whereCompanyId($this->loginUser->company_id);
+        $data = $data->where('store.company_id',$this->loginUser->company_id);
 
         if ($this->req->store_id) {
-            $data = $data->whereStoreId($this->req->store_id);
+            $data = $data->where('store.store_id',$this->req->store_id);
         }
         if ($this->req->store_name) {
-            $data = $data->where('store_name', 'like', '%' . $this->req->store_name . '%');
+            $data = $data->where('store.store_name', 'like', '%' . $this->req->store_name . '%');
         }
         if ($this->req->address) {
-            $data = $data->where('address', 'like', '%' . $this->req->address . '%');
+            $data = $data->where('store.address', 'like', '%' . $this->req->address . '%');
         }
         if ($this->req->state_id) {
-            $data = $data->whereStateId($this->req->state_id);
+            $data = $data->where('store.state_id',$this->req->state_id);
         }
         if ($this->req->province_id) {
-            $data = $data->whereProvinceId($this->req->province_id);
+            $data = $data->where('store.province_id',$this->req->province_id);
         }
         if ($this->req->city_id) {
-            $data = $data->whereCityId($this->req->city_id);
+            $data = $data->where('store.city_id',$this->req->city_id);
         }
         if ($this->req->staff_id) {
-            $data = $data->whereStaffId($this->req->staff_id);
+            $data = $data->where('store.staff_id',$this->req->staff_id);
         }
         if ($this->req->check) {
-            $data = $data->whereIn('check', $this->req->check);
+            $data = $data->whereIn('store.check', $this->req->check);
         }
         if ($this->req->listDate) {
             $data = $data->whereBetween('store.created_at', $this->req->listDate);

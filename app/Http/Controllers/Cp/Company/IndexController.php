@@ -31,27 +31,27 @@ class IndexController extends Controller
         $data = new Company();
         $data = $data->with(['manage', 'image' => function ($r) {
             $r->whereType(1)->whereIsDel(0);
-        }])->whereIn('check', $this->req->input('check', [1]))->with('manage');
+        }])->whereIn('company.check', $this->req->input('check', [1]))->with('manage');
         if ($this->req->company_id) {
-            $data = $data->whereCompanyId($this->req->company_id);
+            $data = $data->where('company.company_id',$this->req->company_id);
         }
         if ($this->req->company_name) {
-            $data = $data->where('company_name', 'like', '%' . trim($this->req->company_name) . '%');
+            $data = $data->where('company.company_name', 'like', '%' . trim($this->req->company_name) . '%');
         }
         if ($this->req->area_code) {
-            $data = $data->whereAreaCode($this->req->area_code);
+            $data = $data->where('company.area_code',$this->req->area_code);
         }
         if ($this->req->status) {
-            $data = $data->whereStatus($this->req->status);
+            $data = $data->where('company.status',$this->req->status);
         }
         if ($this->req->listDate) {
             if ($this->req->listDate[0])
-                $data = $data->whereBetween('created_at', $this->req->listDate);
+                $data = $data->whereBetween('company.created_at', $this->req->listDate);
         }
         if ($this->req->real_name) {
             $data = $data->where('staff.real_name', 'like', '%' . $this->req->real_name . '%')->leftJoin('staff', 'company.staff_id', '=', 'staff.staff_id');
         }
-        $data = $data->orderBy('company_id','desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $data = $data->orderBy('company.company_id','desc')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }

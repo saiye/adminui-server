@@ -34,7 +34,12 @@ class HandelSms
         $frequencyKey = $area_code . '_' . $phone;
         $frequencyKeyCode = $area_code . '_code' . $phone . '_' . $type.'_'.$action;
         $canSend = Cache::get($frequencyKey);
-        $count=3;
+        $env=Config::get('app.env');
+        if($env=='local'){
+            $count=300;
+        }else{
+            $count=3;
+        }
         if ($canSend<$count) {
             if ($type=='code'){
                 if(!isset($array['code'])){

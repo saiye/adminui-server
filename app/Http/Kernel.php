@@ -51,6 +51,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
+        'signCheck'=>\App\Http\Middleware\SignCheck::class,
         'rbac'=>\App\Http\Middleware\Rbac::class,
         'ApiLogRecord'=>\App\Http\Middleware\ApiLogRecord::class,
         'client'=>\App\Http\Middleware\Client::class,

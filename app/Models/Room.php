@@ -22,6 +22,10 @@ class Room extends Model
        // 'room_id' => 'string',
     ];
 
+    public function channel(){
+        return $this->hasOne('App\Models\Channel', 'channel_id', 'channel_id');
+    }
+
     public function store()
     {
         return $this->hasOne('App\Models\Store', 'store_id', 'store_id');

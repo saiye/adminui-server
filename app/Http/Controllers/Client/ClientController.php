@@ -121,7 +121,13 @@ class ClientController extends Base
                 'physics_id' => $this->request->input('deviceId'),
             ]);
         } else {
-            $device = Device::whereDeviceId($hasItem->id)->first();
+
+            $device = \App\Models\Device::with(['room'=>function($r){
+                $r->with('channel')->select('room_id','channel_id','room_name');
+            },'store'=>function($r){
+                $r->select('store_id','store_name');
+            }])->whereDeviceId($hasItem->id)->first();
+
             if ($device) {
                 return $this->json([
                     'code' => ErrorCode::SUCCESS,
@@ -131,7 +137,8 @@ class ClientController extends Base
                     "RoomName" => $device->room->room_name,
                     "RoomId" => $device->room_id,
                     "SeatIdx" => $device->seat_num, // [可选] 座位号，法官为0，其他从1开始
-                    "GameServerAddress" => WebConfig::getKeyByFile('GameServer.GameServerAddress'),
+                    "ChannelId" => $device->room->channel_id, // [可选] 座位号，法官为0，其他从1开始
+                    "GameServerAddress" => $device->room->channel?$device->room->channel->gameSrvAddr:WebConfig::getKeyByFile('GameServer.GameServerAddress'),
                 ]);
             }
         }

@@ -92,6 +92,7 @@ Route::group([
     Route::post('room/index/addRoom', 'Room\IndexController@addRoom')->name('cp-addRoom');
     Route::post('room/index/companyAndRoomList', 'Room\IndexController@companyAndRoomList')->name('cp-companyAndRoomList');
     Route::post('room/index/editRoom', 'Room\IndexController@editRoom')->name('cp-editRoom');
+    Route::post('room/index/channelList', 'Room\IndexController@channelList')->name('cp-RoomChannelList');
 
     //设备管理
     Route::post('room/device/deviceList', 'Room\DeviceController@deviceList')->name('cp-deviceList');

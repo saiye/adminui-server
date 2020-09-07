@@ -42,5 +42,6 @@ class ErrorCode
     const  REPETITION_CODE=-34; //不能重复扫码登录
     const  GAME_REPLAY_NULL=-35; //游戏复盘数据不存在
     const  QRCODE_NOT_USE=-36; //二维码未使用
+    const  SIGN_CHECK_FAIL=-37; //签名错误
     const  SUCCESS = 0; // 成功
 }

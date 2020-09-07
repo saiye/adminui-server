@@ -22,20 +22,16 @@ class BillingController extends Controller
 
         $company_id = $this->loginUser->company_id;
 
-        $store_id = $this->loginUser->store_id;
 
-        $data = $data->select(['billing.*', 'store.store_name', 'company.company_name'])->leftJoin('store', 'billing.store_id', '=', 'store.store_id')->leftJoin('company', 'billing.company_id', '=', 'company.company_id');
+        $data = $data->select(['billing.*', 'company.company_name'])->leftJoin('company', 'billing.company_id', '=', 'company.company_id');
 
         $data = $data->where('billing.company_id', $company_id);
-        
-        if ($store_id) {
-            $data = $data->where('billing.store_id', $store_id);
-        }
+
         if ($this->req->time_nuit) {
             $data = $data->whereTimeUnit($this->req->time_unit);
         }
         if ($this->req->search_name) {
-            $data = $data->where('billing.billing_name', 'like', '%' . $this->req->search_name . '%')->orWhere('store.store_name', 'like', '%' . $this->req->search_name . '%');
+            $data = $data->where('billing.billing_name', 'like', '%' . $this->req->search_name . '%');
         }
         if ($this->req->time_type) {
             $data = $data->where('billing.time_type', $this->req->time_type);
@@ -79,9 +75,7 @@ class BillingController extends Controller
 
         $company_id = $this->loginUser->company_id;
         $store_id = $this->loginUser->store_id;
-        if (!$store_id) {
-            return $this->errorJson('抱歉，仅仅支持店长或店员账号加计费模式!', 2);
-        }
+
         $data['company_id'] = $company_id;
         $data['store_id'] = $store_id;
         $room = Billing::create($data);

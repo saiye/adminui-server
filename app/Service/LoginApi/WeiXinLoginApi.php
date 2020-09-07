@@ -162,7 +162,7 @@ class WeiXinLoginApi extends BaseLoginApi
                 'g' => 98,
                 'b' => 74,
             ],
-            'is_hyaline'=>true,
+            'is_hyaline'=>false,
         ];
         $url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' . $access_token;
         try {

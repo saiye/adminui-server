@@ -33,33 +33,29 @@ class IndexController extends Controller
         $data = $data->with('staff')->with(['image' => function ($r) {
             $r->whereType(2)->whereIsDel(0);
         }])->with('tags')->with('company')->with('region')->with('province')->with('city');
-
-        if ($this->req->company_id) {
-            $data = $data->whereCompanyId($this->req->company_id);
-        }
         if ($this->req->store_id) {
-            $data = $data->whereStoreId($this->req->store_id);
+            $data = $data->where('store.store_id',$this->req->store_id);
         }
         if ($this->req->store_name) {
-            $data = $data->where('store_name', 'like', '%' . $this->req->store_name . '%');
+            $data = $data->where('store.store_name', 'like', '%' . $this->req->store_name . '%');
         }
         if ($this->req->address) {
-            $data = $data->where('address', 'like', '%' . $this->req->address . '%');
+            $data = $data->where('store.address', 'like', '%' . $this->req->address . '%');
         }
         if ($this->req->state_id) {
-            $data = $data->whereStateId($this->req->state_id);
+            $data = $data->where('store.state_id',$this->req->state_id);
         }
         if ($this->req->province_id) {
-            $data = $data->whereProvinceId($this->req->province_id);
+            $data = $data->where('store.province_id',$this->req->province_id);
         }
         if ($this->req->city_id) {
-            $data = $data->whereCityId($this->req->city_id);
+            $data = $data->where('store.city_id',$this->req->city_id);
         }
         if ($this->req->staff_id) {
-            $data = $data->whereStaffId($this->req->staff_id);
+            $data = $data->where('store.staff_id',$this->req->staff_id);
         }
         if ($this->req->check) {
-            $data = $data->whereIn('check', $this->req->check);
+            $data = $data->whereIn('store.check', $this->req->check);
         }
         if ($this->req->listDate) {
             $data = $data->whereBetween('store.created_at', $this->req->listDate);
@@ -78,7 +74,7 @@ class IndexController extends Controller
     /**
      * 添加门店
      */
-    public function addStore()
+    public function addStore(HandelSms $api)
     {
         $validator = Validator::make($this->req->all(), [
             'store_name' => 'required|max:30',
@@ -94,6 +90,7 @@ class IndexController extends Controller
             'real_name' => 'required|max:100',
             'sex' => 'required|in:1,2',
             'tags' => 'array',
+            'phone_area_code' => ['required'],
             'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/'],
             'point' => ['required', 'regex:/^([-+])?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180),([-+])?([0-8]?\d{1}\.\d{0,6}|90\.0{0,6}|[0-8]?\d{1}|90)$/'],
         ], [
@@ -124,6 +121,12 @@ class IndexController extends Controller
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
 
+        $phone = $this->req->input('phone');
+        $phone_area_code = $this->req->input('phone_area_code');
+        $res = $api->phoneCheck($phone_area_code, $phone);
+        if ($res['code'] !== 0) {
+            return $this->errorJson($res['errorMessage'], 2);
+        }
         //经纬度处理
         $point = $this->req->input('point');
         $pointArr = explode(',', $point);
@@ -144,7 +147,8 @@ class IndexController extends Controller
             'account' => $this->req->account,
             'real_name' => $this->req->real_name,
             'sex' => $this->req->sex,
-            'phone' => $this->req->phone,
+            'phone' => $phone,
+            'area_code' => $phone_area_code,
             'lock' => 1,
             'role_id' => 3,
             'company_id' => $company_id,
@@ -204,7 +208,7 @@ class IndexController extends Controller
     /**
      * 添加门店
      */
-    public function editStore()
+    public function editStore(HandelSms $api)
     {
         $validator = Validator::make($this->req->all(), [
             'store_id' => 'required',
@@ -221,7 +225,7 @@ class IndexController extends Controller
             'real_name' => 'required|max:100',
             'sex' => 'required|in:1,2',
             'tags' => 'array',
-            'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/'],
+            'phone' => ['required'],
             'point' => ['required', 'regex:/^([-+])?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180),([-+])?([0-8]?\d{1}\.\d{0,6}|90\.0{0,6}|[0-8]?\d{1}|90)$/'],
         ], [
             'company_id.required' => '请选择商户！',
@@ -251,6 +255,12 @@ class IndexController extends Controller
         if ($validator->fails()) {
             return $this->errorJson($validator->errors()->first(), 2);
         }
+        $phone = $this->req->input('phone');
+        $phone_area_code = $this->req->input('phone_area_code');
+        $res = $api->phoneCheck($phone_area_code, $phone);
+        if ($res['code'] !== 0) {
+            return $this->errorJson($res['errorMessage'], 2);
+        }
         //经纬度处理
         $point = $this->req->input('point');
         $imageData = $this->req->input('imageData', []);
@@ -279,7 +289,8 @@ class IndexController extends Controller
             $staffData = [
                 'real_name' => $this->req->real_name,
                 'sex' => $this->req->sex,
-                'phone' => $this->req->phone,
+                'phone' => $phone,
+                'area_code' => $phone_area_code,
                 'lock' => 1,
                 'role_id' => 3,
                 'company_id' => $company_id,
@@ -295,7 +306,8 @@ class IndexController extends Controller
                 'account' => $this->req->account,
                 'real_name' => $this->req->real_name,
                 'sex' => $this->req->sex,
-                'phone' => $this->req->phone,
+                'phone' => $phone,
+                'area_code' => $phone_area_code,
                 'lock' => 1,
                 'role_id' => 3,
                 'company_id' => $company_id,

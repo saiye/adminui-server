@@ -20,19 +20,16 @@ class BillingController extends Controller
     {
         $data = new Billing();
 
-        $data = $data->select(['billing.*','store.store_name','company.company_name'])->leftJoin('store', 'billing.store_id', '=', 'store.store_id')->leftJoin('company', 'billing.company_id', '=', 'company.company_id');
+        $data = $data->select(['billing.*','company.company_name'])->leftJoin('company', 'billing.company_id', '=', 'company.company_id');
 
         if($this->req->company_id){
             $data=$data->where('billing.company_id',$this->req->company_id);
-        }
-        if($this->req->store_id){
-            $data=$data->where('billing.store_id',$this->req->store_id);
         }
         if($this->req->time_nuit){
             $data=$data->whereTimeUnit($this->req->time_unit);
         }
         if ($this->req->search_name) {
-            $data = $data->where('billing.billing_name', 'like', '%' . $this->req->search_name . '%')->orWhere('store.store_name', 'like', '%' . $this->req->search_name . '%')->orWhere('company.company_name', 'like', '%' . $this->req->search_name . '%');
+            $data = $data->where('billing.billing_name', 'like', '%' . $this->req->search_name . '%')->orWhere('company.company_name', 'like', '%' . $this->req->search_name . '%');
         }
         if ($this->req->time_type) {
             $data = $data->where('billing.time_type', $this->req->time_type);
@@ -46,7 +43,7 @@ class BillingController extends Controller
     }
 
     /**
-     * 添加房间
+     * 添加计费
      */
     public function addBilling()
     {

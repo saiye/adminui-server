@@ -26,7 +26,7 @@ class Rbac
         }
         //登录后进行rbac权限判断
         if (!$this->rbac($request, $user, $guard)) {
-            return $this->errorJson('你没有权限访问！');
+            return $this->errorJson('权限不足,不可以使用该功能！');
         }
         return $next($request);
     }

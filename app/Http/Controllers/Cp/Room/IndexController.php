@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Cp\Room;
 
 use App\Constants\PaginateSet;
 use  App\Http\Controllers\Cp\BaseController as Controller;
+use App\Models\Channel;
 use App\Models\Company;
 use App\Models\Device;
 use App\Models\PhysicsAddress;
@@ -50,6 +51,7 @@ class IndexController extends Controller
             'seats_num' => 'required|numeric|max:16|min:1',
             'description' => 'max:150',
             'billing_id' => 'required',
+            'channel_id' => 'required',
             'storeArr' => 'required|array',
         ], [
             'room_name.required' => '房间名字必须填写！',
@@ -59,6 +61,7 @@ class IndexController extends Controller
             'seats_num.min' => '座位数最小值是1',
             'describe.max' => '描述不能超过150字！',
             'billing_id.required' => '计费模式，不能为空！',
+            'channel_id.required' => '渠道，不能为空！',
             'storeArr.required' => '请选择门店！',
             'storeArr.array' => '请选择门店是一个数组!',
         ]);
@@ -134,6 +137,7 @@ class IndexController extends Controller
             'seats_num' => 'required|numeric|max:16|min:1',
             'description' => 'max:150',
             'billing_id' => 'required',
+            'channel_id' => 'required',
             'storeArr' => 'required|array',
         ], [
             'room_.required' => '房间id必须存在',
@@ -146,6 +150,7 @@ class IndexController extends Controller
             'billing_id.required' => '计费模式，不能为空！',
             'storeArr.required' => '请选择门店！',
             'storeArr.array' => '请选择门店是一个数组!',
+            'channel_id.required' => '渠道，不能为空！',
         ]);
         if ($validator->fails()) {
             //返回默认支付
@@ -222,6 +227,20 @@ class IndexController extends Controller
                 }
                 break;
         }
+        $assign = compact('data');
+        return $this->successJson($assign);
+    }
+
+    public function channelList()
+    {
+        $data = new Channel();
+        if ($this->req->channel_name) {
+            $data = $data->where('channel_name', 'like', '%' . $this->req->channel_name . '%');
+        }
+        if ($this->req->channel_id) {
+            $data = $data->whereChannelId($this->req->channel_id);
+        }
+        $data = $data->select('channel_name','channel_id')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
     }
