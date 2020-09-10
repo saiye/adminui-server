@@ -86,7 +86,8 @@ class IndexController extends Controller
             'real_name' => 'required|max:100',
             'sex' => 'required|in:1,2',
             'tags' => 'array',
-            'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/'],
+            'phone' => ['required'],
+            'phone_area_code' => ['required','numeric'],
             'point' => ['required', 'regex:/^([-+])?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180),([-+])?([0-8]?\d{1}\.\d{0,6}|90\.0{0,6}|[0-8]?\d{1}|90)$/'],
         ], [
             'store_name.required' => '门店名称，不能为空！',
@@ -110,13 +111,15 @@ class IndexController extends Controller
             'tags.array' => '标签格式错误!',
             'point.required' => '请输入经纬度!',
             'point.regex' => '请输入正确的经纬度!',
+            'phone_area_code.required'=>'请输入区号!',
+            'phone_area_code.numeric'=>'手机区号错误!',
         ]);
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());
         }
-
         //经纬度处理
         $point = $this->req->input('point');
+        $phone_area_code=$this->req->input('phone_area_code');
         $pointArr = explode(',', $point);
 
         $company_id = $this->loginUser->company_id;
@@ -135,6 +138,7 @@ class IndexController extends Controller
             'account' => $this->req->account,
             'real_name' => $this->req->real_name,
             'sex' => $this->req->sex,
+            'area_code'=>$phone_area_code,
             'phone' => $this->req->phone,
             'lock' => 1,
             'role_id' => 3,
@@ -212,6 +216,7 @@ class IndexController extends Controller
             'close_at' => 'required|numeric|min:0|max:24',
             'tags' => 'array',
             'phone' => ['required', 'regex:/^1[3|4|5|6|7|8|9][0-9]{9}$/'],
+            'phone_area_code' => ['required','numeric'],
             'point' => ['required', 'regex:/^([-+])?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180),([-+])?([0-8]?\d{1}\.\d{0,6}|90\.0{0,6}|[0-8]?\d{1}|90)$/'],
         ], [
             'store_name.required' => '门店名称，不能为空！',
@@ -236,6 +241,8 @@ class IndexController extends Controller
             'tags.array' => '标签格式错误!',
             'point.required' => '请输入经纬度!',
             'point.regex' => '请输入正确的经纬度!',
+            'phone_area_code.required'=>'请输入区号!',
+            'phone_area_code.numeric'=>'手机区号错误!',
         ]);
         if ($validator->fails()) {
             return $this->errorJson($validator->errors()->first(), 2);
@@ -243,10 +250,9 @@ class IndexController extends Controller
         //经纬度处理
         $point = $this->req->input('point');
         $imageData = $this->req->input('imageData', []);
-
+        $phone_area_code=$this->req->input('phone_area_code');
         $pointArr = explode(',', $point);
         $company_id = $this->loginUser->company_id;
-
         $area = $this->req->area;
         $region_id = $city_id = $province_id = 0;
         if (count($area) == 3) {
@@ -269,6 +275,7 @@ class IndexController extends Controller
                 'real_name' => $this->req->real_name,
                 'sex' => $this->req->sex,
                 'phone' => $this->req->phone,
+                'area_code'=>$phone_area_code,
                 'lock' => 1,
                 'role_id' => 3,
                 'company_id' => $company_id,
@@ -284,6 +291,7 @@ class IndexController extends Controller
                 'account' => $this->req->account,
                 'real_name' => $this->req->real_name,
                 'sex' => $this->req->sex,
+                'area_code'=>$phone_area_code,
                 'phone' => $this->req->phone,
                 'lock' => 1,
                 'role_id' => 3,

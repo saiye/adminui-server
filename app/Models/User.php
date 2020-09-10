@@ -5,6 +5,7 @@ namespace App\Models;
 use App\TraitInterface\ModelDataFormat;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -15,6 +16,11 @@ class User extends Authenticatable
 
     protected $guarded = [
         'id'
+    ];
+
+    protected $casts = [
+         'area_code' => 'string',
+         'phone' => 'string',
     ];
 
     /**
@@ -35,6 +41,10 @@ class User extends Authenticatable
                 $v=WebConfig::getKeyByFile('icon.girl','');
             }
         }
-        return $v;
+        $arr=explode(':',$v);
+        if(isset($arr[0]) and in_array($arr[0],['http','https'])){
+            return $v;
+        }
+        return  Storage::url($v);
     }
 }

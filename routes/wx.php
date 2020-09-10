@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-
 Route::group([
     'middleware' => ['auth:wx', 'ApiLogRecord']
 ], function () {
@@ -18,6 +17,8 @@ Route::group([
     Route::post('user/editPassword', 'UserController@editPassword');
     Route::post('user/decryptData', 'UserController@decryptData');
     Route::post('user/phoneAccountBuildOpenId', 'UserController@phoneAccountBuildOpenId');
+    Route::post('user/updateIcon', 'UserController@updateIcon');
+    Route::post('user/updateUserInfo', 'UserController@updateUserInfo');
     Route::post('store/detail', 'StoreController@detail');
     Route::post('store/storeList', 'StoreController@storeList');
     Route::post('store/goodsList', 'StoreController@goodsList');
@@ -33,6 +34,8 @@ Route::group([
 Route::post('game/fightHistorical', 'GameController@fightHistorical');
 //游戏复盘
 Route::post('game/roomReplay', 'GameController@roomReplay');
+//角色战绩统计
+Route::post('game/roleFightTotal', 'GameController@roleFightTotal');
 //小程序登录
 Route::post('user/login', 'UserController@login');
 //手机账号登录
@@ -53,6 +56,10 @@ Route::post('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
 Route::post('call/wx', 'PayController@callWx')->name('wx-callWx');
 //微信退款
 Route::post('call/callWxRefund', 'PayController@callWxRefund')->name('wx-CallWxRefund');
+Route::any('lang/areaCodeList', 'LangController@areaCodeList')->name('wx-areaCodeList');
+
+
+
 
 
 

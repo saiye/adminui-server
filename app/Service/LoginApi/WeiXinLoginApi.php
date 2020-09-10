@@ -4,17 +4,12 @@ namespace App\Service\LoginApi;
 
 use App\Constants\CacheKey;
 use App\Constants\ErrorCode;
-use App\Models\PhysicsAddress;
 use App\Models\QrCodePath;
-use Illuminate\Cache\DynamoDbStore;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
 use Log;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use function GuzzleHttp\default_user_agent;
-
 /**
  *  小程序登录接口api
  * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
@@ -133,7 +128,7 @@ class WeiXinLoginApi extends BaseLoginApi
             Log::info('获取access_token失败,无法创建二维码!');
             return false;
         }
-        $time=time();
+        $time=mt_rand(1,99);//随机数
         $hasQrCodeModel=QrCodePath::whereDeviceId($data['deviceShortId'])->whereChannelId($data['channelId'])->whereWidth($data['width'])->first();
         $deviceShortId=$data['deviceShortId'];
         $channelId=$data['channelId'];
@@ -148,9 +143,12 @@ class WeiXinLoginApi extends BaseLoginApi
                 'time'=>$time,
             ]);
         }
+        $env=Config::get('app.env');
+        //32位长度限制
         $sceneData = scene_encode([
             'id' => $hasQrCodeModel->id,
             't' => $type,
+            'env'=>$env,
             'time' =>$time,
         ]);
         $post = [
@@ -194,7 +192,7 @@ class WeiXinLoginApi extends BaseLoginApi
                     $hasQrCodeModel->save();
                     return ['image_path' => $image_path, 'full_path' => $full_path];
                 }elseif (isset($res['errmsg'])){
-                    Log::info('erCode Cant generate');
+                    Log::info('wx erCode Cant generate');
                     Log::info($res);
                     return false;
                 }

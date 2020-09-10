@@ -43,5 +43,6 @@ class ErrorCode
     const  GAME_REPLAY_NULL=-35; //游戏复盘数据不存在
     const  QRCODE_NOT_USE=-36; //二维码未使用
     const  SIGN_CHECK_FAIL=-37; //签名错误
+    const  USER_EDIT_PWD_FAIL=-38; //密码修改失败
     const  SUCCESS = 0; // 成功
 }

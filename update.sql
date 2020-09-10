@@ -149,3 +149,12 @@ ADD COLUMN `refund_reason_type` TINYINT(4) DEFAULT '4' NOT NULL COMMENT '退款�
 
 
 ALTER TABLE `lrs_manage`.`qr_code_path`     ADD COLUMN `type` TINYINT(4) NOT NULL COMMENT '1进游戏，2.成为法官' AFTER `time`,
+
+
+ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `level` INT(10) DEFAULT '1' NOT NULL AFTER `type`;
+
+
+
+ALTER TABLE `lrs_game_logs`.`room_game_log`     ADD COLUMN `skinId` INT(11) DEFAULT '1' NOT NULL COMMENT 'skinId' AFTER `gameRes`;
+
+

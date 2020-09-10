@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class SendSmsJob implements ShouldQueue
 {
@@ -37,7 +38,7 @@ class SendSmsJob implements ShouldQueue
     {
 
         $env=Config::get('app.env');
-        if($env!=='local'){
+        if(in_array($env,['production'])){
             /*    if ($this->noteSms->area_code == 86) {
                     $api = new AliYunSms();
                 } else {
@@ -50,6 +51,8 @@ class SendSmsJob implements ShouldQueue
                     $this->noteSms->status = $status ? 1 : 2;
                     $this->noteSms->save();
                 }
+        }else{
+            Log::info('app.env:'.$env.'短信不下发!');
         }
     }
 

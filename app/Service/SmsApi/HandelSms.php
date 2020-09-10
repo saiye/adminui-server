@@ -18,10 +18,12 @@ use Illuminate\Support\Facades\Config;
 class HandelSms
 {
     public $validationFactory=null;
+    public $request=null;
 
     public function __construct(Application $app)
     {
         $this->validationFactory =$app->make('validator');
+        $this->request =$app->make('request');
     }
 
     public function send($type, $area_code, $phone, $array,$action)
@@ -64,9 +66,16 @@ class HandelSms
 
             Cache::put($frequencyKey,$canSend, 86400);
             //3.触发队列执行发送
-            dispatch(new SendSmsJob($NoteSms));
+            $env=$this->request->header('env','product');
+            if($env=='product'){
+                dispatch(new SendSmsJob($NoteSms));
+                return [
+                    'errorMessage' => '验证码已经下发,有效期15分钟!',
+                    'code' => ErrorCode::SUCCESS,
+                ];
+            }
             return [
-                'errorMessage' => '验证码已经下发,有效期15分钟!',
+                'errorMessage' => '测试环境,验证码请前往后台查看，有效期15分钟!',
                 'code' => ErrorCode::SUCCESS,
             ];
         }

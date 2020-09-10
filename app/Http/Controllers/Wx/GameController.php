@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Wx;
 
 use App\Constants\ErrorCode;
+use App\Constants\PaginateSet;
 use App\Models\Channel;
 use App\Models\GameBoard;
 use App\Models\PlayerCountRecord;
@@ -11,6 +12,7 @@ use App\Models\RoomGameLog;
 use App\Models\User;
 use App\Service\GameApi\LrsApi;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 class GameController extends Base
 {
@@ -80,7 +82,7 @@ class GameController extends Base
         $fightType = $this->request->input('fightType');
         $limit = $this->request->input('limit', 10);
         $page = $this->request->input('page', 1);
-        $list = PlayerGameLog::with('user')->with('board')->whereUserId($user_id);
+        $list = PlayerGameLog::with('user')->with('board')->with('roomGameLog')->whereUserId($user_id);
         if ($dupId) {
             $list = $list->whereDupId($dupId);
         }
@@ -113,7 +115,8 @@ class GameController extends Base
                     'mvp' => $v->mvp,// 0 - ⽆， 1 mvp
                     'svp' => $v->svp,// 0 - ⽆， 1 svp
                     'sex' => $v->user->sex,//0男,1女
-                    'user_id' => $v->user_id
+                    'user_id' => $v->user_id,
+                    'skinId'=>$v->roomGameLog->skinId
                 ]);
             }
             return $this->json([
@@ -210,11 +213,14 @@ class GameController extends Base
             ]);
         }
         return $this->json([
-            'errorMessage' => '你未登录!ss',
+            'errorMessage' => '你未登录!',
             'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
         ]);
     }
 
+    /*
+     * 复盘
+     */
     public function  roomReplay(){
         $validator = $this->validationFactory->make($this->request->all(), [
             'room_game_id' => 'required|numeric',
@@ -254,5 +260,45 @@ class GameController extends Base
     }
 
 
+    /**
+     * 区号列表
+     */
+    public function areaCodeList(){
+
+    }
+
+    /**
+     * 角色战绩统计
+     */
+    public function roleFightTotal(){
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'userId' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $userId=$this->request->input('userId');
+        $totalList = PlayerGameLog::select('job',DB::raw('sum(1) as totalNum'))->whereUserId($userId)->groupBy('job')->get();
+        if(count($totalList)){
+            //赢局
+            $winList = PlayerGameLog::select('job',DB::raw('sum(1) as winNum'))->whereUserId($userId)->whereRes(2)->groupBy('job')->get()->keyBy('job');
+            foreach ($totalList as &$v){
+                $v->totalNum=$v->totalNum+0;
+                $v->winNum=isset($winList[$v->job])?$winList[$v->job]->winNum+0:0;
+            }
+            return $this->json([
+                'errorMessage' => '获取成功!',
+                'code' => ErrorCode::SUCCESS,
+                'data'=>$totalList,
+            ]);
+        }
+        return $this->json([
+            'errorMessage' => '数据不存在!',
+            'code' => ErrorCode::DATA_NULL,
+        ]);
+    }
 
 }

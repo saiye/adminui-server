@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Http\Controllers\Cp\Main;
 
 use App\Constants\PaginateSet;
 use App\Http\Controllers\Cp\BaseController;
+use App\Models\CountryZone;
 use App\Models\NoteSms;
 use App\Models\WebConfig;
 use Illuminate\Support\Facades\Storage;
@@ -110,20 +112,80 @@ class SettingController extends BaseController
         return $this->errorJson('刷新失败');
     }
 
-    public function sendSmsList(){
-        $list=new NoteSms();
-        if($this->req->area_code){
-            $list=$list->where('area_code',$this->req->area_code);
+    public function sendSmsList()
+    {
+        $list = new NoteSms();
+        if ($this->req->area_code) {
+            $list = $list->where('area_code', $this->req->area_code);
         }
-        if($this->req->phone){
-            $list=$list->where('phone',$this->req->phone);
+        if ($this->req->phone) {
+            $list = $list->where('phone', $this->req->phone);
         }
-        if($this->req->type){
-            $list=$list->where('type',$this->req->type);
+        if ($this->req->type) {
+            $list = $list->where('type', $this->req->type);
         }
-        $data= $list->orderBy('id','desc')->paginate(PaginateSet::LIMIT)->appends($this->req->except('page'));
+        $data = $list->orderBy('id', 'desc')->paginate(PaginateSet::LIMIT)->appends($this->req->except('page'));
         $assign = compact('data');
         return $this->successJson($assign);
+    }
+
+    /**
+     * 地区列表
+     */
+    public function areaList()
+    {
+        $list = new CountryZone();
+        if ($this->req->area_code) {
+            $list = $list->where('area_code', $this->req->area_code);
+        }
+        if ($this->req->search_name) {
+            $list = $list->where('name_zh_cn', 'like', '%' . $this->req->search_name.'%');
+        }
+        $data = $list->orderBy('id', 'desc')->paginate(PaginateSet::LIMIT)->appends($this->req->except('page'));
+        $assign = compact('data');
+        return $this->successJson($assign);
+    }
+
+    public function addArea()
+    {
+        $validator = Validator::make($this->req->all(), [
+            'name_zh_cn' => 'required',
+            'name_en' => 'required',
+            'area_code' => 'required',
+            'letter_en' => 'required',
+            'letter_zh_cn' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorJson($validator->errors()->first(), 2);
+        }
+        $data = $this->req->input();
+        $save = CountryZone::create($data);
+        if ($save) {
+            return $this->successJson([], '创建成功！');
+        }
+        return $this->errorJson('创建失败!');
+    }
+
+    public function editArea()
+    {
+        $validator = Validator::make($this->req->all(), [
+            'id' => 'required|numeric',
+            'name_zh_cn' => 'required',
+            'name_en' => 'required',
+            'area_code' => 'required',
+            'letter_en' => 'required',
+            'letter_zh_cn' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorJson($validator->errors()->first(), 2);
+        }
+        $id = $this->req->input('id');
+        $data = $this->req->except('id');
+        $isUp = CountryZone::whereId($id)->update($data);
+        if ($isUp) {
+            return $this->successJson([], '修改成功！');
+        }
+        return $this->errorJson('修改失败!');
     }
 
 }

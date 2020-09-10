@@ -10,22 +10,19 @@ namespace App\Http\Controllers\Www;
 
 
 use App\Constants\ErrorCode;
-use App\TraitInterface\ApiTrait;
 use App\TraitInterface\BaseTrait;
 
 class NoLoginController extends BaseController
 {
-    use ApiTrait, BaseTrait;
-
+    use  BaseTrait;
     public function apiNoLogin()
     {
-        return $this->json(['errorMessage' => '你未登录!!',
+        return $this->json(['errorMessage' => trans('user.not_login'),
             'code' => ErrorCode::ACCOUNT_NOT_LOGIN]);
     }
-
     public function adminNoLogin()
     {
-        return $this->errorJson('你未登录!!');
+        return $this->errorJson(trans('user.not_login'));
     }
 
 }

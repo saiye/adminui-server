@@ -68,8 +68,6 @@ class UserController extends Base
             'phone' => 'required|numeric',
             'nickname' => 'required|max:20',
             'sex' => 'required|in:0,1',
-        ], [
-            'nickname.required' => '用户昵称必填',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -148,9 +146,6 @@ class UserController extends Base
         $validator = $this->validationFactory->make($this->request->all(), [
             'phone_code' => 'required|numeric',
             'certificate' => 'required',
-        ], [
-            'phone_code.required' => '验证码必须输入！',
-            'phone_code.numeric' => '验证码必须是数字！',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -323,15 +318,6 @@ class UserController extends Base
             'token' => 'required',
             'password' => ['required', 'min:6', 'max:18', 'regex:/^(?!^(\d+|[a-zA-Z]+|[~.!@#$%^&*?]+)$)^[\w~!@#$%\^&*.?]+$/'],
             'affirm_password' => 'required|min:6|max:18|same:password',//确认密码
-        ], [
-            'password.required' => '密码必填!',
-            'password.min' => '密码最短6位!',
-            'password.max' => '密码最长18位!',
-            'password.regex' => '密码必须包含字母，数字，特殊符号中的两种,6-18位',
-            'affirm_password.required' => '确认密码必填!',
-            'affirm_password.min' => '密码最短6位',
-            'affirm_password.alpha_dash' => '验证字段可以包含字母和数字，以及破折号和下划线',
-            'affirm_password.same' => '两次输入密码不一致',
         ]);
         if ($validator->fails()) {
             return $this->json([

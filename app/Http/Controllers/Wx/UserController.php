@@ -16,7 +16,9 @@ use App\Service\LoginApi\WeiXinLoginApi;
 use App\Service\SceneAction\SceneFactory;
 use App\Service\SmsApi\HandelSms;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class UserController extends Base
@@ -54,11 +56,17 @@ class UserController extends Base
             $user->token = hash('sha256', Str::random(60));
             $user->save();
             $channel = Channel::whereChannelId($user->channel_id)->first();
-            $api = new LrsApi($channel);
-            return $api->logicLogout($user->id);
+            if($channel){
+                $api = new LrsApi($channel);
+                return $api->logicLogout($user->id);
+            }
+            return $this->json([
+                'errorMessage' => trans('user.logout_successfully'),
+                'code' => ErrorCode::SUCCESS,
+            ]);
         }
         return $this->json([
-            'errorMessage' => '你未登录!',
+            'errorMessage' => trans('user.not_login'),
             'code' => ErrorCode::VALID_FAILURE,
         ]);
     }
@@ -91,13 +99,13 @@ class UserController extends Base
         }
         if (!$user) {
             return $this->json([
-                'errorMessage' => '未找到用户',
+                'errorMessage' =>trans('user.lock'),// '未找到用户',
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
             ]);
         }
         if ($user->lock == 2) {
             return $this->json([
-                'errorMessage' => '账号已锁定!',
+                'errorMessage' => trans('user.lock'),
                 'code' => ErrorCode::ACCOUNT_LOCK,
             ]);
         }
@@ -141,13 +149,13 @@ class UserController extends Base
         }
         if (!$user) {
             return $this->json([
-                'errorMessage' => '未找到用户',
+                'errorMessage' => trans('user.user_not_exist'),
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
             ]);
         }
         if ($user->lock == 2) {
             return $this->json([
-                'errorMessage' => '账号已锁定!',
+                'errorMessage' => trans('user.lock'),
                 'code' => ErrorCode::ACCOUNT_LOCK,
             ]);
         }
@@ -171,6 +179,9 @@ class UserController extends Base
         if ($user) {
             return $this->json([
                 'errorMessage' => 'success',
+                'now_exp'=>36,
+                'next_exp'=>3600,
+                'level'=>$user->level,
                 'user_id' => $user->id,
                 'nickname' => $user->nickname,
                 'sex' => $user->sex,
@@ -189,7 +200,7 @@ class UserController extends Base
             ]);
         } else {
             return $this->json([
-                'errorMessage' => '你未登录',
+                'errorMessage' => trans('user.not_login'),
                 'code' => ErrorCode::ACCOUNT_NOT_LOGIN,
             ]);
         }
@@ -203,10 +214,6 @@ class UserController extends Base
         $validator = $this->validationFactory->make($this->request->all(), [
             'phone' => 'required|numeric',
             'area_code' => 'required|numeric',
-        ], [
-            'area_code.numeric' => '区号只能是数字!',
-            'phone_code.required' => '验证码不能为空！',
-            'phone_code.numeric' => '验证码必须是个数字！',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -224,20 +231,20 @@ class UserController extends Base
         $user = $this->user();
         if ($user->phone == $phone) {
             return $this->json([
-                'errorMessage' => '手机账号已绑定请勿重复操作！',
+                'errorMessage' => trans('user.do_not_repeat_binding'),
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
         $hasUser = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if ($hasUser) {
             return $this->json([
-                'errorMessage' => '绑定失败,手机账号已存在！',
+                'errorMessage' => trans('user.account_exist_cant_build'),
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
         if (!$api->checkCode('code', $area_code, $phone, $phone_code, SmsAction::BUILD_USER_PHONE)) {
             return $this->json([
-                'errorMessage' => '验证码错误',
+                'errorMessage' => trans('user.verification_code_invalid'),
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
@@ -245,7 +252,7 @@ class UserController extends Base
         $user->area_code = $area_code;
         $user->save();
         return $this->json([
-            'errorMessage' => '绑定成功!',
+            'errorMessage' => trans('user.binding_successful'),
             'code' => ErrorCode::SUCCESS,
         ]);
     }
@@ -274,7 +281,7 @@ class UserController extends Base
         $hasUser = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if ($hasUser) {
             return $this->json([
-                'errorMessage' => '手机账号已存在,不能绑定！',
+                'errorMessage' => trans('user.account_exist_cant_build'),
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
@@ -293,13 +300,6 @@ class UserController extends Base
             'phone' => 'required',
             'area_code' => 'required|numeric',
             'password' => ['required', 'min:6', 'max:18', 'regex:/^(?!^(\d+|[a-zA-Z]+|[~.!@#$%^&*?]+)$)^[\w~!@#$%\^&*.?]+$/'],
-        ], [
-            'phone.required' => '手机号码必填',
-            'area_code.numeric' => '区号只能是数字!',
-            'password.required' => '密码必填!',
-            'password.min' => '密码最短6位!',
-            'password.max' => '密码最长18位!',
-            'password.regex' => '密码必须包含字母，数字，特殊符号中的两种,6-18位',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -309,7 +309,7 @@ class UserController extends Base
         }
         $area_code = $this->request->input('area_code');
         $phone = $this->request->input('phone');
-        $password = $this->request->input('password');
+        $password = trim($this->request->input('password'));
         $res = $api->phoneCheck($area_code, $phone);
         if ($res['code'] !== 0) {
             return $this->json($res);
@@ -317,17 +317,17 @@ class UserController extends Base
         $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if (!$user) {
             return $this->json([
-                'errorMessage' => '账号不存在！',
+                'errorMessage' => trans('user.user_not_exist'),
                 'code' => ErrorCode::ACCOUNT_NOT_EXIST,
             ]);
         }
-        if ($user and Hash::check($password, $user->password)) {
+        if (Hash::check($password,$user->password)) {
             $token = hash('sha256', Str::random(32));
             $user->token = $token;
             $user->type = Logic::USER_TYPE_PHONE;
             $user->save();
             return $this->json([
-                'errorMessage' => '登录成功',
+                'errorMessage' =>trans('user.login_successfully'),
                 'token' => $token,
                 'code' => ErrorCode::SUCCESS,
             ]);
@@ -366,7 +366,7 @@ class UserController extends Base
                 $user->open_id = $res['openid'];
                 $user->save();
                 return $this->json([
-                    'errorMessage' => '绑定成功！',
+                    'errorMessage' => trans('user.binding_successful'),
                     'code' => ErrorCode::SUCCESS,
                 ]);
             }
@@ -378,7 +378,7 @@ class UserController extends Base
         //小程序用户操作
         $user->save();
         return $this->json([
-            'errorMessage' => '绑定成功！',
+            'errorMessage' => trans('user.binding_successful'),
             'code' => ErrorCode::SUCCESS,
         ]);
     }
@@ -390,16 +390,7 @@ class UserController extends Base
     {
         $validator = $this->validationFactory->make($this->request->all(), [
             'password' => ['required', 'min:6', 'max:18', 'regex:/^(?!^(\d+|[a-zA-Z]+|[~.!@#$%^&*?]+)$)^[\w~!@#$%\^&*.?]+$/'],
-            'affirm_password' => 'required|min:6|max:18|same:password',//确认密码
-        ], [
-            'password.required' => '密码必填!',
-            'password.min' => '密码最短6位!',
-            'password.max' => '密码最长18位!',
-            'password.regex' => '密码必须包含字母，数字，特殊符号中的两种,6-18位',
-            'affirm_password.required' => '确认密码必填!',
-            'affirm_password.min' => '密码最短6位',
-            'affirm_password.alpha_dash' => '验证字段可以包含字母和数字，以及破折号和下划线',
-            'affirm_password.same' => '两次输入密码不一致',
+            'affirm_password' => 'required|min:6|max:18|same:password',
         ]);
         if ($validator->fails()) {
             return $this->json([
@@ -407,13 +398,19 @@ class UserController extends Base
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
-        $password = $this->request->post('password');
+        $password = $this->request->input('password');
         $user = Auth::guard('wx')->user();
-        $user->password = Hash::make($password);
-        $user->save();
+        $user->password = Hash::make(trim($password));
+        $editPassword=$user->save();
+        if($editPassword){
+            return $this->json([
+                'errorMessage' => trans('user.pwd_update_success'),
+                'code' => ErrorCode::SUCCESS,
+            ]);
+        }
         return $this->json([
-            'errorMessage' => '密码修改成功',
-            'code' => ErrorCode::SUCCESS,
+            'errorMessage' =>trans('user.pwd_update_success'),// '密码修改成功',
+            'code' => ErrorCode::USER_EDIT_PWD_FAIL,
         ]);
     }
 
@@ -460,7 +457,7 @@ class UserController extends Base
                     $user->area_code = $data->countryCode;
                     $user->save();
                     return $this->json([
-                        'errorMessage' => '绑定成功！',
+                        'errorMessage' =>trans('user.binding_successful'),// '绑定成功！',
                         'code' => ErrorCode::SUCCESS,
                     ]);
                 }
@@ -471,7 +468,7 @@ class UserController extends Base
             ]);
         }
         return $this->json([
-            'errorMessage' => '用户不存在！',
+            'errorMessage' => trans('user.user_not_exist'),
             'code' => ErrorCode::VALID_FAILURE,
         ]);
     }
@@ -496,7 +493,7 @@ class UserController extends Base
         $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if (!$user) {
             return $this->json([
-                'errorMessage' => "用户不存在！",
+                'errorMessage' =>trans('user.user_not_exist'),
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
@@ -504,7 +501,7 @@ class UserController extends Base
         $res = $api->send($type, $area_code, $phone, ['code' => mt_rand(11111, 99999)], SmsAction::USER_FORGET_PASSWORD);
         if ($res['code'] == 0) {
             return $this->json([
-                'errorMessage' => "验证码下发成功",
+                'errorMessage' =>  trans('user.phone_send_code'),
                 'code' => ErrorCode::SUCCESS,
             ]);
         }
@@ -538,7 +535,7 @@ class UserController extends Base
         $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if (!$user) {
             return $this->json([
-                'errorMessage' => '用户不存在！',
+                'errorMessage' => trans('user.user_not_exist'),
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
@@ -548,14 +545,14 @@ class UserController extends Base
             $save = $user->save();
             if ($save) {
                 return $this->json([
-                    'errorMessage' => '验证成功',
+                    'errorMessage' => trans('user.verify_successfully'),
                     'code' => ErrorCode::SUCCESS,
                     'token' => $token
                 ]);
             }
         }
         return $this->json([
-            'errorMessage' => '验证码无效!',
+            'errorMessage' => trans('user.verification_code_invalid'),
             'code' => ErrorCode::SMS_CODE_FAILURE,
         ]);
     }
@@ -584,7 +581,7 @@ class UserController extends Base
         $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if ($user) {
             return $this->json([
-                'errorMessage' => "用户已注册",
+                'errorMessage' => trans('user.already_exist'),
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
@@ -592,7 +589,7 @@ class UserController extends Base
         $res = $api->send('code', $area_code, $phone, ['code' => mt_rand(11111, 99999)], SmsAction::USER_REG);
         if ($res['code'] == 0) {
             return $this->json([
-                'errorMessage' => '验证码已下发！',
+                'errorMessage' =>trans('user.phone_send_code'),
                 'code' => ErrorCode::SUCCESS,
             ]);
         }
@@ -603,7 +600,7 @@ class UserController extends Base
     }
 
     /**
-     * 手机号码,进行注册
+     * app端手机号码,进行注册
      */
     public function doPhoneReg(HandelSms $api)
     {
@@ -632,7 +629,7 @@ class UserController extends Base
         $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if ($user) {
             return $this->json([
-                'errorMessage' => "用户已注册",
+                'errorMessage' => trans('user.already_exist'),
                 'code' => ErrorCode::VALID_FAILURE,
             ]);
         }
@@ -647,21 +644,83 @@ class UserController extends Base
                 'sex' => $sex,
                 'nickname' => $nickname,
                 'area_code' =>$area_code,
-                'password' => Str::random(32),
+                'password' =>Hash::make( Str::random(32)),
                 'type'=>Logic::USER_TYPE_PHONE,
                 'token' => $token,
             ]);
             if ($user) {
                 return $this->json([
-                    'errorMessage' => '注册成功!',
+                    'errorMessage' => trans('user.registered_successfully'),
                     'code' => ErrorCode::SUCCESS,
                     'token' => $token,
                 ]);
             }
         }
         return $this->json([
-            'errorMessage' => '验证码无效!',
+            'errorMessage' =>trans('user.verification_code_invalid'),
             'code' => ErrorCode::VALID_FAILURE,
         ]);
     }
+
+    /**
+     * 修改头像
+     */
+    public function updateIcon(){
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'icon' => 'required|image',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $env=Config::get('app.env');
+        $path = $this->request->file('icon')->store('app/'.$env.'/icon');
+        if (!$path) {
+            $this->errorJson(trans('user.upload_fail'));
+        }
+        $url = Storage::url($path);
+        $user=$this->user();
+        $oldPath=$user->getOriginal('icon');
+        if($oldPath){
+            Storage::delete($oldPath);
+        }
+        $user->icon=$path;
+        $user->save();
+        return $this->json([
+            'errorMessage' =>trans('user.edit_success'),
+            'icon' => $url,
+            'code' => ErrorCode::SUCCESS,
+        ]);
+    }
+
+    /**
+     * 修改用户信息
+     */
+    public function updateUserInfo(){
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'nickname' => 'required|max:20|min:1',
+            'sex' => 'required|in:0,1',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $nickname=$this->request->input('nickname');
+        $sex=$this->request->input('sex');
+        $user=$this->user();
+        $user->nickname=$nickname;
+        $user->sex=$sex;
+        $user->save();
+        return $this->json([
+            'errorMessage' =>trans('user.edit_success'),
+            'code' => ErrorCode::SUCCESS,
+        ]);
+    }
+
+
+
 }

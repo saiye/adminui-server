@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Config;
 class NoteSms extends Model
 {
     public   $timestamps=false;
-    protected $appends = ['status_word'];
+    protected $appends = ['status_word','created_at'];
 
     protected $guarded = [
         'id'
@@ -17,6 +17,12 @@ class NoteSms extends Model
     public function getStatusWordAttribute($value)
     {
         return Config::get('phone.status.'.$this->status,0);
+    }
+
+
+    public function getCreatedAtAttribute()
+    {
+        return $this->attributes['created_at'] = date('Y-m-d H:i:s',$this->create_time);
     }
 
 

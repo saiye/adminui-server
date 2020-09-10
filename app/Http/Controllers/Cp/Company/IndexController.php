@@ -7,6 +7,7 @@ use App\Constants\SmsAction;
 use  App\Http\Controllers\Cp\BaseController as Controller;
 use App\Models\Area;
 use App\Models\Company;
+use App\Models\CountryZone;
 use App\Models\Image;
 use App\Models\Staff;
 use App\Service\SmsApi\HandelSms;
@@ -367,14 +368,17 @@ class IndexController extends Controller
 
     public function getState()
     {
-
-        $conf = Config::get('phone.route');
-        $data = [];
-        foreach ($conf as $k => $v) {
-            array_push($data, [
-                'value' => $k,
-                'name' => $v['name'],
-            ]);
+        $searchName=$this->req->input('searchName');
+        $locale=$this->req->header('locale','zh-cn');
+        $list=CountryZone::searchAreaList($locale,$searchName);
+        $data=[];
+        foreach ($list as $ls){
+            foreach ($ls as $value){
+                array_push($data,[
+                    'name'=>$value['name'],
+                    'value'=>$value['area_code'],
+                ]);
+            }
         }
         $assign = compact('data');
         return $this->successJson($assign);

@@ -26,4 +26,8 @@ class PlayerGameLog extends Model
     public function  board(){
         return $this->hasOne(GameBoard::class,'dup_id','dup_id');
     }
+
+    public function roomGameLog(){
+        return $this->hasOne(RoomGameLog::class,'id','room_game_id');
+    }
 }

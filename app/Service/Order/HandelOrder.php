@@ -117,7 +117,7 @@ class HandelOrder
                 'info' => $item[0]['info'],
                 'order_sn' => date('YmdHis') . mt_rand(999, 99999),
                 'total_price' => $totalPrice,
-                'actual_payment' =>$totalPrice,
+                'actual_payment' =>0,
                 'due_price' => $totalPrice,
                 'user_id' => $user->id,
                 'nickname' => $user->nickname,

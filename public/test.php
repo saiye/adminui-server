@@ -62,5 +62,17 @@ $data=[
     ],
 ];*/
 
+$url='https://www.abc.com/a.png';
+
+//$url='/a.png';
+$arr=explode(':',$url);
+if(isset($arr[0]) and in_array($arr[0],['http','https'])){
+    echo 'https or http'.$url;
+}else{
+    echo 'not http'.$url;
+
+
+}
+
 
 

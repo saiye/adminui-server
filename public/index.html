@@ -365,6 +365,42 @@ code {
           : 'default'
     });
   </script>
+<p>狼人杀，小程序，APP接口</p>
+<hr>
+<p>###接口说明</p>
+<p><a href="https://lrs-admin.7955.com/">正式服后台</a></p>
+<p><a href="https://lrs-tt.7955.com/">正式服api地址</a></p>
+<p><a href="http://test-lrs-admin.7955.com/">测试服后台</a></p>
+<p><a href="https://test-lrs-tt.7955.com/">测试服api地址</a></p>
+<p>###多语言,多端识别,接口加密，调试问题</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"locale"</span>: <span class="hljs-string">'zh-cn'</span>, <span class="hljs-comment">//or  en</span>
+    <span class="hljs-string">"client"</span>:<span class="hljs-string">'ios'</span>,<span class="hljs-comment">//web,android,ios,minapp,</span>
+    <span class="hljs-string">"sign"</span>:<span class="hljs-string">'xxxx'</span>,<span class="hljs-comment">//加密参数，具体算法待定</span>
+    <span class="hljs-string">'env'</span>:<span class="hljs-string">'production'</span><span class="hljs-comment">// or test  //该值非 production,服务端认为是测试环境,短信不下发,默认是production</span>
+}
+</div></code></pre>
+<hr>
+<p>###App微信登录接口[app -&gt; Manage Server]:</p>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/wxAppLogin
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>{
+           <span class="hljs-string">'code'</span> =&gt; <span class="hljs-string">'required'</span>,
+           <span class="hljs-string">'longitude'</span> =&gt; <span class="hljs-string">'nullable|numeric'</span>,
+           <span class="hljs-string">'longitude'</span> =&gt; <span class="hljs-string">'nullable|numeric'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">"code"</span>: ERetCode, <span class="hljs-comment">// 返回码</span>
+    <span class="hljs-string">"errorMessage"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// [可选] 错误描述</span>
+    <span class="hljs-string">"token"</span>:<span class="hljs-string">'xxxx'</span>
+}
+</div></code></pre>
 <p>###小程序登录接口[app -&gt; Manage Server]:</p>
 <blockquote>
 <p>访问链接: https://lrs-tt.7955.com/wx/user/login
@@ -383,6 +419,13 @@ code {
     <span class="hljs-string">'latitude'</span>:<span class="hljs-string">''</span><span class="hljs-comment">//numeric  维度</span>
 }
 </div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">"code"</span>: ERetCode, <span class="hljs-comment">// 返回码</span>
+    <span class="hljs-string">"errorMessage"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// [可选] 错误描述</span>
+    <span class="hljs-string">"token"</span>:<span class="hljs-string">'xxxx'</span>
+}
+</div></code></pre>
 <p>###扫码进游戏[app -&gt; Manage Server]:</p>
 <blockquote>
 <p>访问链接: https://lrs-tt.7955.com/wx/user/scene
@@ -397,6 +440,13 @@ code {
 <pre class="hljs"><code><div>params{
 	<span class="hljs-string">'scene'</span>:<span class="hljs-built_in">string</span>,<span class="hljs-comment">//必须，扫码场景，带过来</span>
 }
+
+其他说明:
+scene值如:id=<span class="hljs-number">1</span>&amp;t=<span class="hljs-number">1</span>&amp;env=production&amp;time=<span class="hljs-number">123</span>
+考虑到测试环境需要扫码功能，需要前端获取scen的env参数做下面逻辑处理，战绩，游戏中等接口考虑做相应切换.(如实现上有困难，考虑不做)
+env:local,提交到 http:<span class="hljs-comment">//192.168.1.71/wx/user/scene</span>
+env:test,提交到，http:<span class="hljs-comment">//test-lrs-tt.7955.com/</span>
+env:producttion ,提交到， https:<span class="hljs-comment">//lrs-tt.7955.com/wx/user/scene</span>
 </div></code></pre>
 <p>Response</p>
 <pre class="hljs"><code><div>{
@@ -435,16 +485,23 @@ code {
 <p>Response</p>
 <pre class="hljs"><code><div>{
     <span class="hljs-string">"errorMessage"</span>: <span class="hljs-string">"success"</span>,
+    <span class="hljs-string">'now_exp'</span>:<span class="hljs-number">36</span>,<span class="hljs-comment">//当前经验</span>
+    <span class="hljs-string">'next_exp'</span>:<span class="hljs-number">3600</span>,<span class="hljs-comment">//下一等级经验值</span>
+    <span class="hljs-string">'level'</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//当前等级</span>
     <span class="hljs-string">"user_id"</span>: <span class="hljs-number">1</span>,
     <span class="hljs-string">"nickname"</span>: <span class="hljs-string">"zhansan"</span>,
     <span class="hljs-string">"sex"</span>: <span class="hljs-number">1</span>,<span class="hljs-comment">//0男1女</span>
     <span class="hljs-string">"icon"</span>: <span class="hljs-string">""</span>,
-    <span class="hljs-string">"popularity"</span>: <span class="hljs-number">0</span>,
-    <span class="hljs-string">"attention"</span>: <span class="hljs-number">0</span>,
-    <span class="hljs-string">"fans"</span>: <span class="hljs-number">0</span>,
-    <span class="hljs-string">"remaining"</span>: <span class="hljs-string">"0.00"</span>,
-    <span class="hljs-string">"income"</span>: <span class="hljs-string">"0.00"</span>,
-    <span class="hljs-string">"withdrawal"</span>: <span class="hljs-string">"0.00"</span>,
+    <span class="hljs-string">"popularity"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//人气</span>
+    <span class="hljs-string">"attention"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//关注</span>
+    <span class="hljs-string">"fans"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//粉丝</span>
+    <span class="hljs-string">"remaining"</span>: <span class="hljs-string">"0.00"</span>,<span class="hljs-comment">//余额</span>
+    <span class="hljs-string">"income"</span>: <span class="hljs-string">"0.00"</span>,<span class="hljs-comment">//收入</span>
+    <span class="hljs-string">"withdrawal"</span>: <span class="hljs-string">"0.00"</span>,<span class="hljs-comment">//已提现</span>
+    <span class="hljs-string">'phone'</span>:<span class="hljs-string">''</span>,<span class="hljs-comment">//手机号码</span>
+    <span class="hljs-string">'area_code'</span>:<span class="hljs-string">''</span>,<span class="hljs-comment">//区号</span>
+    <span class="hljs-string">'type'</span>:<span class="hljs-string">'1'</span>,<span class="hljs-comment">//0后台添加用户，1 小程序用户， 2手机注册用户</span>
+    <span class="hljs-string">"is_build_openid"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//是否已绑定openId</span>
     <span class="hljs-string">"code"</span>: <span class="hljs-number">0</span> ,<span class="hljs-comment">// ERetCode,  返回码</span>
 }
 </div></code></pre>
@@ -491,7 +548,7 @@ Request
     }
 }
 </div></code></pre>
-<h3 id="%E7%8E%A9%E5%AE%B6%E6%83%B3%E8%B5%B7%E5%A4%B4%E9%83%A8%E6%88%98%E7%BB%A9%E6%B1%87%E6%80%BBapp---manage-server">玩家想起头部战绩汇总[app -&gt; Manage Server]:</h3>
+<h3 id="%E7%8E%A9%E5%AE%B6%E5%A4%B4%E9%83%A8%E6%88%98%E7%BB%A9%E6%B1%87%E6%80%BBapp---manage-server">玩家头部战绩汇总[app -&gt; Manage Server]:</h3>
 <blockquote>
 <p>访问链接: https://lrs-tt.7955.com/wx/game/record
 协议发送类型: <code>POST</code></p>
@@ -559,7 +616,36 @@ Request
             <span class="hljs-attr">"sex"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//0男,1女</span>
             <span class="hljs-attr">"user_id"</span>: <span class="hljs-number">67</span>,
             <span class="hljs-attr">"job"</span>:<span class="hljs-number">0</span>,<span class="hljs-comment">//职业0表示没有职业,头像显示当前微信头像，其他值查询文档底部职业对照表。。前端根据self_job显示不同的职业头像</span>
+            <span class="hljs-attr">"skinId"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//皮肤id</span>
         }
+    ]
+}
+</div></code></pre>
+<h3 id="%E8%A7%92%E8%89%B2%E6%88%98%E7%BB%A9%E7%BB%9F%E8%AE%A1app---manage-server">角色战绩统计app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/game/roleFightTotal
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+ <span class="hljs-string">'userId'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">"获取成功!"</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"data"</span>: [
+        {
+            <span class="hljs-attr">"job"</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-attr">"totalNum"</span>: <span class="hljs-number">8</span>,<span class="hljs-comment">//总局数</span>
+            <span class="hljs-attr">"winNum"</span>: <span class="hljs-number">1</span><span class="hljs-comment">//赢局数</span>
+        },
     ]
 }
 </div></code></pre>
@@ -663,20 +749,16 @@ Request
 协议发送类型: <code>POST</code>
 Request</p>
 </blockquote>
-<pre class="hljs"><code><div>header
+<pre class="hljs"><code><div>Request
 {
-    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
-}
-Request
-{
-    <span class="hljs-string">'roomGameid'</span> =&gt; <span class="hljs-string">'required|numeric'</span>
+    <span class="hljs-string">'room_game_id'</span> =&gt; <span class="hljs-string">'required|numeric'</span>
 }
 </div></code></pre>
 <p>Response</p>
 <pre class="hljs"><code><div>{
     <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
     <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
-    <span class="hljs-attr">"playerlist"</span>: [
+    <span class="hljs-attr">"playerList"</span>: [
         {
             <span class="hljs-attr">"seat"</span>: <span class="hljs-number">1</span>,<span class="hljs-comment">//位置</span>
             <span class="hljs-attr">"nickname"</span>: <span class="hljs-string">"nw3"</span>,
@@ -688,12 +770,14 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">0</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">0</span>, <span class="hljs-comment">// 行为类型</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>:<span class="hljs-string">""</span>,<span class="hljs-comment">// 根据不同的actionType 具体内容不同</span>
         },
         {
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">// 预言家查验</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">//预言家位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">// 查验位置</span>
@@ -704,6 +788,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">2</span>, <span class="hljs-comment">// 预言家查杀</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">//预言家位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">// 查杀位置</span>
@@ -714,6 +799,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">3</span>, <span class="hljs-comment">// 预言家空过</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">//预言家位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">0</span>,<span class="hljs-comment">//</span>
@@ -723,6 +809,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">4</span>, <span class="hljs-comment">// 狼刀</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"killseat"</span>:<span class="hljs-number">1</span>, <span class="hljs-comment">//刀的位置</span>
                 <span class="hljs-attr">"choselist"</span>:[
@@ -737,6 +824,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">5</span>, <span class="hljs-comment">// 狼空刀</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"killseat"</span>:<span class="hljs-number">0</span>, <span class="hljs-comment">//刀的位置</span>
                 <span class="hljs-attr">"choselist"</span>:[
@@ -751,6 +839,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">6</span>, <span class="hljs-comment">// 狼自爆</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼人位置</span>
             }
@@ -760,6 +849,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">7</span>, <span class="hljs-comment">// 白狼王带走</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼人位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -770,6 +860,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">8</span>, <span class="hljs-comment">// 白狼王不带走</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼人位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -779,6 +870,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">9</span>, <span class="hljs-comment">// 黑狼带走</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼人位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -788,6 +880,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">10</span>, <span class="hljs-comment">// 黑狼不带走</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//狼人位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -797,6 +890,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">11</span>, <span class="hljs-comment">// 女巫救</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//女巫位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -806,6 +900,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">12</span>, <span class="hljs-comment">// 女巫杀</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//女巫位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -815,6 +910,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">13</span>, <span class="hljs-comment">// 女巫过</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//女巫位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -824,6 +920,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">14</span>, <span class="hljs-comment">// 守卫守</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//守卫位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -833,6 +930,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">15</span>, <span class="hljs-comment">// 守卫过</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//守卫位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -842,6 +940,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">16</span>, <span class="hljs-comment">// 猎人杀</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//猎人位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -851,6 +950,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">17</span>, <span class="hljs-comment">// 猎人过</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//猎人位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//选择位置</span>
@@ -860,6 +960,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">18</span>, <span class="hljs-comment">// 白痴翻牌</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//白痴位置</span>
             }
@@ -867,13 +968,24 @@ Request
         {
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
+            <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">19</span>, <span class="hljs-comment">// 混血儿选择</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
+            <span class="hljs-attr">"datajson"</span>: {
+                <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//支持的位置</span>
+            }
+        },
+        {
+            <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
+            <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">101</span>, <span class="hljs-comment">// 选警长延期</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: <span class="hljs-string">""</span>,
         },
         {
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">102</span>, <span class="hljs-comment">// 选警长pk</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seats"</span> :[
                     {
@@ -889,6 +1001,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">103</span>, <span class="hljs-comment">// 当选警长</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 警长位置</span>
             },
@@ -897,12 +1010,14 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">104</span>, <span class="hljs-comment">// 警徽流失</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: <span class="hljs-string">""</span>,
         },
         {
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">105</span>, <span class="hljs-comment">// 转移警长</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//警长位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">2</span>,<span class="hljs-comment">//转移位置</span>
@@ -912,6 +1027,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">106</span>, <span class="hljs-comment">// 撕毁警徽</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"seat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//警长位置</span>
                 <span class="hljs-attr">"chose"</span>:<span class="hljs-number">0</span>,
@@ -921,18 +1037,21 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">107</span>, <span class="hljs-comment">// 平安夜</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: <span class="hljs-string">""</span>,
         },
         {
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">108</span>, <span class="hljs-comment">// 平安日</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: <span class="hljs-string">""</span>,
         },
         {
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">109</span>, <span class="hljs-comment">// 公布死讯</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"deadInfos"</span>:[
                     {
@@ -950,6 +1069,7 @@ Request
             <span class="hljs-attr">"curRound"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 当前回合</span>
             <span class="hljs-attr">"dayornight"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 1白天， 0 黑夜</span>
             <span class="hljs-attr">"actionType"</span>:<span class="hljs-number">110</span>, <span class="hljs-comment">// 放逐公告</span>
+            <span class="hljs-attr">"ver"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">// 数据版本号</span>
             <span class="hljs-attr">"datajson"</span>: {
                 <span class="hljs-attr">"banishseat"</span>:<span class="hljs-number">1</span>,<span class="hljs-comment">//被放逐的位置</span>
                 <span class="hljs-attr">"choselist"</span>:[
@@ -990,7 +1110,8 @@ Request
 		HunterKill = <span class="hljs-number">16</span>,<span class="hljs-comment">//猎人杀</span>
 		HunterPass = <span class="hljs-number">17</span>,<span class="hljs-comment">// 猎人过</span>
 
-		IdiotShowIdentify = <span class="hljs-number">18</span>,<span class="hljs-comment">// 白痴翻牌</span>
+        IdiotShowIdentify = <span class="hljs-number">18</span>,<span class="hljs-comment">// 白痴翻牌</span>
+        MixBloodSelect = <span class="hljs-number">19</span>,<span class="hljs-comment">// 混血儿选择</span>
 
 		DelaySelectPolice = <span class="hljs-number">101</span>, <span class="hljs-comment">// 选警长延期</span>
 		SelectPolicePK = <span class="hljs-number">102</span>,<span class="hljs-comment">// 选警长pk</span>
@@ -1018,44 +1139,6 @@ Request
 		WolfHunterKill = <span class="hljs-number">8</span>, <span class="hljs-comment">// 枪杀</span>
 	}
 
-</div></code></pre>
-<h3 id="%E7%9B%B8%E5%86%8Capp---manage-server">相册app -&gt; Manage Server]:</h3>
-<blockquote>
-<p>访问链接: https://lrs-tt.7955.com/wx/user/images
-协议发送类型: <code>POST</code></p>
-</blockquote>
-<p>Request</p>
-<pre class="hljs"><code><div>header
-{
-    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
-}
-Request
-{
-    <span class="hljs-string">'limit'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
-    <span class="hljs-string">'page'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
-    <span class="hljs-string">'userId'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
-}
-</div></code></pre>
-<p>Response</p>
-<pre class="hljs"><code><div>{
-    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">"success"</span>,
-    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
-    <span class="hljs-attr">"list"</span>: [
-        {
-            <span class="hljs-attr">"month"</span>: <span class="hljs-string">"5月"</span>,
-            <span class="hljs-attr">"list"</span>: [
-                {
-                    <span class="hljs-attr">"src"</span>: <span class="hljs-string">"https://lrs-tt.7955.com/storage/qrCode/1113.png"</span>,
-                    <span class="hljs-attr">"title"</span>: <span class="hljs-string">"1111"</span>
-                },
-                {
-                    <span class="hljs-attr">"src"</span>: <span class="hljs-string">"https://lrs-tt.7955.com/storage/qrCode/1113.png"</span>,
-                    <span class="hljs-attr">"title"</span>: <span class="hljs-string">"222"</span>
-                }
-            ]
-        }
-    ]
-}
 </div></code></pre>
 <h3 id="%E5%95%86%E5%93%81%E5%88%86%E7%B1%BBapp---manage-server">商品分类app -&gt; Manage Server]:</h3>
 <blockquote>
@@ -1233,7 +1316,8 @@ Request
             <span class="hljs-attr">"address"</span>: <span class="hljs-string">"aaaaa"</span>,<span class="hljs-comment">//地址</span>
             <span class="hljs-attr">"close_at"</span>: <span class="hljs-number">24</span>,<span class="hljs-comment">//营业结束</span>
             <span class="hljs-attr">"open_at"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//营业开始时间</span>
-            <span class="hljs-attr">"distance"</span>:<span class="hljs-number">1.2</span> <span class="hljs-comment">//距离单位千米</span>
+            <span class="hljs-attr">"distance"</span>:<span class="hljs-number">1.2</span>, <span class="hljs-comment">//距离单位千米</span>
+             <span class="hljs-attr">"trade"</span>: <span class="hljs-number">0</span>,<span class="hljs-comment">//曾经购物过0否，1是</span>
         }
     ]
 }
@@ -1574,6 +1658,320 @@ Request
     <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
 }
 </div></code></pre>
+<h3 id="%E7%BB%91%E5%AE%9A%E6%89%8B%E6%9C%BA%E8%8E%B7%E5%8F%96%E9%AA%8C%E8%AF%81%E7%A0%81-app---manage-server">绑定手机，获取验证码 app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/buildPhoneGetCode
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'phone'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'area_code'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,<span class="hljs-comment">//地区码</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+}
+</div></code></pre>
+<h3 id="%E6%8F%90%E4%BA%A4%E9%AA%8C%E8%AF%81%E7%A0%81%E7%BB%91%E5%AE%9A%E6%89%8B%E6%9C%BAapp---manage-server">提交验证码，绑定手机app -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/doBuildPhone
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'phone'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,<span class="hljs-comment">//电话号</span>
+    <span class="hljs-string">'area_code'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,<span class="hljs-comment">//地区码</span>
+    <span class="hljs-string">'phone_code'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,<span class="hljs-comment">//短信验证码</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+}
+</div></code></pre>
+<h3 id="%E5%B0%8F%E7%A8%8B%E5%BA%8F%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81---manage-server">小程序,修改密码 -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/editPassword
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'password'</span> =&gt; [<span class="hljs-string">'required'</span>, <span class="hljs-string">'min:6'</span>, <span class="hljs-string">'max:18'</span>, <span class="hljs-string">'regex:/^(?!^(\d+|[a-zA-Z]+|[~.!@#$%^&amp;*?]+)$)^[\w~!@#$%\^&amp;*.?]+$/'</span>],
+    <span class="hljs-string">'affirm_password'</span> =&gt; <span class="hljs-string">'required|min:6|max:18|same:password'</span>,<span class="hljs-comment">//确认密码</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+}
+</div></code></pre>
+<h3 id="%E6%89%8B%E6%9C%BA%E7%99%BB%E5%BD%95%E5%B0%8F%E7%A8%8B%E5%BA%8F---manage-server">手机登录小程序 -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/phoneLogin
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+
+}
+Request
+{
+    <span class="hljs-string">'phone'</span> =&gt; <span class="hljs-string">'required'</span>,
+    <span class="hljs-string">'area_code'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'password'</span> =&gt; [<span class="hljs-string">'required'</span>, <span class="hljs-string">'min:6'</span>, <span class="hljs-string">'max:18'</span>, <span class="hljs-string">'regex:/^(?!^(\d+|[a-zA-Z]+|[~.!@#$%^&amp;*?]+)$)^[\w~!@#$%\^&amp;*.?]+$/'</span>],
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"token"</span>:<span class="hljs-string">"xxxxxxxxxx"</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+}
+</div></code></pre>
+<h3 id="%E5%B0%8F%E7%A8%8B%E5%BA%8F%E7%94%A8%E6%88%B7%E6%89%8B%E6%9C%BA%E8%B4%A6%E5%8F%B7%E7%99%BB%E5%BD%95%E7%BB%91%E5%AE%9A%E5%BE%AE%E4%BF%A1openid%E5%AE%9A%E4%BD%8D%E7%AD%89%E5%9B%A0%E4%B8%BA%E6%94%AF%E4%BB%98%E9%9C%80%E8%A6%81%E7%94%A8%E5%88%B0openid---manage-server">小程序,用户手机账号登录，绑定微信openid,定位等.因为支付需要用到openid -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/phoneAccountBuildOpenId
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'js_code'</span> =&gt; <span class="hljs-string">'required'</span>,
+    <span class="hljs-string">'longitude'</span> =&gt; <span class="hljs-string">'nullable|numeric'</span>, <span class="hljs-comment">//可选 经度 longitude</span>
+    <span class="hljs-string">'latitude'</span> =&gt; <span class="hljs-string">'nullable|numeric'</span>, <span class="hljs-comment">//可选 纬度</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+}
+</div></code></pre>
+<h3 id="%E8%8E%B7%E5%8F%96%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8A%A0%E5%AF%86%E4%B8%B2%E7%BB%91%E5%AE%9A%E6%89%8B%E6%9C%BAopenid---manage-server">获取小程序加密串，绑定手机openid -&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/decryptData
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+  <span class="hljs-string">'encryptedData'</span> =&gt; <span class="hljs-string">'required'</span>,
+ <span class="hljs-string">'iv'</span> =&gt; <span class="hljs-string">'required'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"data"</span>:[
+
+    ],
+}
+</div></code></pre>
+<h3 id="%E5%BF%98%E8%AE%B0%E5%AF%86%E7%A0%81%E8%8E%B7%E5%8F%96%E9%AA%8C%E8%AF%81%E7%A0%81-client--manage-server">忘记密码，获取验证码 [Client-&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接:  https://lrs-tt.7955.com/wx/user/forgetPasswordSendCode
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>{
+     <span class="hljs-string">'phone'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+     <span class="hljs-string">'area_code'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">"code"</span>: ERetCode, <span class="hljs-comment">// 返回码</span>
+    <span class="hljs-string">"errorMessage"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// [可选] 错误描述</span>
+}
+</div></code></pre>
+<h3 id="%E5%BF%98%E8%AE%B0%E5%AF%86%E7%A0%81%E6%A3%80%E6%B5%8B%E9%AA%8C%E8%AF%81%E7%A0%81client--manage-server">忘记密码，检测验证码[Client-&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接:  https://lrs-tt.7955.com/wx/user/forgetPasswordCheckPhoneCode
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">'phone_code'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,<span class="hljs-comment">//验证码</span>
+    <span class="hljs-string">'area_code'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'phone'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">"code"</span>: ERetCode, <span class="hljs-comment">// 返回码</span>
+    <span class="hljs-string">"errorMessage"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// [可选] 错误描述</span>
+    <span class="hljs-string">"token"</span>:<span class="hljs-string">'xxxx'</span>,<span class="hljs-comment">//成功返回,拿到token,如需要修改密码，调用上面的修改密码接口</span>
+}
+</div></code></pre>
+<h3 id="%E6%89%8B%E6%9C%BA%E5%8F%B7%E7%A0%81%E6%B3%A8%E5%86%8C%E6%A3%80%E6%B5%8B%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E6%B3%A8%E5%86%8C%E5%A6%82%E5%8F%AF%E4%BB%A5%E6%B3%A8%E5%86%8C%E5%88%99%E4%B8%8B%E5%8F%91%E9%AA%8C%E8%AF%81%E7%A0%81-client--manage-server">手机号码注册,检测是否可以注册，如可以注册,则下发验证码 [Client-&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接:  https://lrs-tt.7955.com/wx/user/phoneRegCheckAndSendCode
+协议发送类型: <code>POST</code>
+Request</p>
+</blockquote>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">'area_code'</span> =&gt; <span class="hljs-string">'required'</span>,<span class="hljs-comment">//手机区号</span>
+    <span class="hljs-string">'phone'</span> =&gt; <span class="hljs-string">'required'</span>,<span class="hljs-comment">//手机号码</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">"code"</span>: ERetCode, <span class="hljs-comment">// 返回码</span>
+    <span class="hljs-string">"errorMessage"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// [可选] 错误描述</span>
+}
+</div></code></pre>
+<h3 id="%E6%89%A7%E8%A1%8C%E6%89%8B%E6%9C%BA%E5%8F%B7%E7%A0%81%E6%B3%A8%E5%86%8C%E6%93%8D%E4%BD%9Cclient--manage-server">执行手机号码注册操作！[Client-&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接:  https://lrs-tt.7955.com/wx/user/doPhoneReg
+协议发送类型: <code>POST</code>
+Request</p>
+</blockquote>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">'area_code'</span> =&gt; <span class="hljs-string">'required'</span>,<span class="hljs-comment">//手机区号</span>
+    <span class="hljs-string">'phone'</span> =&gt; <span class="hljs-string">'required'</span>,
+    <span class="hljs-string">'nickname'</span> =&gt; <span class="hljs-string">'required|max:20'</span>,
+    <span class="hljs-string">'sex'</span> =&gt; <span class="hljs-string">'required|in:0,1'</span>,
+    <span class="hljs-string">'phone_code'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,<span class="hljs-comment">//手机验证码</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">"code"</span>: ERetCode, <span class="hljs-comment">// 返回码</span>
+    <span class="hljs-string">"errorMessage"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// [可选] 错误描述</span>
+    <span class="hljs-string">"token"</span>:<span class="hljs-string">'xxxx'</span>,<span class="hljs-comment">//成功返回,拿到token,如需要修改密码，调用上面的修改密码接口</span>
+}
+</div></code></pre>
+<h3 id="%E4%BF%AE%E6%94%B9%E7%94%A8%E6%88%B7%E5%A4%B4%E5%83%8Fapp--manage-server">修改用户头像，app-&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/updateIcon
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+<span class="hljs-string">'icon'</span> =&gt; <span class="hljs-string">'required|image'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"icon"</span>:'http:<span class="hljs-comment">//www.abc.com/xxx.png',</span>
+    <span class="hljs-string">"code"</span>: <span class="hljs-number">0</span>,
+}
+</div></code></pre>
+<h3 id="%E4%BF%AE%E6%94%B9%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E6%98%B5%E7%A7%B0%E6%80%A7%E5%88%ABapp--manage-server">修改用户信息，[昵称，性别]，app-&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/user/updateUserInfo
+协议发送类型: <code>POST</code></p>
+</blockquote>
+<p>Request</p>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"token"</span>: <span class="hljs-built_in">string</span>, <span class="hljs-comment">// token</span>
+}
+Request
+{
+    <span class="hljs-string">'nickname'</span> =&gt; <span class="hljs-string">'required|max:20|min:1'</span>,
+    <span class="hljs-string">'sex'</span> =&gt; <span class="hljs-string">'required|in:0,1'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+}
+</div></code></pre>
+<h3 id="%E5%AE%98%E7%BD%91%E6%B3%A8%E5%86%8C-website--manage-server">官网注册  website-&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/home/doPhoneReg
+协议发送类型: <code>POST</code>
+Request</p>
+</blockquote>
+<pre class="hljs"><code><div>header
+{
+}
+Request
+{
+    <span class="hljs-string">'area_code'</span> =&gt; <span class="hljs-string">'required'</span>,
+    <span class="hljs-string">'phone'</span> =&gt; <span class="hljs-string">'required'</span>,
+    <span class="hljs-string">'nickname'</span> =&gt; <span class="hljs-string">'required|max:20'</span>,
+    <span class="hljs-string">'sex'</span> =&gt; <span class="hljs-string">'required|in:0,1'</span>,
+    <span class="hljs-string">'phone_code'</span> =&gt; <span class="hljs-string">'required|numeric'</span>,
+    <span class="hljs-string">'password'</span> =&gt; [<span class="hljs-string">'required'</span>, <span class="hljs-string">'min:6'</span>, <span class="hljs-string">'max:18'</span>, <span class="hljs-string">'regex:/^(?!^(\d+|[a-zA-Z]+|[~.!@#$%^&amp;*?]+)$)^[\w~!@#$%\^&amp;*.?]+$/'</span>],
+    <span class="hljs-string">'affirm_password'</span> =&gt; <span class="hljs-string">'required|min:6|max:18|same:password'</span>,<span class="hljs-comment">//确认密码</span>
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+}
+</div></code></pre>
+<h3 id="%E5%8C%BA%E5%8F%B7%E5%A4%9A%E8%AF%AD%E8%A8%80-website--manage-server">区号多语言 website-&gt; Manage Server]:</h3>
+<blockquote>
+<p>访问链接: https://lrs-tt.7955.com/wx/lang/areaCodeList
+协议发送类型: <code>POST</code>
+Request</p>
+</blockquote>
+<pre class="hljs"><code><div>header
+{
+    <span class="hljs-string">"locale"</span>: <span class="hljs-string">'zh-cn'</span>, <span class="hljs-comment">//or  en</span>
+}
+Request
+{
+  <span class="hljs-string">'search_key'</span> =&gt; <span class="hljs-string">'nullable'</span>,
+}
+</div></code></pre>
+<p>Response</p>
+<pre class="hljs"><code><div>{
+ {
+    <span class="hljs-attr">"errorMessage"</span>: <span class="hljs-string">"ok"</span>,
+    <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,
+    <span class="hljs-attr">"data"</span>: {
+        <span class="hljs-attr">"A"</span>: [
+                {
+                    <span class="hljs-attr">"name"</span>: <span class="hljs-string">"阿尔巴尼亚"</span>,
+                    <span class="hljs-attr">"area_code"</span>: <span class="hljs-number">355</span>,
+                    <span class="hljs-attr">"letter"</span>: <span class="hljs-string">"A"</span>
+                }
+            ]
+         }
+}
+</div></code></pre>
 <ul>
 <li>
 <h2 id="span-id%22eretcode%22%E8%BF%94%E5%9B%9E%E7%A0%81span"><span id="ERetCode">返回码</span></h2>
@@ -1584,7 +1982,7 @@ Request
 </blockquote>
 <pre class="hljs"><code><div><span class="hljs-keyword">enum</span> ERetCode
 {
-    <span class="hljs-keyword">const</span> SERVER_ERROR = <span class="hljs-number">500</span>;
+   <span class="hljs-keyword">const</span> SERVER_ERROR = <span class="hljs-number">500</span>;
     <span class="hljs-keyword">const</span> DEVICE_NOT_BINDING = <span class="hljs-number">-1</span>; <span class="hljs-comment">// 设备未绑定房间</span>
     <span class="hljs-keyword">const</span> ACCOUNT_NOT_EXIST = <span class="hljs-number">-2</span>; <span class="hljs-comment">// 账号不存在</span>
     <span class="hljs-keyword">const</span> ACCOUNT_VALID_FAILURE = <span class="hljs-number">-3</span>; <span class="hljs-comment">// 账号校验失败</span>
@@ -1599,7 +1997,7 @@ Request
     <span class="hljs-keyword">const</span>  THREE_ACCOUNT_NOT_LOGIN = <span class="hljs-number">-12</span>; <span class="hljs-comment">//第三方用户未登录，auth2 code验证失败</span>
     <span class="hljs-keyword">const</span>  CREATE_ACCOUNT_ERROR = <span class="hljs-number">-13</span>; <span class="hljs-comment">//创建用户失败</span>
     <span class="hljs-keyword">const</span>  CREATE_ERCODE_ERROR = <span class="hljs-number">-14</span>; <span class="hljs-comment">//二维码生成失败</span>
-    <span class="hljs-keyword">const</span>  DATA_NULL = <span class="hljs-number">-16</span>; <span class="hljs-comment">//数据不存在</span>
+    <span class="hljs-keyword">const</span>  DATA_NULL = <span class="hljs-number">-16</span>; <span class="hljs-comment">// 数据不存在</span>
     <span class="hljs-keyword">const</span>  CREATE_ORDER_FAILURE = <span class="hljs-number">-17</span>; <span class="hljs-comment">//订单创建失败</span>
     <span class="hljs-keyword">const</span>  STORE_ORDER_FAILURE = <span class="hljs-number">-18</span>; <span class="hljs-comment">//存在跨店铺商品</span>
     <span class="hljs-keyword">const</span>  ORDER_PARAM_FAILURE = <span class="hljs-number">-19</span>; <span class="hljs-comment">//订单参数错误</span>
@@ -1611,6 +2009,12 @@ Request
     <span class="hljs-keyword">const</span>  GOODS_NOT_FIND= <span class="hljs-number">-25</span>; <span class="hljs-comment">//商品不存在</span>
     <span class="hljs-keyword">const</span>  ORDER_IS_PAY= <span class="hljs-number">-26</span>; <span class="hljs-comment">//订单已支付</span>
     <span class="hljs-keyword">const</span>  ORDER_IS_CANCEL= <span class="hljs-number">-27</span>; <span class="hljs-comment">//订单已取消</span>
+    <span class="hljs-keyword">const</span>  BALANCE_CANT= <span class="hljs-number">-28</span>; <span class="hljs-comment">//余额不足</span>
+    <span class="hljs-keyword">const</span>  SMS_OFTEN= <span class="hljs-number">-29</span>; <span class="hljs-comment">//操作短信太频繁</span>
+    <span class="hljs-keyword">const</span>  SMS_NOT_SUPPORT= <span class="hljs-number">-30</span>; <span class="hljs-comment">//不支持该地区短信</span>
+    <span class="hljs-keyword">const</span>  LOGOUT_FAILURE_IN_GAMING=<span class="hljs-number">-31</span>; <span class="hljs-comment">//游戏中无法退出</span>
+    <span class="hljs-keyword">const</span>  SMS_CODE_FAILURE=<span class="hljs-number">-32</span>; <span class="hljs-comment">//验证码无效</span>
+    <span class="hljs-keyword">const</span>  REPEAT_BUILD_PHONE=<span class="hljs-number">-33</span>; <span class="hljs-comment">//请勿重复绑定</span>
     <span class="hljs-keyword">const</span>  SUCCESS = <span class="hljs-number">0</span>; <span class="hljs-comment">// 成功</span>
 }
 </div></code></pre>
@@ -1655,6 +2059,10 @@ Request
     'v' =&gt; 9,
     'name' =&gt; '黑狼王',
 ],
+11 =&gt; [
+        'v' =&gt; 11,
+        'name' =&gt; '白痴',
+    ],
 </div></code></pre>
 
 </body>

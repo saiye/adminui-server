@@ -44,7 +44,10 @@ Route::group([
     Route::post('main/set/edit', 'Main\SettingController@postEdit')->name('cp-WebConfigPostEdit');
     Route::post('main/set/putFile', 'Main\SettingController@putConfigToFile')->name('cp-WebConfigPutFile');
     Route::post('main/set/sendSmsList', 'Main\SettingController@sendSmsList')->name('cp-sendSmsList');
-
+    Route::post('main/set/areaList', 'Main\SettingController@areaList')->name('cp-SetAreaList');
+    Route::post('main/set/addArea', 'Main\SettingController@addArea')->name('cp-SetAddArea');
+    Route::post('main/set/editArea', 'Main\SettingController@editArea')->name('cp-SetEditArea');
+    
     //商户管理
     Route::post('company/index/companyList', 'Company\IndexController@companyList')->name('cp-companyList');
     Route::post('company/index/addCompany', 'Company\IndexController@addCompany')->name('cp-addCompany');

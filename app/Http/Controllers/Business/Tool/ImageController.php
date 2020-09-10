@@ -34,7 +34,6 @@ class ImageController extends Controller
             'type.numeric' => 'type 是一个数字',
             'type.in' => 'type 1商户营业执照,2店面照片',
             'foreign_id.numeric' => '外键是一个数字',
-
         ]);
         if ($validator->fails()) {
             return $this->errorJson('参数错误', 2, $validator->errors()->toArray());

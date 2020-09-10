@@ -55,11 +55,11 @@ class RoomGameLogJob implements ShouldQueue
         $gameLog = RoomGameLog::create([
             'gameRes' => $this->post['gameRes'],
             'replayContentJson' => $this->post['replayContentJson']??'{}',
+            'skinId'=>$this->post['skinId']??0,
         ]);
         $playerlogs = [];
         $playercounts = [];
         foreach ($this->post['unitInfos'] as $unit) {
-
             if($unit['res']!==1){
                 // 跟新统计数据
                 $record = PlayerCountRecord::find($unit["userId"]);

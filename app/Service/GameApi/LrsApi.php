@@ -37,6 +37,10 @@ class LrsApi extends BaseGameApi
                 'verify' => false,
                 'json' => $data
             ]);
+            if(Cache::get(CacheKey::API_LOG_RECORD)){
+                Log::info('call game login url:' . $url);
+                Log::info($data);
+            }
             if ($response->getStatusCode() == 200) {
                 $str=$response->getBody()->getContents();
                 $res=json_decode($str,true);
@@ -89,7 +93,7 @@ class LrsApi extends BaseGameApi
             ]);
         }
         return $this->json([
-            'errorMessage' => 'success',
+            'errorMessage' => trans('user.logout_successfully'),
             'code' => ErrorCode::SUCCESS,
         ]);
     }

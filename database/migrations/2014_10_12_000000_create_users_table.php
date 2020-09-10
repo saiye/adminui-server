@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('sex')->default(1)->comment('性别0男,1女');
             $table->tinyInteger('judge')->default(2)->comment('是否为法官1是,2否');
             $table->tinyInteger('lock')->default(1)->comment('是否正常,1是2否');
+            $table->unsignedInteger('level')->default(1)->comment('等级');
             $table->unsignedInteger('popularity')->default(0)->comment('人气');
             $table->unsignedInteger('attention')->default(0)->comment('关注');
             $table->unsignedInteger('fans')->default(0)->comment('粉丝');

@@ -210,8 +210,6 @@ class OrderController extends Base
             'order_id' => 'required|numeric',
             'user_coupon_id' => 'nullable|numeric',
             'pay_type' => 'required|numeric|in:1,5',
-        ], [
-            'pay_type.in' => '该支付方式不支持！',
         ]);
         if ($validator->fails()) {
             return $this->json([
