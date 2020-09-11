@@ -66,8 +66,8 @@ class HandelSms
 
             Cache::put($frequencyKey,$canSend, 86400);
             //3.触发队列执行发送
-            $env=$this->request->header('env','product');
-            if($env=='product'){
+            $env=$this->request->header('env','production');
+            if($env=='production'){
                 dispatch(new SendSmsJob($NoteSms));
                 return [
                     'errorMessage' => '验证码已经下发,有效期15分钟!',

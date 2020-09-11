@@ -22,4 +22,7 @@ return [
     'account_exist_cant_build'=>'Mobile phone account already exists, cannot bind!',
     'do_not_repeat_binding'=>'Do not repeat binding.',
     'logout_successfully'=>'Logout success！',
+    'sign_up_success'=>'Sign up success.',
+    'no_repeat_apply'=>'Please do not repeat apply!',
+    'apply_fail'=>'apply fail',
 ];

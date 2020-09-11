@@ -139,6 +139,7 @@ class WeiXinLoginApi extends BaseLoginApi
                 'device_id'=>$deviceShortId,
                 'channel_id'=>$channelId,
                 'width'=>$width,
+                'client'=>0,
                 'type'=>$type,
                 'time'=>$time,
             ]);

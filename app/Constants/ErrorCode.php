@@ -44,5 +44,7 @@ class ErrorCode
     const  QRCODE_NOT_USE=-36; //二维码未使用
     const  SIGN_CHECK_FAIL=-37; //签名错误
     const  USER_EDIT_PWD_FAIL=-38; //密码修改失败
+    const  REPEAT_APPLY=-39; //重复报名
+    const  APPLY_FAIL=-40; //报名失败
     const  SUCCESS = 0; // 成功
 }

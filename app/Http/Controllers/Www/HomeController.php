@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Www;
 use App\Constants\ErrorCode;
 use App\Constants\Logic;
 use App\Constants\SmsAction;
+use App\Models\ApplyUser;
 use App\Models\User;
 use App\Service\SmsApi\HandelSms;
 use App\TraitInterface\ApiTrait;
@@ -90,6 +91,53 @@ class HomeController extends BaseController
         return $this->json([
             'errorMessage' =>trans('user.verification_code_invalid'),
             'code' => ErrorCode::VALID_FAILURE,
+        ]);
+    }
+
+    /**
+     * 报名入驻
+     */
+    public function applyIn(HandelSms $api){
+        $validator = $this->validationFactory->make($this->request->all(), [
+            'area_code' => 'required',
+            'phone' => 'required',
+            'username' => 'required|max:20',
+        ]);
+        if ($validator->fails()) {
+            return $this->json([
+                'errorMessage' => $validator->errors()->first(),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $areaCode=$this->request->input('area_code');
+        $phone=$this->request->input('phone');
+        $username=$this->request->input('username');
+        $res=$api->phoneCheck($areaCode,$phone);
+        if($res['code']!=ErrorCode::SUCCESS){
+            return $this->json($res);
+        }
+        $hasApply=ApplyUser::whereAreaCode($areaCode)->wherePhone($phone)->first();
+        if($hasApply){
+            return $this->json([
+                'errorMessage' =>trans('user.no_repeat_apply'),
+                'code' => ErrorCode::VALID_FAILURE,
+            ]);
+        }
+        $data=[
+           'area_code'=>$areaCode,
+           'phone'=>$phone,
+           'username'=>$username,
+        ];
+       $insert= ApplyUser::create($data);
+       if($insert){
+           return $this->json([
+               'errorMessage' =>trans('user.sign_up_success'),
+               'code' => ErrorCode::SUCCESS,
+           ]);
+       }
+        return $this->json([
+            'errorMessage' =>trans('user.apply_fail'),
+            'code' => ErrorCode::APPLY_FAIL,
         ]);
     }
 }

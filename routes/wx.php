@@ -51,7 +51,9 @@ Route::post('user/phoneRegCheckAndSendCode', 'UserController@phoneRegCheckAndSen
 //执行手机注册
 Route::post('user/doPhoneReg', 'UserController@doPhoneReg');
 //获取二维码
-Route::post('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
+Route::any('qrCode/image', 'QrCodeController@image')->name('wx-QrCodeImage');
+//app二维码
+Route::any('qrCode/appQrCode', 'QrCodeController@appQrCode')->name('wx-appQrCode');
 //微信支付回调
 Route::post('call/wx', 'PayController@callWx')->name('wx-callWx');
 //微信退款

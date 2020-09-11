@@ -40,6 +40,7 @@ class UserController extends Base
                 "nickname" => $user->nickname,
                 "sex" => $user->sex,
                 "icon" => $user->icon ?? '',
+                "bigIcon" => $user->big_icon ?? '',
                 "userId" => $user->id,
                 "playCount" => $player ? $player->total_game : 0,//总局数
                 "successCount" => $player ? $player->win_game : 0,//胜利局数
@@ -420,6 +421,7 @@ class UserController extends Base
                     "name" => $user->nickname,
                     "sex" => $user->sex,
                     "icon" => empty($user->icon)?'':$user->icon,
+                    "bigIcon" => $user->big_icon,
                     "roomId" => $device->room_id, // [可选] 房间唯一id
                     "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
                     "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是

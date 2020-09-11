@@ -158,3 +158,13 @@ ALTER TABLE `lrs_manage`.`users`     ADD COLUMN `level` INT(10) DEFAULT '1' NOT 
 ALTER TABLE `lrs_game_logs`.`room_game_log`     ADD COLUMN `skinId` INT(11) DEFAULT '1' NOT NULL COMMENT 'skinId' AFTER `gameRes`;
 
 
+ALTER TABLE `lrs_manage`.`users`
+ADD COLUMN `big_icon` VARCHAR(191) NULL AFTER `icon`;
+
+
+ALTER TABLE `lrs_manage`.`qr_code_path`
+ADD COLUMN `client` TINYINT(4) DEFAULT '0' NOT NULL COMMENT '0小程序二维码,1app二维码' AFTER `time`,
+CHANGE `path` `path` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'qrCode图片地址';
+
+
+

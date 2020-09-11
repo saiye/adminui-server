@@ -258,15 +258,6 @@ class GameController extends Base
             'code' => ErrorCode::GAME_REPLAY_NULL,
         ]);
     }
-
-
-    /**
-     * 区号列表
-     */
-    public function areaCodeList(){
-
-    }
-
     /**
      * 角色战绩统计
      */

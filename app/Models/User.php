@@ -14,6 +14,7 @@ class User extends Authenticatable
 
     use Notifiable, ModelDataFormat;
 
+
     protected $guarded = [
         'id'
     ];
@@ -47,4 +48,22 @@ class User extends Authenticatable
         }
         return  Storage::url($v);
     }
+
+    public function getBigIconAttribute($v)
+    {
+        if(!$v or $v=="''"){
+            if($this->sex==0){
+                $v=WebConfig::getKeyByFile('icon.boy','');
+            }else{
+                $v=WebConfig::getKeyByFile('icon.girl','');
+            }
+        }
+        $arr=explode(':',$v);
+        if(isset($arr[0]) and in_array($arr[0],['http','https'])){
+            return $v;
+        }
+        return  Storage::url($v);
+    }
+
+
 }

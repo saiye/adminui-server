@@ -22,4 +22,7 @@ return [
     'logout_successfully'=>'登出成功！',
     'account_exist_cant_build'=>'手机账号已存在,不能绑定！',
     'do_not_repeat_binding'=>'请勿重复绑定！',
+    'sign_up_success'=>'报名成功!',
+    'no_repeat_apply'=>'请勿重复报名!',
+    'apply_fail'=>'报名失败!',
 ];

@@ -29,4 +29,5 @@ class LangController extends Base
             'data' => $list,
         ]);
     }
+
 }
