@@ -72,7 +72,7 @@ class IndexController extends Controller
             'refund_reason_type' => 'required|numeric|in:1,2,3,4',
             'refund_reason' => 'required|max:100',
             'refund_fee' => 'required|numeric|min:0.01',
-            'refundGoodsArr' => 'required|array',
+            'refundGoodsArr' => 'required_if:refund_type,1|array',
         ], [
             'refund_reason_type.required' => '请选择退款原因！',
             'refund_reason.required' => '请输入与客人沟通情况！',

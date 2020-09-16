@@ -20,7 +20,7 @@ class IndexController extends Controller
     public function getState()
     {
         $searchName=$this->req->input('searchName');
-        $locale=$this->req->header('locale','zh-cn');
+        $locale=$this->req->header('locale','zh_cn');
         $list=CountryZone::searchAreaList($locale,$searchName);
         $data=[];
         foreach ($list as $ls){

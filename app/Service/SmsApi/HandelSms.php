@@ -110,13 +110,6 @@ class HandelSms
         ], [
             'area_code' => 'required|numeric|in:'.$area_code,
             'phone' => ['required','numeric','regex:'.$res['pattern']],
-        ], [
-            'area_code.required' => '地区码必填',
-            'area_code.numeric' => '地区码是一个数字',
-            'area_code.in' => '地区码不支持!',
-            'phone.required' => '手机号必填',
-            'phone.numeric' => '手机号必须是一串数字',
-            'phone.regex' => '手机号格式不正确!',
         ]);
         if ($validator->fails()) {
             return [

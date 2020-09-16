@@ -83,6 +83,7 @@ class CheckGoodsOrder extends CheckBase
                             'goods_name' => $goods->goods_name,
                             'created_at' => $date,
                             'updated_at' => $date,
+                            'sku_arr'=>json_encode($buy['ext']),
                         ],
                     ]);
                 }

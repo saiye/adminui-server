@@ -95,18 +95,8 @@ class SettingController extends BaseController
      */
     public function putConfigToFile()
     {
-        $webConfig = WebConfig::cache_file;
-        $res = WebConfig::all();
-        $data = [];
-        foreach ($res as $val) {
-            $data[$val->key] = $val->format;
-        }
-        $content = "<?php\n return\t" . var_export($data, true) . ';';
-        $isOK = Storage::disk('local')->put($webConfig, $content);
+        $isOK= WebConfig::putFile();
         if ($isOK) {
-            if (function_exists('opcache_reset')) {
-                opcache_reset();
-            }
             return $this->successJson([], '刷新成功！');
         }
         return $this->errorJson('刷新失败');

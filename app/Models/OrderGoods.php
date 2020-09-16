@@ -22,6 +22,16 @@ class OrderGoods extends Model
          'active' => 'boolean',
     ];
 
+    public function getSkuArrAttribute($value)
+    {
+        return json_decode($value, true);
+    }
+
+    public function setSkuArrAttribute($value)
+    {
+        $this->attributes['sku_arr'] = json_encode($value);
+    }
+
     public function getRefundNumAttribute()
     {
         return $this->attributes['refund_num']='';

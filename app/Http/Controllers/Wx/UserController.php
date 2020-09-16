@@ -179,13 +179,14 @@ class UserController extends Base
         if ($user) {
             return $this->json([
                 'errorMessage' => 'success',
-                'now_exp'=>36,
+                'now_exp'=>0,
                 'next_exp'=>3600,
                 'level'=>$user->level,
                 'user_id' => $user->id,
                 'nickname' => $user->nickname,
                 'sex' => $user->sex,
                 'icon' => $user->icon,
+                'bigIcon' => $user->big_icon,
                 'popularity' => $user->popularity,//人气
                 'attention' => $user->attention,//关注
                 'fans' => $user->fans,//粉丝
@@ -490,6 +491,10 @@ class UserController extends Base
         }
         $phone = $this->request->input('phone');
         $area_code = $this->request->input('area_code');
+        $res=$api->phoneCheck($area_code,$phone);
+        if($res['code']!==ErrorCode::SUCCESS){
+            return $this->json($res);
+        }
         $user = User::whereAreaCode($area_code)->wherePhone($phone)->first();
         if (!$user) {
             return $this->json([
@@ -720,7 +725,4 @@ class UserController extends Base
             'code' => ErrorCode::SUCCESS,
         ]);
     }
-
-
-
 }

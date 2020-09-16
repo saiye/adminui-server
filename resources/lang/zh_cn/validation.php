@@ -143,11 +143,30 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'phone'=>[
+            'required'=>'请输入正确的手机号码！',
+            'regex' => '请输入正确的手机号码！',
+        ],
+        'account'=>[
+            'required'=>'账号必填',
+        ],
+        'password'=>[
+            'required' => '密码必填!',
+            'min' => '密码最短6位!',
+            'max' => '密码最长18位!',
+            'regex' => '密码必须包含字母，数字，特殊符号中的两种,6-18位',
+        ],
+        'affirm_password'=>[
+            'required' => '确认密码必填!',
+            'min' => '密码最短6位',
+            'regex' => '密码必须包含字母，数字，特殊符号中的两种,6-18位',
+            'same' => '两次输入密码不一致',
+            'regex' => '密码必须包含字母，数字，特殊符号中的两种,6-18位',
+        ],
+        'area_code'=>[
+            'required'=>'地区码不能为空!',
         ],
     ],
-
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Attributes
@@ -165,24 +184,4 @@ return [
 
     'chinese_word' => ':attribute 必须包含以下有效字符 (中文/英文，数字, 下划线)',
     'sequential_array' => ':attribute 必须是一个有序数组',
-
-    'account'=>[
-        'required'=>'账号必填',
-    ],
-    'password'=>[
-        'required'=>'密码不能为空!',
-        'password.required' => '密码必填!',
-        'password.min' => '密码最短6位!',
-        'password.max' => '密码最长18位!',
-        'password.regex' => '密码必须包含字母，数字，特殊符号中的两种,6-18位',
-    ],
-    'affirm_password'=>[
-        'affirm_password.required' => '确认密码必填!',
-        'affirm_password.min' => '密码最短6位',
-        'affirm_password.alpha_dash' => '验证字段可以包含字母和数字，以及破折号和下划线',
-        'affirm_password.same' => '两次输入密码不一致',
-    ],
-    'area_code'=>[
-        'required'=>'地区码不能为空!',
-    ],
 ];

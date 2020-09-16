@@ -61,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
         //en ,zh-cn
         $locale=$this->app->make('request')->header('locale','zh_cn');
         $this->app->setLocale($locale);
-        Schema::defaultStringLength(191);
+        Schema::defaultStringLength(200);
         $isDebug = Config::get('app.debug');
         if ($isDebug) {
             DB::listen(

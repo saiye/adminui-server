@@ -70,12 +70,12 @@ class Action1 extends SceneBase
         }
         $channel = Channel::whereChannelId($channelId)->first();
         if ($channel) {
-           if( $hasQrCodeModel->time!==$time){
+           /*if( $hasQrCodeModel->time!==$time){
                 return $this->json([
                     'errorMessage' => '二维码已过期!',
                     'code' => ErrorCode::REPETITION_CODE,
                 ]);
-            }
+            }*/
             $hasQrCodeModel->time=0;
             $hasQrCodeModel->save();
             //更新最后登录的渠道
@@ -89,7 +89,7 @@ class Action1 extends SceneBase
                 "name" => $user->nickname,
                 "sex" => $user->sex,
                 "icon" => $user->icon ?? '',
-                "bigIcon" => $user->big_icon ?? '',
+               // "bigIcon" => $user->big_icon ?? '',
                 "roomId" => $device->room_id, // [可选] 房间唯一id
                 "dupId" => $device->room->dup_id, // [可选] 房间对于dupId
                 "judge" => $device->seat_num == 0 ? 1 : 0, // [可选] 是否是法官，0否 1是

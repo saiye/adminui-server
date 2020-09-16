@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Config;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class WebConfig extends Model
 {
@@ -16,7 +17,7 @@ class WebConfig extends Model
 
     protected $table = 'web_config';
 
-    const cache_file='web_config.php';
+    const cache_file = 'web_config.php';
 
     protected $guarded = [
         'id'
@@ -42,14 +43,54 @@ class WebConfig extends Model
         return $this->attributes['format'] = $data;
     }
 
-    public static function getKeyByFile($key,$default='')
+    public static function getKeyByFile($key, $default = '')
     {
+        return static::getCache($key, $default);
         $file = Storage::disk('local')->path(WebConfig::cache_file);
         if (is_file($file)) {
             $array = include $file;
-            return  Arr::get($array, $key,$default);
+            return Arr::get($array, $key, $default);
         }
         return $default;
     }
 
+    public static function putFile()
+    {
+        return static::putCache();
+        $webConfig = WebConfig::cache_file;
+        $res = WebConfig::all();
+        $data = [];
+        foreach ($res as $val) {
+            $data[$val->key] = $val->format;
+        }
+        $content = "<?php\n return\t" . var_export($data, true) . ';';
+        $isOK = Storage::disk('local')->put($webConfig, $content);
+        if ($isOK) {
+            if (function_exists('opcache_reset')) {
+                opcache_reset();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 分布式不用文件缓存,用redis缓存.
+     */
+    public static function putCache()
+    {
+        $res = WebConfig::all();
+        foreach ($res as $val) {
+            Cache::put('webConfig'.$val->key, $val->format);
+            foreach ($val->format as $k => $v) {
+                Cache::put('webConfig'.$val->key . '.' . $k, $v);
+            }
+        }
+        return true;
+    }
+
+    public static function getCache($key, $default = '')
+    {
+        return Cache::get('webConfig'.$key, $default);
+    }
 }

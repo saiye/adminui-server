@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Business\Room;
 
 use App\Constants\PaginateSet;
 use  App\Http\Controllers\Business\BaseController as Controller;
+use App\Models\Channel;
 use App\Models\Company;
 use App\Models\Device;
 use App\Models\PhysicsAddress;
@@ -230,6 +231,20 @@ class IndexController extends Controller
         return $this->successJson($assign);
     }
 
+
+    public function channelList()
+    {
+        $data = new Channel();
+        if ($this->req->channel_name) {
+            $data = $data->where('channel_name', 'like', '%' . $this->req->channel_name . '%');
+        }
+        if ($this->req->channel_id) {
+            $data = $data->whereChannelId($this->req->channel_id);
+        }
+        $data = $data->select('channel_name','channel_id')->paginate($this->req->input('limit', PaginateSet::LIMIT))->appends($this->req->except('page'));
+        $assign = compact('data');
+        return $this->successJson($assign);
+    }
 
 }
 

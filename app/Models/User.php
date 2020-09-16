@@ -46,7 +46,7 @@ class User extends Authenticatable
         if(isset($arr[0]) and in_array($arr[0],['http','https'])){
             return $v;
         }
-        return  Storage::url($v);
+        return  Storage::url($v).'?x-oss-process=image/resize,m_lfit,h_132,w_132/format,png';
     }
 
     public function getBigIconAttribute($v)

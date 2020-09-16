@@ -50,19 +50,23 @@ abstract class BaseLoginApi implements LoginApi
             if (!$hasThreeUser) {
                 DB::beginTransaction();
                 $threeUser = null;
-                $user = User::create([
-                    'nickname' => $info['nickname'],
-                    'account' => $info['openid'],
-                    'password' => Hash::make($info['openid']),
-                    'sex' => $info['sex'],
-                    'judge' => 2,
-                    'lock' => 1,
-                    'icon' => $info['icon']??'',
-                    'open_id'=>$info['openid'],
-                    'type'=>Logic::USER_TYPE_WX,
-                    'lon' => $longitude,
-                    'lat' => $latitude,
-                ]);
+                $user=User::whereAccount($info['openid'])->first();
+                if(!$user){
+                    $user = User::create([
+                        'nickname' => $info['nickname'],
+                        'account' => $info['openid'],
+                        'password' => Hash::make($info['openid']),
+                        'sex' => $info['sex'],
+                        'judge' => 2,
+                        'lock' => 1,
+                        'icon' => $info['icon']??'',
+                        'big_icon' =>$this->formatBigIcon( $info['icon'],Logic::USER_TYPE_WX),
+                        'open_id'=>$info['openid'],
+                        'type'=>Logic::USER_TYPE_WX,
+                        'lon' => $longitude,
+                        'lat' => $latitude,
+                    ]);
+                }
                 if ($user) {
                     $threeUser = ThreeUser::create([
                         'open_id' => $info['openid'],
@@ -90,6 +94,7 @@ abstract class BaseLoginApi implements LoginApi
                 $user->nickname = $info['nickname'];
                 $user->open_id = $info['openid'];
                 $user->icon = $info['icon']??'';
+                $user->big_icon =$this->formatBigIcon( $info['icon'],Logic::USER_TYPE_WX);
                 $user->lon =$longitude;
                 $user->lat =$latitude;
                 $user->type=Logic::USER_TYPE_WX;
@@ -112,5 +117,14 @@ abstract class BaseLoginApi implements LoginApi
         return $result;
     }
 
-
+    public function formatBigIcon($url,$type){
+        switch ($type){
+            case Logic::USER_TYPE_WX:
+                $url=str_replace('/132','/0',$url);
+                break;
+            default:
+                break;
+        }
+        return $url;
+    }
 }

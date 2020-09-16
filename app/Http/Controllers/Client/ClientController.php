@@ -147,7 +147,13 @@ class ClientController extends Base
 
     public function conf()
     {
-        $data=WebConfig::getKeyByFile('version');
+        $data=WebConfig::getKeyByFile('version',[
+            'version'=>'',
+            'url'=>'',
+            'forceUpdateVer'=>'',
+            'apkUrl'=>'',
+            'apkMD5'=>'',
+        ]);
         return $this->json(array_merge([
             'code' => ErrorCode::SUCCESS,
             'errorMessage' => 'success',

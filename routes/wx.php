@@ -58,8 +58,8 @@ Route::any('qrCode/appQrCode', 'QrCodeController@appQrCode')->name('wx-appQrCode
 Route::post('call/wx', 'PayController@callWx')->name('wx-callWx');
 //微信退款
 Route::post('call/callWxRefund', 'PayController@callWxRefund')->name('wx-CallWxRefund');
-Route::any('lang/areaCodeList', 'LangController@areaCodeList')->name('wx-areaCodeList');
 
+Route::any('lang/areaCodeList', 'LangController@areaCodeList')->name('wx-areaCodeList');
 
 
 

@@ -76,6 +76,7 @@ Route::group([
     Route::post('room/index/addRoom', 'Room\IndexController@addRoom')->name('bs-addRoom');
     Route::post('room/index/companyAndRoomList', 'Room\IndexController@companyAndRoomList')->name('bs-companyAndRoomList');
     Route::post('room/index/editRoom', 'Room\IndexController@editRoom')->name('bs-editRoom');
+    Route::post('room/index/channelList', 'Room\IndexController@channelList')->name('bs-RoomChannelList');
 
     //设备管理
     Route::post('room/device/deviceList', 'Room\DeviceController@deviceList')->name('bs-deviceList');

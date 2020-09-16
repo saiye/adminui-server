@@ -129,7 +129,7 @@ class WeiXinLoginApi extends BaseLoginApi
             return false;
         }
         $time=mt_rand(1,99);//随机数
-        $hasQrCodeModel=QrCodePath::whereDeviceId($data['deviceShortId'])->whereChannelId($data['channelId'])->whereWidth($data['width'])->first();
+        $hasQrCodeModel=QrCodePath::whereDeviceId($data['deviceShortId'])->whereChannelId($data['channelId'])->whereWidth($data['width'])->whereClient(0)->first();
         $deviceShortId=$data['deviceShortId'];
         $channelId=$data['channelId'];
         $width=$data['width'];
@@ -190,6 +190,7 @@ class WeiXinLoginApi extends BaseLoginApi
                     $hasQrCodeModel->path=$image_path;
                     $hasQrCodeModel->time=$time;
                     $hasQrCodeModel->type=$type;
+                    $hasQrCodeModel->client=0;
                     $hasQrCodeModel->save();
                     return ['image_path' => $image_path, 'full_path' => $full_path];
                 }elseif (isset($res['errmsg'])){

@@ -32,6 +32,12 @@ class Base extends Controller
 
     public function json($data, $status = 200)
     {
+      /*  return response()->header([
+            'Access-Control-Allow-Origin' =>'*',
+            'Access-Control-Allow-Headers' =>'Origin, Content-Type, Cookie,X-CSRF-TOKEN, Accept,Authorization,Locale',
+            'Access-Control-Allow-Methods' =>'GET, POST, PATCH, PUT, OPTIONS',
+            'Access-Control-Allow-Credentials' =>false,
+        ])->json($data, $status);  */
         return response()->json($data, $status);
     }
 
