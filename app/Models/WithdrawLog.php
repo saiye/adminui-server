@@ -10,7 +10,7 @@ class WithdrawLog extends Model
 {
     use ModelDataFormat;
     protected $table = 'withdraw_log';
-    protected $appends = ['pay_type_word', 'check_status_word'];
+    protected $appends = ['pay_type_word', 'check_status_word','check_status'];
     protected $guarded = [
         'id'
     ];
