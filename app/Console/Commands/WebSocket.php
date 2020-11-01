@@ -7,7 +7,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Service\Swoole\WebSocketServer;
+use App\Service\WebSocket\WebSocketServer;
 use Illuminate\Support\Facades\Log;
 
 class WebSocket extends Command

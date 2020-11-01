@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Swoole\Rooms;
+namespace App\Service\WebSocket\Rooms;
 use Illuminate\Support\Arr;
 use Predis\Client as RedisClient;
 use Predis\Pipeline\Pipeline;

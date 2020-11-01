@@ -23,7 +23,7 @@ class CreateRefundOrderGoodsTable extends Migration
             $table->tinyInteger('type')->default(1)->comment('商品类型');
             $table->string('tag',100)->nullable()->comment('默认规格字符');
             $table->string('image',100)->nullable()->comment('商品图片');
-            $table->json('sku_arr')->nullable()->comment('sku_arr');
+            $table->text('sku_arr')->nullable()->comment('sku_arr');
             $table->timestamps();
         });
     }

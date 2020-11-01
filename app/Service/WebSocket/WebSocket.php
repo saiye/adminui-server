@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Service\Swoole;
+namespace App\Service\WebSocket;
 
-use App\Service\Swoole\Rooms\RoomContract;
+use App\Service\WebSocket\Rooms\RoomContract;
 use Illuminate\Support\Facades\App;
 use Swoole\WebSocket\Server;
 

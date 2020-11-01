@@ -1,5 +1,5 @@
 <?php
-namespace App\Service\Swoole\Facades;
+namespace App\Service\WebSocket\Facades;
 
 use App\Services\Swoole\Rooms\RoomContract;
 use Illuminate\Support\Facades\Facade;

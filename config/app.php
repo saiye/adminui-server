@@ -198,6 +198,8 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Hhxsv5\LaravelS\Illuminate\LaravelSServiceProvider::class,
+        SwooleTW\Http\LaravelServiceProvider::class,
 
     ],
 

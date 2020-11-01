@@ -1,8 +1,8 @@
 <?php
 
 use Swoole\Http\Request;
-use App\Service\Swoole\WebSocket;
-use App\Service\Swoole\Facades\Websocket as WebsocketProxy;
+use App\Service\WebSocket\WebSocket;
+use App\Service\WebSocket\Facades\Websocket as WebsocketProxy;
 /*
 |--------------------------------------------------------------------------
 | Websocket Routes

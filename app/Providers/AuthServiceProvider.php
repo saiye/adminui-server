@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 use App\Service\Auth\JwtGuard;
 
+
 class AuthServiceProvider extends ServiceProvider
 {
     /**
@@ -27,12 +28,15 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+    }
+
+    public function register()
+    {
         Auth::extend('jwt', function($app, $name, array $config) {
             return new JwtGuard(Auth::createUserProvider($config['provider']),$app['request'],
                 $config['input_key'] ?? 'token',
                 $config['storage_key'] ?? 'token',
                 $config['hash'] ?? false);
         });
-
     }
 }

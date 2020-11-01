@@ -3,7 +3,7 @@
  * Created by 2020/10/21 0021 22:41
  * User: yuansai chen
  */
-namespace App\Service\Swoole;
+namespace App\Service\WebSocket;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use InvalidArgumentException;
 

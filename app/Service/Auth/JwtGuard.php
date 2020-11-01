@@ -8,6 +8,8 @@
 namespace App\Service\Auth;
 
 use Illuminate\Auth\TokenGuard;
+use Illuminate\Support\Facades\Log;
+
 class JwtGuard extends TokenGuard
 {
     /**
@@ -34,6 +36,7 @@ class JwtGuard extends TokenGuard
         if (empty($token)) {
             $token = $this->request->getPassword();
         }
+        Log::info('token:'.$token);
         return $token;
     }
 }

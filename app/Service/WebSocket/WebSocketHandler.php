@@ -4,9 +4,9 @@
  * User: yuansai chen
  */
 
-namespace App\Service\Swoole;
+namespace App\Service\WebSocket;
 
-use App\Services\WebSocket\SocketIO\Packet;
+use App\Service\WebSocket\SocketIO\Packet;
 use Hhxsv5\LaravelS\Swoole\WebSocketHandlerInterface;
 use Illuminate\Support\Facades\Log;
 use Swoole\Http\Request;
@@ -47,7 +47,6 @@ class WebSocketHandler implements WebSocketHandlerInterface
             $server->push($request->fd, $initPayload);
             $server->push($request->fd, $connectPayload);
         }
-        Log::info('WebSocket 连接建立:' . $request->fd);
         if ($this->websocket->eventExists('connect')) {
             $this->websocket->call('connect', $request);
         }

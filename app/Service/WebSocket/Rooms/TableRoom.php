@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Swoole\Rooms;
+namespace App\Service\WebSocket\Rooms;
 use Swoole\Table;
 
 class TableRoom implements RoomContract

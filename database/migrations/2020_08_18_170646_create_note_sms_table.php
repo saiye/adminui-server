@@ -17,12 +17,12 @@ class CreateNoteSmsTable extends Migration
             $table->id();
             $table->integer('area_code')->comment('地区码');
             $table->string('phone', 20)->comment('phone');
-            $table->json('msg')->comment('msg');
+            $table->text('msg')->comment('msg');
             $table->bigInteger('create_time')->default(0)->comment('创建时间');
             $table->tinyInteger('status')->default(0)->comment('发送状态0未发送,1已发送');
             $table->string('type',100)->comment('类型1注册，2找回密码');
             $table->string('action',100)->comment('操作');
-            $table->json('res')->comment('结果');
+            $table->text('res')->comment('结果');
         });
     }
     /**
